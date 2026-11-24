@@ -23,6 +23,7 @@ import {
 const MENU_ITEM = "kny:menu_kimetsu";
 const TAG_DICA_OFF = "kny_cfg_dica_off"; // barra de ação desligada
 const TAG_SOM_OFF = "kny_cfg_som_off";   // sons do menu desligados
+const TAG_CLASSICO = "kny_cfg_classico";
 
 /* ---------------------------------------------------------------------
    Utilidades
@@ -32,12 +33,16 @@ const wait = (ticks) => new Promise((res) => system.runTimeout(res, ticks));
 
 // Mostra o formulário e tenta de novo se o jogador estiver com outra tela aberta.
 async function mostrar(form, player) {
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 12 && player.isValid; i++) {
     const r = await form.show(player);
     if (r.cancelationReason !== "UserBusy") return r;
+    if (i === 11) {
+      if (player.isValid) player.sendMessage("§c[Menu Kimetsu] Feche o chat ou a outra tela e use o item novamente.");
+      return r;
+    }
     await wait(10);
   }
-  return { canceled: true };
+  return { canceled: true, cancelationReason: "UserClosed" };
 }
 
 function som(player, id, pitch = 1, volume = 0.6) {
@@ -251,71 +256,66 @@ function darItemMenu(player) {
   }
 }
 
-world.afterEvents.playerSpawn.subscribe((ev) => {
-  const p = ev.player;
+world.afterEvents.playerSpawn.subscribe(({ player: p, initialSpawn }) => {
   system.runTimeout(() => {
+    if (!p.isValid) return;
     try {
       if (!temItemMenu(p)) darItemMenu(p);
-      p.sendMessage("§8[Kimetsu] §cMenu pronto: use o item §lMenu Kimetsu§r§c (ou o livro).");
+      if (initialSpawn) {
+        p.sendMessage("§8[Kimetsu] §cUse o item §lMenu Kimetsu§r§c ou o livro. Agache ao usar para abrir o menu clássico.");
+      }
       if (jaEscolheu(p)) {
         if (!p.hasTag(TAG_ESCOLHEU)) p.addTag(TAG_ESCOLHEU); // personagens antigos não precisam escolher
-      } else {
-        escolha(p).catch((e) => reportar(p, e));
+      } else if (initialSpawn) {
+        pedirAbertura(p);
       }
     } catch {}
   }, 100);
 });
 
-// O antigo livro de conquistas agora também abre este menu
-const ITENS_MENU = [MENU_ITEM, "kny:book_archievement"];
+const sessoesMenu = new Map();
 
 function reportar(p, e) {
   try {
-    p.sendMessage("§c[Menu Kimetsu] Erro: " + e);
+    if (p.isValid) p.sendMessage("§c[Menu Kimetsu] Não foi possível abrir esta tela. Agache ao usar o item para tentar o menu clássico.");
   } catch {}
-  console.warn("[Menu Kimetsu] " + e);
+  console.warn("[Menu Kimetsu] " + (e?.stack ?? e));
 }
 
-function abrir(p) {
-  const tela = jaEscolheu(p) ? menuPrincipal : escolha;
-  tela(p).catch((e) => reportar(p, e));
+// Uma sessão por jogador, do primeiro formulário até fechar o último submenu.
+function pedirAbertura(p, classico = false) {
+  if (!p?.isValid || p.typeId !== "minecraft:player" || sessoesMenu.has(p.id)) return;
+  const id = p.id;
+  const sessao = {};
+  sessoesMenu.set(id, sessao);
+  system.run(async () => {
+    try {
+      if (!p.isValid || p.hasTag("kny_caido")) return;
+      if (classico) p.addTag(TAG_CLASSICO);
+      await (jaEscolheu(p) ? menuPrincipal(p) : escolha(p));
+    } catch (e) {
+      if (p.isValid) reportar(p, e);
+    } finally {
+      if (sessoesMenu.get(id) === sessao) sessoesMenu.delete(id);
+    }
+  });
 }
 
-// Evita abrir duas vezes quando mais de um evento dispara no mesmo clique
-const ultimaAbertura = new Map();
-function pedirAbertura(p) {
-  try {
-    const agora = system.currentTick;
-    if (agora - (ultimaAbertura.get(p.id) ?? -100) < 10) return;
-    ultimaAbertura.set(p.id, agora);
-    system.run(() => abrir(p));
-  } catch (e) {
-    console.warn("[Menu Kimetsu] " + e);
-  }
-}
-
-function eItemDoMenu(item) {
-  return !!item && ITENS_MENU.includes(item.typeId);
-}
-
-// Gatilho 1: clique direito com o item
-world.afterEvents.itemUse.subscribe((ev) => {
-  if (eItemDoMenu(ev.itemStack)) pedirAbertura(ev.source);
+// Os dois itens vinculam a própria ação de uso, inclusive no modo de toque.
+system.beforeEvents.startup.subscribe(({ itemComponentRegistry }) => {
+  const aoUsar = ({ source }) => {
+    if (source?.typeId === "minecraft:player") pedirAbertura(source, source.isSneaking);
+  };
+  itemComponentRegistry.registerCustomComponent("kny:abrir_menu", {
+    onUse: aoUsar,
+    onUseOn: aoUsar,
+  });
 });
 
-// Gatilho 2: início do uso (cobre itens antigos com "segurar para usar")
-try {
-  world.afterEvents.itemStartUse?.subscribe((ev) => {
-    if (eItemDoMenu(ev.itemStack)) pedirAbertura(ev.source);
-  });
-} catch (e) {
-  console.warn("[Menu Kimetsu] itemStartUse indisponível: " + e);
-}
-
-// Gatilho 3: comando  /scriptevent kny:menu  (útil para testar)
+// Diagnóstico de operador e alternativa para voltar à interface clássica.
 try {
   system.afterEvents?.scriptEventReceive?.subscribe((ev) => {
-    if (ev.id === "kny:menu" && ev.sourceEntity?.typeId === "minecraft:player") pedirAbertura(ev.sourceEntity);
+    if (ev.id === "kny:menu") pedirAbertura(ev.sourceEntity, ev.message?.trim() === "classico");
   });
 } catch (e) {
   console.warn("[Menu Kimetsu] scriptEvent indisponível: " + e);
@@ -464,8 +464,6 @@ function jaEscolheu(p) {
   );
 }
 
-const escolhendo = new Set();
-
 function textoContrato(nome) {
   const L = "§4==========================";
   return (
@@ -485,48 +483,35 @@ function textoContrato(nome) {
   );
 }
 
-async function escolha(p, tentativas = 6) {
-  if (escolhendo.has(p.id)) return;
-  escolhendo.add(p.id);
-  try {
-    let classico = p.hasTag(TAG_CLASSICO);
-    for (let i = 0; i < tentativas; i++) {
-      if (jaEscolheu(p)) return;
-      let f;
-      if (classico) {
-        f = novoForm(p)
+async function escolha(p) {
+  let classico = p.hasTag(TAG_CLASSICO);
+  for (let i = 0; i < 2 && p.isValid && !jaEscolheu(p); i++) {
+    const f = classico
+      ? novoForm(p)
           .title("§l§cKIMETSU NO YAIBA")
           .body(textoContrato(p.name))
-          .button("§l§cAssinar o contrato\n§r§7Tornar-se Caçador", "textures/icons/menu_char");
-      } else {
-        // tela com rolagem (moldura): texto + botão de assinar fixo embaixo
-        f = new ActionFormData()
+          .button("§l§cAssinar o contrato\n§r§7Tornar-se Caçador", "textures/icons/menu_char")
+      : new ActionFormData()
           .title(`${MARCA_CTR}§lKIMETSU NO YAIBA`)
           .body(" ")
           .button("T:" + textoContrato(p.name))
           .button("S:§l§aASSINAR O CONTRATO");
-      }
-
-      const r = await mostrar(f, p);
-      if (!r.canceled) {
-        if (classico || r.selection === 1) {
-          aplicarEscolha(p);
-          return;
-        }
-        continue;
-      }
-      if (!classico && r.cancelationReason === undefined) classico = true; // a tela nova não abriu: usa a clássica
-      await wait(60); // fechou sem assinar: mostra de novo em instantes
+    const r = await mostrar(f, p);
+    if (!p.isValid || jaEscolheu(p)) return;
+    if (r.canceled && !classico && r.cancelationReason === undefined) {
+      classico = true;
+      continue;
     }
-  } finally {
-    escolhendo.delete(p.id);
+    if (!r.canceled && r.selection === (classico ? 0 : 1)) await aplicarEscolha(p);
+    return;
   }
 }
 
-function aplicarEscolha(p) {
-  p.addTag(TAG_ESCOLHEU);
+async function aplicarEscolha(p) {
   // mesmo caminho do addon ao virar caçador (uniforme, Nichirin e rank inicial)
-  kcmd(p, "function start_slayer");
+  await kcmd(p, "function start_slayer");
+  if (!p.isValid) return;
+  p.addTag(TAG_ESCOLHEU);
   p.sendMessage(`§cContrato assinado! Bem-vindo à Corporação, §l${p.name}§r§c.`);
   som(p, "random.levelup", 1.2, 0.7);
 }
@@ -581,8 +566,6 @@ system.runInterval(() => {
      R: quadrados da direita (navegação)        L: barras da esquerda (melhorar status)
 --------------------------------------------------------------------- */
 
-const TAG_PAINEL = "kny_cfg_painel"; // (antigo) painel era opcional
-const TAG_CLASSICO = "kny_cfg_classico"; // quem prefere o menu clássico (o painel é o padrão)
 const MARCA_PAINEL = "kny_painel|";
 
 async function painelPrincipal(p) {
@@ -626,7 +609,10 @@ async function painelPrincipal(p) {
     if (ehOperador(p)) extras.push(["Cargo", t.icones.config, () => alterarCargo(p)]);
   }
   for (const [txt, icone, acao] of [...nav, ...extras].slice(0, 6)) add("R:", txt, icone, acao);
-  add("R:", "Clássico", t.icones.voltar, () => menuClassico(p));
+  add("R:", "Clássico", t.icones.voltar, () => {
+    p.addTag(TAG_CLASSICO);
+    return menuClassico(p);
+  });
 
   // barras da esquerda: melhorar status (cada toque melhora 1 vez)
   const qtd = qtdCompra(p);
@@ -665,7 +651,7 @@ async function painelPrincipal(p) {
   return acao();
 }
 
-// abre o painel se o jogador ativou o teste; senão, o menu clássico
+// Respeita a preferência do jogador nos submenus e na próxima abertura.
 async function menuPrincipal(p) {
   if (!p.hasTag(TAG_CLASSICO)) return painelPrincipal(p);
   return menuClassico(p);
@@ -742,7 +728,10 @@ async function menuClassico(p) {
     case 5: return statusMenu(p);
   }
   const acao = extras[res.selection - 6];
-  if (acao === "painel") return painelPrincipal(p);
+  if (acao === "painel") {
+    p.removeTag(TAG_CLASSICO);
+    return painelPrincipal(p);
+  }
   if (acao === "treino") return painelTreino(p);
   if (acao === "ensinar") return ensinar(p);
   if (acao === "transformar") return transformarMenu(p);
@@ -1424,7 +1413,7 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => {
 });
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   limparTreino(playerId);
-  ultimaAbertura.delete(playerId);
+  sessoesMenu.delete(playerId);
 });
 world.afterEvents.playerDimensionChange.subscribe(({ player }) => {
   if (treinando.has(player.id)) pararTreino(player, "Treino encerrado ao trocar de dimensão.");

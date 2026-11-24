@@ -1,9 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { registerHooks } from "node:module";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { world, jogador, executarAgendados, executarIntervalos } from "./simulador.mjs";
+import { system, world, jogador, executarAgendados, executarIntervalos } from "./simulador.mjs";
 
 const simulador = new URL("./simulador.mjs", import.meta.url).href;
 registerHooks({
@@ -15,13 +16,28 @@ registerHooks({
   },
 });
 
-const scripts = pathToFileURL(resolve(process.env.KIMETSU_BP ?? "Kimetsu Fix Be", "scripts") + "/");
+const pack = resolve(process.env.KIMETSU_BP ?? "Kimetsu Fix Be");
+const scripts = pathToFileURL(resolve(pack, "scripts") + "/");
 const carregar = (nome) => import(new URL(nome, scripts));
 const c = await carregar("stats_config.js");
 const s = await carregar("stats.js");
 await carregar("menu.js");
 await carregar("hud_painel.js");
 const { ATR, ATRIBUTOS, PATENTES, POR_PATENTE, CUSTOS, NIVEL_MAXIMO, LIMITE_SALDO } = c;
+
+const componentesMenu = new Map();
+system.beforeEvents.startup.emit({
+  itemComponentRegistry: {
+    registerCustomComponent(id, component) { componentesMenu.set(id, component); },
+  },
+});
+function usarMenu(p, nome = "menu_kimetsu", evento = "onUse") {
+  const item = JSON.parse(readFileSync(resolve(pack, "items", nome + ".json"), "utf8"))["minecraft:item"];
+  assert.equal(item.components["minecraft:interact_button"], "Abrir menu");
+  const id = Object.keys(item.components).find((id) => componentesMenu.has(id));
+  assert.ok(id, nome + " precisa da ação de uso registrada");
+  componentesMenu.get(id)[evento]({ source: p, itemStack: { typeId: item.description.identifier } });
+}
 
 const DADOS = "kny:stats_v70";
 const up = (p, a, vezes = 1) => s.comprar(p, a, vezes, s.statusAtributo(p, a));
@@ -266,7 +282,7 @@ test("fluxos públicos de compra do menu clássico e do painel, cancelamento e H
       return { canceled: true };
     },
   );
-  world.afterEvents.itemUse.emit({ source: p, itemStack: { typeId: "kny:menu_kimetsu" } });
+  usarMenu(p);
   await executarAgendados();
   assert.equal(s.efetivo(p, ATR.for), 5);
   assert.equal(s.disponiveis(p), 1500);
@@ -285,7 +301,7 @@ test("fluxos públicos de compra do menu clássico e do painel, cancelamento e H
     },
   );
   executarIntervalos(10);
-  world.afterEvents.itemUse.emit({ source: p, itemStack: { typeId: "kny:menu_kimetsu" } });
+  usarMenu(p);
   await executarAgendados();
   assert.equal(s.efetivo(p, ATR.for), 6);
   assert.equal(s.disponiveis(p), 1250);
@@ -293,6 +309,98 @@ test("fluxos públicos de compra do menu clássico e do painel, cancelamento e H
   p.getComponent("minecraft:health").setCurrentValue(22);
   executarIntervalos(5);
   assert.match(p.titulos.at(-1), /^HP22 QV050F100S100/);
+});
+
+test("os dois itens abrem uma sessão de menu e agachado abre o modo clássico", async () => {
+  const p = novo({ tag: "upper6" });
+  let responder;
+  p.escolhas.push(() => new Promise((resolve) => { responder = resolve; }));
+  usarMenu(p);
+  usarMenu(p, "book_archievement", "onUseOn");
+  await executarAgendados();
+  assert.equal(p.telas.length, 1);
+  assert.match(p.telas[0].titulo, /^kny_painel\|.*PAINEL DO ONI/);
+  usarMenu(p);
+  await executarAgendados();
+  assert.equal(p.telas.length, 1);
+  responder({ canceled: true, cancelationReason: "UserClosed" });
+  await executarAgendados();
+  p.isSneaking = true;
+  usarMenu(p, "book_archievement");
+  await executarAgendados();
+  assert.equal(p.telas.length, 2);
+  assert.match(p.telas[1].titulo, /MENU DO ONI/);
+  assert.ok(p.hasTag("kny_cfg_classico"));
+  assert.ok(!p.telas[1].buttons.some(({ texto }) => texto.includes("Alterar meu cargo")));
+  p.desconectar();
+});
+
+test("outra tela aberta dá um aviso e a próxima tentativa de uso continua disponível", async () => {
+  const p = novo();
+  p.addTag("kny_escolheu");
+  for (let i = 0; i < 12; i++) {
+    p.escolhas.push(() => ({ canceled: true, cancelationReason: "UserBusy" }));
+  }
+  usarMenu(p);
+  await executarAgendados();
+  await executarAgendados();
+  assert.equal(p.telas.length, 12);
+  assert.equal(p.mensagens.filter((t) => /Feche o chat/.test(t)).length, 1);
+  assert.ok(!p.hasTag("kny_cfg_classico"));
+  usarMenu(p);
+  await executarAgendados();
+  assert.equal(p.telas.length, 13);
+  assert.match(p.telas[12].titulo, /^kny_painel\|/);
+  p.desconectar();
+});
+
+test("a troca entre painel e clássico vale também nos submenus e na próxima abertura", async () => {
+  const p = novo();
+  p.addTag("slayer");
+  p.escolhas.push(
+    (f) => ({ selection: f.buttons.findIndex(({ texto }) => texto === "R:Clássico") }),
+    () => ({ selection: 1 }),
+    (f) => {
+      assert.doesNotMatch(f.titulo, /^kny_conf\|/);
+      return { canceled: true, cancelationReason: "UserClosed" };
+    },
+  );
+  usarMenu(p);
+  await executarAgendados();
+  assert.equal(p.telas.length, 3);
+  assert.ok(p.hasTag("kny_cfg_classico"));
+  p.escolhas.push(
+    (f) => ({ selection: f.buttons.findIndex(({ texto }) => texto.includes("Menu em painel")) }),
+  );
+  usarMenu(p);
+  await executarAgendados();
+  assert.match(p.telas.at(-1).titulo, /^kny_painel\|/);
+  assert.ok(!p.hasTag("kny_cfg_classico"));
+  p.desconectar();
+});
+
+test("fechar o contrato libera o item e apenas o botão de assinar cria o Caçador", async () => {
+  const p = jogador();
+  const comandos = [];
+  p.runCommand = (cmd) => { comandos.push(cmd); };
+  p.escolhas.push(
+    () => ({ canceled: true, cancelationReason: "UserClosed" }),
+    () => ({ canceled: false, selection: 0 }),
+    () => ({ canceled: false, selection: 1 }),
+  );
+  world.afterEvents.playerSpawn.emit({ player: p, initialSpawn: true });
+  for (let i = 1; i <= 3; i++) {
+    usarMenu(p);
+    await executarAgendados();
+    assert.equal(p.telas.length, i);
+    assert.match(p.telas[i - 1].titulo, /^kny_ctr\|/);
+    assert.equal(p.hasTag("kny_escolheu"), i === 3);
+  }
+  assert.deepEqual(comandos, ["function start_slayer"]);
+  usarMenu(p);
+  await executarAgendados();
+  assert.match(p.telas.at(-1).titulo, /^kny_painel\|/);
+  p.desconectar();
 });
 
 test("golpe da v69 modificado uma vez e causas de finalização preservadas", () => {

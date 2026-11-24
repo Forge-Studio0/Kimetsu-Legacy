@@ -53,6 +53,7 @@ export const world = {
 
 export const system = {
   currentTick: 100,
+  beforeEvents: sinais(),
   afterEvents: sinais(),
   run(fn) { depois.push(fn); },
   runTimeout(fn, ticks) { depois.push(fn); },
@@ -83,7 +84,7 @@ export class ActionFormData {
   async show(p) {
     p.telas.push(this);
     const escolha = p.escolhas.shift();
-    return escolha ? escolha(this) : { canceled: true };
+    return escolha ? escolha(this) : { canceled: true, cancelationReason: "UserClosed" };
   }
 }
 
