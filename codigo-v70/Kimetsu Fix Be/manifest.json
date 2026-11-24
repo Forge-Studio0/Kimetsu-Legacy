@@ -1,0 +1,71 @@
+{
+	"format_version": 2,
+	"metadata": {
+		"authors": [
+			"canal jogando"
+		],
+		"generated_with": {
+			"bridge": [
+				"2.6.1"
+			],
+			"dash": [
+				"0.10.10"
+			]
+		}
+	},
+	"header": {
+		"name": "Kimetsu Survival Craft Be",
+		"description": "addon expirada no Mod de Pc",
+		"min_engine_version": [
+			1,
+			20,
+			12
+		],
+		"uuid": "1f4341b8-0a71-4109-8ab6-f293f8f58b03",
+		"version": [
+			1,
+			0,
+			51
+		]
+	},
+	"modules": [
+		{
+			"type": "data",
+			"uuid": "bcdd0914-873d-4af4-a65b-7b0b3d62f325",
+			"version": [
+				1,
+				0,
+				0
+			]
+		},
+		{
+			"type": "script",
+			"language": "javascript",
+			"uuid": "251c5ff7-4a33-4058-920f-c3bdc1e28259",
+			"entry": "scripts/main.js",
+			"version": [
+				1,
+				0,
+				0
+			]
+		}
+	],
+	"dependencies": [
+		{
+			"uuid": "2f0c2217-122c-44f0-9ae7-15da49f018a3",
+			"version": [
+				1,
+				0,
+				50
+			]
+		},
+		{
+			"module_name": "@minecraft/server",
+			"version": "2.12.0-beta"
+		},
+		{
+			"module_name": "@minecraft/server-ui",
+			"version": "2.0.0"
+		}
+	]
+}

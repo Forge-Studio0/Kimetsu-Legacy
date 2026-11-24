@@ -1,0 +1,27 @@
+KIMETSU LEGACY v70
+Código-fonte e testes
+
+A pasta Kimetsu Fix Be contém os nove arquivos que mudaram na v70.
+Os outros arquivos ficam na v69 original e no .mcaddon v70 distribuído separadamente.
+Pode-se comparar com o Behavior Pack extraído da v69 ou copiar os nove arquivos
+para uma cópia dele, respeitando os caminhos dentro do pack.
+
+Teste automatizado em Node.js
+Use Node 24 e aponte KIMETSU_BP para a pasta do Behavior Pack completo,
+com todos os arquivos e dependências internas extraídos, inclusive os que
+não mudaram. Execute node --test testes/stats.test.mjs.
+
+Exemplo:
+KIMETSU_BP="/caminho/Kimetsu Fix Be" node --test testes/stats.test.mjs
+
+GameTest no Bedrock dedicado
+Use um mundo de teste separado, com Beta APIs habilitadas. Copie bedrock.js
+para scripts/stats_test.js no pack de teste, importe "./stats_test.js" em main.js
+e adicione o módulo @minecraft/server-gametest 1.0.0-beta ao manifesto de teste.
+O teste cria jogadores simulados, altera regras apenas nesse mundo isolado e
+salva uma ficha para conferir a leitura após o reinício do servidor.
+Use o Resource Pack original para a apresentação. Os testes de motor também
+podem carregar uma dependência vazia com o mesmo UUID e versão, em um ambiente isolado.
+
+A dependência vazia, o mundo, os arquivos de servidor e o GameTest não fazem
+parte do arquivo .mcaddon v70 de produção.

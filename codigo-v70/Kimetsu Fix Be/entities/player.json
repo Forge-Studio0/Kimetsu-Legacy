@@ -1,0 +1,3912 @@
+{
+  "format_version": "1.10",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "minecraft:player",
+      "is_spawnable": false,
+      "is_summonable": false,
+      "is_experimental": false,
+      "scripts": {
+        "animate": [
+          "health",
+          "hp",
+          "click",
+          "main",
+          "main2",
+          "start",
+          "rengoku_hold",
+          "zenitsu_hold",
+          "kaigaku_hold",
+          "tomioka_hold",
+          "tanjiro_hold",
+          "sanemi_hold",
+          "kokushibo_hold",
+          "kokushibo_hold2",
+          "uzui_hold",
+          "muichiro_hold",
+          "mitsuri_hold",
+          "yoriichi_hold",
+          "shinobu_hold",
+          "inosuke_hold",
+          "gyomei_hold",
+          "flame_hold",
+          "wind_hold",
+          "water_hold",
+          "mist_hold",
+          "sun_hold",
+          "moon_hold",
+          "thunder_hold",
+          "obanai_hold",
+          "akaza_hold",
+          "gyutaro_hold",
+          "zohakuten_hold",
+          "enmu_hold",
+          "gyokko_hold",
+          "kemari_hold",
+          "yahaba_hold",
+          "doma_hold",
+          "nezuko_hold",
+          "flower_hold",
+          "demonking_hold",
+          "death_hold",
+          "mark_hold",
+          "breathings_hold",
+          "sun_protection",
+          "nakime_hold",
+          "burn"
+        ]
+      },
+      "animations": {
+        "burn": "controller.animation.test_burn",
+        "flame_hold": "controller.animation.flame_hold",
+        "wind_hold": "controller.animation.wind_hold",
+        "water_hold": "controller.animation.water_hold",
+        "mist_hold": "controller.animation.mist_hold",
+        "sun_hold": "controller.animation.sun_hold",
+        "flower_hold": "controller.animation.flower_hold",
+        "kanao1": "animation.kanao1",
+        "kanao2": "animation.kanao2",
+        "kanao3": "animation.kanao3",
+        "kanao4": "animation.kanao4",
+        "thunder_hold": "controller.animation.thunder_hold",
+        "thunder1": "animation.zenitsu1",
+        "thunder2": "animation.kaigaku1",
+        "thunder3": "animation.kaigaku2",
+        "thunder4": "animation.kaigaku3",
+        "thunder5": "animation.kaigaku4",
+        "thunder6": "animation.kaigaku5",
+        "mark_hold": "controller.animation.mark_hold",
+        "mark": "animation.mark",
+        "moon_hold": "controller.animation.moon_hold",
+        "moon1": "animation.moon1",
+        "moon2": "animation.moon2",
+        "moon3": "animation.moon3",
+        "moon4": "animation.moon4",
+        "moon5": "animation.moon5",
+        "nezuko_hold": "controller.animation.nezuko_hold",
+        "nezuko1": "animation.nezuko1",
+        "click": "controller.animation.click",
+        "main": "controller.animation.main",
+        "main2": "controller.animation.main2",
+        "health": "controller.animation.health",
+        "hp": "controller.animation.hp",
+        "start": "controller.animation.start",
+        "sun_protection": "animation.sun_protection",
+        "breathings_hold":"controller.animation.breathings_hold",
+        "rengoku_hold": "controller.animation.rengoku_hold",
+        "rengoku1": "animation.rengoku1",
+        "rengoku2": "animation.rengoku2",
+        "rengoku3": "animation.rengoku3",
+        "rengoku4": "animation.rengoku4",
+        "rengoku5": "animation.rengoku5",
+        "rengoku6": "animation.rengoku6",
+        "zenitsu_hold": "controller.animation.zenitsu_hold",
+        "zenitsu1": "animation.zenitsu1",
+        "zenitsu2": "animation.zenitsu2",
+        "zenitsu3": "animation.zenitsu3",
+        "zenitsu4": "animation.zenitsu4",
+        "zenitsu5": "animation.zenitsu5",
+        "kaigaku_hold": "controller.animation.kaigaku_hold",
+        "kaigaku1": "animation.kaigaku1",
+        "kaigaku2": "animation.kaigaku2",
+        "kaigaku3": "animation.kaigaku3",
+        "kaigaku4": "animation.kaigaku4",
+        "kaigaku5": "animation.kaigaku5",
+        "tomioka_hold": "controller.animation.tomioka_hold",
+        "tanjiro_hold": "controller.animation.tanjiro_hold",
+        "tomioka1": "animation.tomioka1",
+        "tomioka2": "animation.tomioka2",
+        "tomioka3": "animation.tomioka3",
+        "tomioka4": "animation.tomioka4",
+        "tomioka5": "animation.tomioka5",
+        "tomioka6": "animation.tomioka6",
+        "tomioka7": "animation.tomioka7",
+        "tomioka8": "animation.tomioka8",
+        "tomioka9": "animation.tomioka9",
+        "tomioka10": "animation.tomioka10",
+        "tomioka11": "animation.tomioka11",
+        "sanemi_hold": "controller.animation.sanemi_hold",
+        "sanemi1": "animation.sanemi1",
+        "sanemi2": "animation.sanemi2",
+        "sanemi3": "animation.sanemi3",
+        "sanemi4": "animation.sanemi4",
+        "sanemi5": "animation.sanemi5",
+        "sanemi6": "animation.sanemi6",
+        "sanemi7": "animation.sanemi7",
+        "sanemi8": "animation.sanemi8",
+        "sanemi9": "animation.sanemi9",
+        "uzui_hold": "controller.animation.uzui_hold",
+        "uzui1": "animation.uzui1",
+        "uzui2": "animation.uzui2",
+        "uzui3": "animation.uzui3",
+        "kokushibo_hold": "controller.animation.kokushibo_hold",
+        "kokushibo1": "animation.kokushibo1",
+        "kokushibo2": "animation.kokushibo2",
+        "kokushibo3": "animation.kokushibo3",
+        "kokushibo4": "animation.kokushibo4",
+        "kokushibo5": "animation.kokushibo5",
+        "kokushibo6": "animation.kokushibo6",
+        "kokushibo_hold2": "controller.animation.kokushibo_hold2",
+        "kokushibo7": "animation.kokushibo7",
+        "kokushibo8": "animation.kokushibo8",
+        "kokushibo9": "animation.kokushibo9",
+        "kokushibo10": "animation.kokushibo10",
+        "kokushibo11": "animation.kokushibo11",
+        "kokushibo12": "animation.kokushibo12",
+        "kokushibo13": "animation.kokushibo13",
+        "muichiro_hold": "controller.animation.muichiro_hold",
+        "muichiro1": "animation.muichiro1",
+        "muichiro2": "animation.muichiro2",
+        "muichiro3": "animation.muichiro3",
+        "muichiro4": "animation.muichiro4",
+        "muichiro5": "animation.muichiro5",
+        "muichiro6": "animation.muichiro6",
+        "muichiro7": "animation.muichiro7",
+        "mitsuri_hold": "controller.animation.mitsuri_hold",
+        "mitsuri1": "animation.mitsuri1",
+        "mitsuri2": "animation.mitsuri2",
+        "mitsuri3": "animation.mitsuri3",
+        "mitsuri4": "animation.mitsuri4",
+        "mitsuri5": "animation.mitsuri5",
+        "yoriichi_hold": "controller.animation.yoriichi_hold",
+        "yoriichi1": "animation.yoriichi1",
+        "yoriichi2": "animation.yoriichi2",
+        "yoriichi3": "animation.yoriichi3",
+        "yoriichi4": "animation.yoriichi4",
+        "yoriichi5": "animation.yoriichi5",
+        "yoriichi6": "animation.yoriichi6",
+        "yoriichi7": "animation.yoriichi7",
+        "yoriichi8": "animation.yoriichi8",
+        "yoriichi9": "animation.yoriichi9",
+        "yoriichi10": "animation.yoriichi10",
+        "yoriichi11": "animation.yoriichi11",
+        "yoriichi12": "animation.yoriichi12",
+        "yoriichi13": "animation.yoriichi13",
+        "shinobu_hold": "controller.animation.shinobu_hold",
+        "shinobu1": "animation.shinobu1",
+        "shinobu2": "animation.shinobu2",
+        "shinobu3": "animation.shinobu3",
+        "shinobu4": "animation.shinobu4",
+        "inosuke_hold": "controller.animation.inosuke_hold",
+        "inosuke1": "animation.inosuke1",
+        "inosuke2": "animation.inosuke2",
+        "inosuke3": "animation.inosuke3",
+        "inosuke4": "animation.inosuke4",
+        "inosuke5": "animation.inosuke5",     
+        "gyomei_hold": "controller.animation.gyomei_hold",
+        "gyomei1": "animation.gyomei1",
+        "gyomei2": "animation.gyomei2",
+        "gyomei3": "animation.gyomei3",
+        "gyomei4": "animation.gyomei4",
+        "gyomei5": "animation.gyomei5",   
+        "obanai_hold": "controller.animation.obanai_hold",
+        "obanai1": "animation.obanai1",
+        "obanai2": "animation.obanai2",
+        "obanai3": "animation.obanai3",
+        "obanai4": "animation.obanai4",
+        "obanai5": "animation.obanai5",
+        "akaza_hold": "controller.animation.akaza_hold",
+        "akaza1": "animation.akaza1",
+        "akaza2": "animation.akaza2",
+        "akaza3": "animation.akaza3",
+        "akaza4": "animation.akaza4",
+        "akaza5": "animation.akaza5",
+        "akaza6": "animation.akaza6",
+        "akaza7": "animation.akaza7",
+        "gyutaro_hold": "controller.animation.gyutaro_hold",
+        "gyutaro1": "animation.gyutaro1",
+        "gyutaro2": "animation.gyutaro2",
+        "gyutaro3": "animation.gyutaro3",
+        "zohakuten_hold": "controller.animation.zohakuten_hold",
+        "zohakuten1": "animation.zohakuten1",
+        "zohakuten2": "animation.zohakuten2",
+        "zohakuten3": "animation.zohakuten3",
+        "zohakuten4": "animation.zohakuten4",
+        "zohakuten5": "animation.zohakuten5",
+        "zohakuten6": "animation.zohakuten6",
+        "enmu_hold": "controller.animation.enmu_hold",
+        "enmu1": "animation.enmu1",
+        "enmu2": "animation.enmu2",
+        "gyokko_hold": "controller.animation.gyokko_hold",
+        "gyokko1": "animation.gyokko1",
+        "gyokko2": "animation.gyokko2",
+        "gyokko3": "animation.gyokko3",
+        "gyokko4": "animation.gyokko4",
+        "gyokko5": "animation.gyokko5",
+        "kemari_hold": "controller.animation.kemari_hold",
+        "kemari": "animation.kemari",
+        "yahaba_hold": "controller.animation.yahaba_hold",
+        "yahaba1": "animation.yahaba1",
+        "yahaba2": "animation.yahaba2",
+        "doma_hold": "controller.animation.doma_hold",
+        "doma1": "animation.doma1",
+        "doma2": "animation.doma2",
+        "doma3": "animation.doma3",
+        "doma4": "animation.doma4",
+        "doma5": "animation.doma5",
+        "doma6": "animation.doma6",
+        "doma7": "animation.doma7",
+        "doma8": "animation.doma8",
+        "doma9": "animation.doma9",
+        "demonking_hold": "controller.animation.demonking_hold",
+        "demonking1": "animation.demonking1",
+        "demonking2": "animation.demonking2",
+        "demonking3": "animation.demonking3",
+        "demonking4": "animation.demonking4",
+        "death_hold": "controller.animation.death_hold",
+        "death1": "animation.death1",
+        "death2": "animation.death2",
+        "death3": "animation.death3",
+        "death4": "animation.death4",
+        "nakime_hold": "controller.animation.nakime_hold",
+        "nakime1": "animation.nakime1",
+        "nakime2": "animation.nakime2"
+      },
+      "properties": {
+	    "kny:mark": {
+		  "client_sync": true,
+          "type": "int",
+          "range":[ 0, 20 ],
+          "default": 0
+		},
+	    "kny:effects": {
+		  "client_sync": true,
+          "type": "int",
+          "range":[ 0, 20 ],
+          "default": 0
+		},
+		"kny:forms": {
+		  "client_sync": true,
+          "type": "int",
+          "range":[ 0, 20 ],
+          "default": 0
+		},
+		"kny:treino": {
+          "client_sync": true,
+          "type": "int",
+          "range":[ 0, 4 ],
+          "default": 0
+		},
+		"kny:caido": {
+		  "client_sync": true,
+          "type": "int",
+          "range":[ 0, 1 ],
+          "default": 0
+		},
+		"kny:skills": {
+		  "client_sync": true,
+          "type": "int",
+          "range":[ 0, 20 ],
+          "default": 0
+		}
+      }
+    },
+    "component_groups": {
+        "kny:caido_grp": {
+          "minecraft:interact": {
+            "interactions": [
+              {
+                "on_interact": {
+                  "filters": {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "player"
+                  },
+                  "event": "kny:caido_interagido",
+                  "target": "self"
+                },
+                "interact_text": "Carregar / Reanimar",
+                "use_item": false,
+                "swing": false
+              }
+            ]
+          }
+        },
+        "minecraft:display_info": {
+        "show_health": false,
+        "show_hunger": true,
+        "show_air": true,
+        "show_experience": true
+     },
+      "mha:player": {
+        "minecraft:movement": {
+          "value": 0.2
+        },
+        "minecraft:type_family": {
+          "family": [ "player", "slayer" ]
+        }
+      },
+      "pamobile:respawn": {
+        "minecraft:mark_variant": {
+          "value": 0
+        },
+        "minecraft:skin_id": {
+          "value": 0
+        },
+        "minecraft:health": {
+          "value": 40,
+          "max": 40
+        },
+        "minecraft:collision_box": {
+          "width": 0.6,
+          "height": 1.8
+        },
+        "minecraft:scale": {
+          "value": 1.0
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        },
+        "minecraft:attack": {
+          "damage": 2
+        },
+        "minecraft:type_family": {
+          "family": [ "player" ]
+        },
+        "minecraft:spell_effects": {
+          "remove_effects": [
+          ]
+        }
+      },
+      "burn_daylight": {
+        "minecraft:burns_in_daylight": {}
+      },
+      "demon_family": {
+        "minecraft:mark_variant": {
+          "value": 2
+        },
+        "minecraft:burns_in_daylight": {},
+        "minecraft:type_family": {
+          "family": [ "player_demon" ]
+        }
+      },
+      "str1": {
+        "minecraft:movement": {
+          "value": 2.15
+        }
+      },
+      "str2": {
+        "minecraft:movement": {
+          "value": 2.3
+        }
+      },
+      "str3": {
+        "minecraft:movement": {
+          "value": 2.45
+        }
+      },
+      "str4": {
+        "minecraft:movement": {
+          "value": 2.6
+        }
+      },
+      "str5": {
+        "minecraft:movement": {
+          "value": 2.75
+        }
+      },
+      "str6": {
+        "minecraft:movement": {
+          "value": 2.9
+        }
+      },
+      "str7": {
+        "minecraft:movement": {
+          "value": 3.15
+        }
+      },
+      "str8": {
+        "minecraft:movement": {
+          "value": 3.3
+        }
+      },
+      "str9": {
+        "minecraft:movement": {
+          "value": 3.45
+        }
+      },
+      "str10": {
+        "minecraft:movement": {
+          "value": 3.6
+        }
+      },
+      "str11": {
+        "minecraft:movement": {
+          "value": 3.75
+        }
+      },
+      "str12": {
+        "minecraft:movement": {
+          "value": 3.9
+        }
+      },
+      "str13": {
+        "minecraft:movement": {
+          "value": 4.15
+        }
+      },
+      "str14": {
+        "minecraft:movement": {
+          "value": 4.3
+        }
+      },
+      "str15": {
+        "minecraft:movement": {
+          "value": 4.45
+        }
+      },
+      "str16": {
+        "minecraft:movement": {
+          "value": 4.6
+        }
+      },
+      "str17": {
+        "minecraft:movement": {
+          "value": 4.75
+        }
+      },
+      "str18": {
+        "minecraft:movement": {
+          "value": 4.9
+        }
+      },
+      "str19": {
+        "minecraft:movement": {
+          "value": 5
+        }
+      },
+      "spd1": {
+        "minecraft:movement": {
+          "value": 0.109
+        }
+      },
+      "spd2": {
+        "minecraft:movement": {
+          "value": 0.118
+        }
+      },
+      "spd3": {
+        "minecraft:movement": {
+          "value": 0.127
+        }
+      },
+      "spd4": {
+        "minecraft:movement": {
+          "value": 0.136
+        }
+      },
+      "spd5": {
+        "minecraft:movement": {
+          "value": 0.145
+        }
+      },
+      "spd6": {
+        "minecraft:movement": {
+          "value": 0.154
+        }
+      },
+      "spd7": {
+        "minecraft:movement": {
+          "value": 0.163
+        }
+      },
+      "spd8": {
+        "minecraft:movement": {
+          "value": 0.172
+        }
+      },
+      "spd9": {
+        "minecraft:movement": {
+          "value": 0.181
+        }
+      },
+      "spd10": {
+        "minecraft:movement": {
+          "value": 0.19
+        }
+      },
+      "spd11": {
+        "minecraft:movement": {
+          "value": 0.2
+        }
+      },
+      "spd12": {
+        "minecraft:movement": {
+          "value": 0.209
+        }
+      },
+      "spd13": {
+        "minecraft:movement": {
+          "value": 0.218
+        }
+      },
+      "spd14": {
+        "minecraft:movement": {
+          "value": 0.227
+        }
+      },
+      "spd15": {
+        "minecraft:movement": {
+          "value": 0.236
+        }
+      },
+      "spd16": {
+        "minecraft:movement": {
+          "value": 0.245
+        }
+      },
+      "spd17": {
+        "minecraft:movement": {
+          "value": 0.254
+        }
+      },
+      "spd18": {
+        "minecraft:movement": {
+          "value": 0.263
+        }
+      },
+      "spd19": {
+        "minecraft:movement": {
+          "value": 0.272
+        }
+      },
+      "spd20": {
+        "minecraft:movement": {
+          "value": 0.281
+        }
+      },
+      "spd21": {
+        "minecraft:movement": {
+          "value": 0.29
+        }
+      },
+      "spd22": {
+        "minecraft:movement": {
+          "value": 0.3
+        }
+      },
+      "vida1": {
+        "minecraft:health": {
+          "value": 44,
+          "max": 44
+        }
+      },
+      "vida2": {
+        "minecraft:health": {
+          "value": 48,
+          "max": 48
+        }
+      },
+      "vida3": {
+        "minecraft:health": {
+          "value": 52,
+          "max": 52
+        }
+      },
+      "vida4": {
+        "minecraft:health": {
+          "value": 56,
+          "max": 56
+        }
+      },
+      "vida5": {
+        "minecraft:health": {
+          "value": 60,
+          "max": 60
+        }
+      },
+      "vida6": {
+        "minecraft:health": {
+          "value": 64,
+          "max": 64
+        }
+      },
+      "vida7": {
+        "minecraft:health": {
+          "value": 68,
+          "max": 68
+        }
+      },
+      "vida8": {
+        "minecraft:health": {
+          "value": 72,
+          "max": 72
+        }
+      },
+      "vida9": {
+        "minecraft:health": {
+          "value": 29,
+          "max": 29
+        }
+      },
+      "vida10": {
+        "minecraft:health": {
+          "value": 30,
+          "max": 30
+        }
+      },
+      "vida11": {
+        "minecraft:health": {
+          "value": 31,
+          "max": 31
+        }
+      },
+      "vida12": {
+        "minecraft:health": {
+          "value": 32,
+          "max": 32
+        }
+      },
+      "vida13": {
+        "minecraft:health": {
+          "value": 33,
+          "max": 33
+        }
+      },
+      "vida14": {
+        "minecraft:health": {
+          "value": 34,
+          "max": 34
+        }
+      },
+      "vida15": {
+        "minecraft:health": {
+          "value": 35,
+          "max": 35
+        }
+      },
+      "vida16": {
+        "minecraft:health": {
+          "value": 36,
+          "max": 36
+        }
+      },
+      "vida17": {
+        "minecraft:health": {
+          "value": 37,
+          "max": 37
+        }
+      },
+      "vida18": {
+        "minecraft:health": {
+          "value": 38,
+          "max": 38
+        }
+      },
+      "vida19": {
+        "minecraft:health": {
+          "value": 39,
+          "max": 39
+        }
+      },
+      "vida20": {
+        "minecraft:health": {
+          "value": 40,
+          "max": 40
+        }
+      },
+      "vida21": {
+        "minecraft:health": {
+          "value": 41,
+          "max": 41
+        }
+      },
+      "vida22": {
+        "minecraft:health": {
+          "value": 42,
+          "max": 42
+        }
+      },
+      "vida23": {
+        "minecraft:health": {
+          "value": 43,
+          "max": 43
+        }
+      },
+      "vida24": {
+        "minecraft:health": {
+          "value": 50,
+          "max": 50
+        }
+      },
+      "vida25": {
+        "minecraft:health": {
+          "value": 45,
+          "max": 45
+        }
+      },
+      "vida26": {
+        "minecraft:health": {
+          "value": 46,
+          "max": 46
+        }
+      },
+      "vida27": {
+        "minecraft:health": {
+          "value": 47,
+          "max": 47
+        }
+      },
+      "vida28": {
+        "minecraft:health": {
+          "value": 60,
+          "max": 60
+        }
+      },
+      "vida29": {
+        "minecraft:health": {
+          "value": 49,
+          "max": 49
+        }
+      },
+      "vida30": {
+        "minecraft:health": {
+          "value": 50,
+          "max": 50
+        }
+      },
+      "vida31": {
+        "minecraft:health": {
+          "value": 51,
+          "max": 51
+        }
+      },
+      "vida32": {
+        "minecraft:health": {
+          "value": 70,
+          "max": 70
+        }
+      },
+      "vida33": {
+        "minecraft:health": {
+          "value": 53,
+          "max": 53
+        }
+      },
+      "vida34": {
+        "minecraft:health": {
+          "value": 54,
+          "max": 54
+        }
+      },
+      "vida35": {
+        "minecraft:health": {
+          "value": 55,
+          "max": 55
+        }
+      },
+      "vida36": {
+        "minecraft:health": {
+          "value": 80,
+          "max": 80
+        }
+      },
+      "vida37": {
+        "minecraft:health": {
+          "value": 57,
+          "max": 57
+        }
+      },
+      "vida38": {
+        "minecraft:health": {
+          "value": 58,
+          "max": 58
+        }
+      },
+      "vida39": {
+        "minecraft:health": {
+          "value": 59,
+          "max": 59
+        }
+      },
+      "vida40": {
+        "minecraft:health": {
+          "value": 90,
+          "max": 90
+        }
+      },
+      "vida41": {
+        "minecraft:health": {
+          "value": 61,
+          "max": 61
+        }
+      },
+      "vida42": {
+        "minecraft:health": {
+          "value": 62,
+          "max": 62
+        }
+      },
+      "vida43": {
+        "minecraft:health": {
+          "value": 63,
+          "max": 63
+        }
+      },
+      "vida44": {
+        "minecraft:health": {
+          "value": 100,
+          "max": 100
+        }
+      },
+      "vida45": {
+        "minecraft:health": {
+          "value": 65,
+          "max": 65
+        }
+      },
+      "vida46": {
+        "minecraft:health": {
+          "value": 66,
+          "max": 66
+        }
+      },
+      "vida47": {
+        "minecraft:health": {
+          "value": 67,
+          "max": 67
+        }
+      },
+      "vida48": {
+        "minecraft:health": {
+          "value": 110,
+          "max": 110
+        }
+      },
+      "vida49": {
+        "minecraft:health": {
+          "value": 69,
+          "max": 69
+        }
+      },
+      "vida50": {
+        "minecraft:health": {
+          "value": 70,
+          "max": 70
+        }
+      },
+      "vida51": {
+        "minecraft:health": {
+          "value": 71,
+          "max": 71
+        }
+      },
+      "vida52": {
+        "minecraft:health": {
+          "value": 120,
+          "max": 120
+        }
+      },
+      "vida53": {
+        "minecraft:health": {
+          "value": 73,
+          "max": 73
+        }
+      },
+      "vida54": {
+        "minecraft:health": {
+          "value": 74,
+          "max": 74
+        }
+      },
+      "vida55": {
+        "minecraft:health": {
+          "value": 75,
+          "max": 75
+        }
+      },
+      "vida56": {
+        "minecraft:health": {
+          "value": 130,
+          "max": 130
+        }
+      },
+      "vida57": {
+        "minecraft:health": {
+          "value": 77,
+          "max": 77
+        }
+      },
+      "vida58": {
+        "minecraft:health": {
+          "value": 78,
+          "max": 78
+        }
+      },
+      "vida59": {
+        "minecraft:health": {
+          "value": 79,
+          "max": 79
+        }
+      },
+      "vida60": {
+        "minecraft:health": {
+          "value": 150,
+          "max": 150
+        }
+      },
+      "vida61": {
+        "minecraft:health": {
+          "value": 81,
+          "max": 81
+        }
+      },
+      "vida62": {
+        "minecraft:health": {
+          "value": 82,
+          "max": 82
+        }
+      },
+      "vida63": {
+        "minecraft:health": {
+          "value": 83,
+          "max": 83
+        }
+      },
+      "vida64": {
+        "minecraft:health": {
+          "value": 84,
+          "max": 84
+        }
+      },
+      "vida65": {
+        "minecraft:health": {
+          "value": 85,
+          "max": 85
+        }
+      },
+      "vida66": {
+        "minecraft:health": {
+          "value": 86,
+          "max": 86
+        }
+      },
+      "vida67": {
+        "minecraft:health": {
+          "value": 87,
+          "max": 87
+        }
+      },
+      "vida68": {
+        "minecraft:health": {
+          "value": 88,
+          "max": 88
+        }
+      },
+      "vida69": {
+        "minecraft:health": {
+          "value": 89,
+          "max": 89
+        }
+      },
+      "vida70": {
+        "minecraft:health": {
+          "value": 90,
+          "max": 90
+        }
+      },
+      "vida71": {
+        "minecraft:health": {
+          "value": 91,
+          "max": 91
+        }
+      },
+      "vida72": {
+        "minecraft:health": {
+          "value": 92,
+          "max": 92
+        }
+      },
+      "vida73": {
+        "minecraft:health": {
+          "value": 93,
+          "max": 93
+        }
+      },
+      "vida74": {
+        "minecraft:health": {
+          "value": 94,
+          "max": 94
+        }
+      },
+      "vida75": {
+        "minecraft:health": {
+          "value": 95,
+          "max": 95
+        }
+      },
+      "vida76": {
+        "minecraft:health": {
+          "value": 96,
+          "max": 96
+        }
+      },
+      "vida77": {
+        "minecraft:health": {
+          "value": 97,
+          "max": 97
+        }
+      },
+      "vida78": {
+        "minecraft:health": {
+          "value": 98,
+          "max": 98
+        }
+      },
+      "vida79": {
+        "minecraft:health": {
+          "value": 99,
+          "max": 99
+        }
+      },
+      "vida80": {
+        "minecraft:health": {
+          "value": 100,
+          "max": 100
+        }
+      },
+      "mugen":{
+        "minecraft:damage_sensor": {
+          "triggers":[
+            {"cause":"starve","deals_damage":true},
+            {"cause":"wither","deals_damage":true},
+            {"cause": "fall","deals_damage": true},
+            {"cause":"lightning","deals_damage":true},
+            {"cause":"freezing","deals_damage":true},
+            {
+              "on_damage": {
+                "filters": {
+                  "any_of":[
+                    {"test":"is_family","subject":"other","value":"demon"},
+                    {"test":"is_family","subject":"other","value":"monster"},
+                    {"test":"is_family","subject":"other","value":"human"},
+                    {"test":"is_family","subject":"other","value":"player"},
+                    {"test":"is_family","subject":"other","value":"slayer"}
+                  ]
+                },
+                "event":"parry_effect"
+              },
+              "deals_damage": false
+            }
+          ]
+        }
+      },      
+      "purple2": {
+        "minecraft:mark_variant": {
+          "value": 99991
+          },
+        "minecraft:type_family": {
+          "family": [ "player", "slayer" ]
+        }
+      },
+      "grau4": {
+        "minecraft:mark_variant": {
+          "value": 3
+        },
+        "minecraft:health": {
+          "value": 25,
+          "max": 25
+        }
+      },
+      "grau3": {
+        "minecraft:mark_variant": {
+          "value": 4
+        },
+        "minecraft:health": {
+          "value": 30,
+          "max": 30
+        }
+      },
+      "grausemi2": {
+        "minecraft:mark_variant": {
+          "value": 5
+        },
+        "minecraft:health": {
+          "value": 35,
+          "max": 35
+        }
+      },
+      "grau2": {
+        "minecraft:mark_variant": {
+          "value": 6
+        },
+        "minecraft:health": {
+          "value": 40,
+          "max": 40
+        }
+      },
+      "grausemi1": {
+        "minecraft:mark_variant": {
+          "value": 7
+        },
+        "minecraft:health": {
+          "value": 45,
+          "max": 45
+        }
+      },
+      "grau1": {
+        "minecraft:mark_variant": {
+          "value": 7
+        },
+        "minecraft:health": {
+          "value": 50,
+          "max": 50
+        }
+      },
+      "especial": {
+        "minecraft:mark_variant": {
+          "value": 3
+        },
+        "minecraft:health": {
+          "value": 60,
+          "max": 60
+        }
+      },
+      "convergence": {
+        "minecraft:mark_variant": {
+          "value": 23
+        }
+      },
+      "thundermode": {
+        "minecraft:mark_variant": {
+          "value": 1930
+        }
+      },
+      "sukuna_heian2": {
+        "minecraft:mark_variant": {
+          "value": 1931
+        }
+      },
+      "mha:test": {
+        "minecraft:mark_variant": {
+          "value": 1
+        },
+        "minecraft:skin_id": {
+          "value": 1
+        },
+        "minecraft:health": {
+          "value": 40,
+          "max": 40
+        },
+        "minecraft:collision_box": {
+          "width": 0.6,
+          "height": 1.8
+        },
+        "minecraft:scale": {
+          "value": 1.0
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        },
+        "minecraft:attack": {
+          "damage": 2
+        },
+        "minecraft:type_family": {
+          "family": [ "player", "slayer" ]
+        },
+        "minecraft:spell_effects": {
+          "remove_effects": [
+          ]
+        }
+      },
+      "kny:half_moon2": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:half_moon2",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:campfire": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:campfire",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:kemari_projetil": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:kemari_projetil",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:air_attack": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:air_attack",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:spawn_goldfish_big": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:spawn_goldfish_big",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:spawn_enmutentacles": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:spawn_enmutentacles",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:eyes_basket2": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:eyes_basket2",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:world_cut": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:world_cut",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_mahoraga": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_mahoraga",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:scattering_lotuses": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:scattering_lotuses",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_frog": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_frog",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_serpent": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_serpent",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_blue": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_blue",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_takada": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_takada",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_nariz": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_nariz",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_piercing_ox": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_piercing_ox",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_blindness": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_blindness",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_jogo": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_jogo",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_barata": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_barata",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_insect": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_insect",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:ember_insects": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:ember_insects",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:direction_arrow": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:direction_arrow",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:flowing_light_flash_event": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:flowing_light_flash_event",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:spawn_dogshadow": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:spawn_dogshadow",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:fish_event": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:fish_event",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:garuda_event": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:garuda_event",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:garuda_event2": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:garuda_event2",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:garuda_event3": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:garuda_event3",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:garuda_event4": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:garuda_event4",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:garuda_event5": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:garuda_event5",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_garuda": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_garuda",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:dismantle": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:dismantle",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:barrage_event": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:barrage_event",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_agito": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_agito",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_divinedogblack": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_divinedogblack",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_toad": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_toad",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:shoot": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:shoot",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:spawn_blood_blade": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:spawn_blood_blade",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_max_elephant": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_max_elephant",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:open2": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:open2",
+            "num_to_spawn": 1
+            }
+        ]
+      },
+      "curse:fish_event2": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:fish_event2",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:spawn_dragon_wood": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:spawn_dragon_wood",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_rabbit": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_rabbit",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:waterprison_event": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:waterprison_event",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:compressed_sound": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:compressed_sound",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_divinedogwhite": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_divinedogwhite",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_divinedogtotality": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_divinedogtotality",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_cento": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_cento",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_hanami": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_hanami",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_tiger_funeral": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_tiger_funeral",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:spawn_dagon": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:spawn_dagon",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "curse:hammer2": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "curse:hammer2",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+      "kny:cutting_threads_rotation": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:cutting_threads_rotation",
+            "num_to_spawn": 1
+          }
+        ]
+      },
+    "kny:anger_thunder_death2": {
+        "minecraft:spawn_entity": [
+          {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "single_use": true,
+            "should_leash": true,
+            "spawn_entity": "kny:anger_thunder_death2",
+            "num_to_spawn": 1
+            }
+          ]
+        }
+     },
+    "components": {
+      "minecraft:health": { "value": 40, "max": 40 },
+      "minecraft:type_family": {
+        "family": [
+          "player"
+        ]
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/entities/player.json"
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:can_climb": {},
+      "minecraft:movement": {
+        "value": 0.1
+      },
+      "minecraft:environment_sensor": [
+        {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "ndjdnd"
+                }
+              ]
+            },
+            "event": "mha:test"
+          }
+        },
+        {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_gamemode",
+                  "subject": "self",
+                  "operator": "equals",
+                  "value": "creative"
+                }
+              ]
+            },
+            "event": "add_creative_tag"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_gamemode",
+                  "subject": "self",
+                  "operator": "not",
+                  "value": "creative"
+                }
+              ]
+            },
+            "event": "remove_creative_tag"
+            }
+         },
+        {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "purple2"
+                }
+              ]
+            },
+            "event": "purple2"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "grau4"
+                }
+              ]
+            },
+            "event": "grau4"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "grau3"
+                }
+              ]
+            },
+            "event": "grau3"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "grausemi2"
+                }
+              ]
+            },
+            "event": "grausemi2"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "grau2"
+                }
+              ]
+            },
+            "event": "grau2"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "grausemi1"
+                }
+              ]
+            },
+            "event": "grausemi1"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "grau1"
+                }
+              ]
+            },
+            "event": "grau1"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "especial"
+                }
+              ]
+            },
+            "event": "especial"
+            }
+          },
+         {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "infinity"
+                }
+              ]
+            },
+            "event": "curse:mugentest"            
+            }
+          },
+         {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "convergence"
+                }
+              ]
+            },
+            "event": "convergence"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "thundermode"
+                }
+              ]
+            },
+            "event": "thundermode"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "thunder_face"
+                }
+              ]
+            },
+            "event": "thunder_face"
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "blank"
+                }
+              ]
+            },
+            "event": "blank"            
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "blank_char"
+                }
+              ]
+            },
+            "event": "blank_char"            
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "sukuna_heian_domain"
+                }
+              ]
+            },
+            "event": "curse:sukuna_heian2"            
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "nanami_domain"
+                }
+              ]
+            },
+            "event": "nanami_domain"            
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "megumi_domain"
+                }
+              ]
+            },
+            "event": "megumi_domain"            
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "choso_domain"
+                }
+              ]
+            },
+            "event": "choso_domain"            
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "yuta_domain"
+                }
+              ]
+            },
+            "event": "yuta_domain"            
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "higuruma_domain"
+                }
+              ]
+            },
+            "event": "higuruma_domain"            
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "hajime_domain"
+                }
+              ]
+            },
+            "event": "hajime_domain"            
+            }
+          },
+          {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "gojo_domain"
+                }
+              ]
+            },
+            "event": "gojo_domain"            
+            }
+          },
+        {
+          "on_environment": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "==",
+                  "value": "player"
+                }
+              ]
+            },
+            "event": "mha:player"
+          }
+        }
+      ],
+      "minecraft:player.saturation": {
+        "value": 20
+      },
+      "minecraft:player.exhaustion": {
+        "value": 0,
+        "max": 4
+      },
+      "minecraft:player.level": {
+        "value": 0,
+        "max": 24791
+      },
+      "minecraft:player.experience": {
+        "value": 0,
+        "max": 1
+      },
+      "minecraft:breathable": {
+        "totalSupply": 15,
+        "suffocateTime": -1,
+        "inhaleTime": 3.75,
+        "generatesBubbles": false
+      },
+      "minecraft:nameable": {
+        "alwaysShow": true,
+        "allowNameTagRenaming": false
+      },
+      "minecraft:physics": {},
+      "minecraft:insomnia": {
+        "days_until_insomnia": 3
+      },
+      "minecraft:rideable": {
+        "seat_count": 2,
+        "family_types": [
+          "parrot_tame"
+        ],
+        "pull_in_entities": true,
+        "seats": [
+          {
+            "position": [
+              0.4,
+              -0.15,
+              0.04
+            ],
+            "min_rider_count": 0,
+            "max_rider_count": 0,
+            "lock_rider_rotation": 0
+          },
+          {
+            "position": [
+              -0.4,
+              -0.15,
+              0.04
+            ],
+            "min_rider_count": 1,
+            "max_rider_count": 2,
+            "lock_rider_rotation": 0
+          }
+        ]
+      },
+      "minecraft:scaffolding_climber": {}
+    },
+    "events": {
+      "kny:stats_limpar_grupos": { "remove": { "component_groups": [
+        "str1", "str2", "str3", "str4", "str5", "str6", "str7", "str8",
+        "str9", "str10", "str11", "str12", "str13", "str14", "str15", "str16",
+        "str17", "str18", "str19", "spd1", "spd2", "spd3", "spd4", "spd5",
+        "spd6", "spd7", "spd8", "spd9", "spd10", "spd11", "spd12", "spd13",
+        "spd14", "spd15", "spd16", "spd17", "spd18", "spd19", "spd20", "spd21",
+        "spd22", "vida1", "vida2", "vida3", "vida4", "vida5", "vida6", "vida7",
+        "vida8", "vida9", "vida10", "vida11", "vida12", "vida13", "vida14", "vida15",
+        "vida16", "vida17", "vida18", "vida19", "vida20", "vida21", "vida22", "vida23",
+        "vida24", "vida25", "vida26", "vida27", "vida28", "vida29", "vida30", "vida31",
+        "vida32", "vida33", "vida34", "vida35", "vida36", "vida37", "vida38", "vida39",
+        "vida40", "vida41", "vida42", "vida43", "vida44", "vida45", "vida46", "vida47",
+        "vida48", "vida49", "vida50", "vida51", "vida52", "vida53", "vida54", "vida55",
+        "vida56", "vida57", "vida58", "vida59", "vida60", "vida61", "vida62", "vida63",
+        "vida64", "vida65", "vida66", "vida67", "vida68", "vida69", "vida70", "vida71",
+        "vida72", "vida73", "vida74", "vida75", "vida76", "vida77", "vida78", "vida79",
+        "vida80"
+      ] } },
+      "pamobile:refresh_player": {
+        "add": {
+          "component_groups": [
+            "pamobile:respawn"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "mha:player",
+            "burn_daylight_on",
+            "grau4",
+            "grau3",
+            "grausemi2",
+            "grau2",
+            "grausemi1",
+            "grau1",
+            "especial",
+            "infinity",
+            "mha:test",
+            "kny:demon_family"
+          ]
+        }
+      },
+      "mha:test": {
+        "add": {
+          "component_groups": [
+            "mha:test"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "pamobile:respawn"
+          ]
+        }
+      },
+      "parry_effect": {
+        "queue_command":{
+          "command":["particle kny:attack_hit ^^1^1.5","playsound parry @a[r=5]"]
+        }
+     },
+     "damage_event": {
+        "queue_command":{
+          "command":["function skills/damage"]
+        }
+     },
+      "minecraft:entity_spawned": {
+        "add": {
+          "component_groups": [
+            "pamobile:respawn"
+          ]
+        },
+        "remove": {}
+      },
+      "mark_blank": {
+        "set_property": {
+          "kny:mark": 0
+        }
+      },
+      "water_mark": {
+        "set_property": {
+          "kny:mark": 1
+        }
+      },
+      "wind_mark": {
+        "set_property": {
+          "kny:mark": 2
+        }
+      },
+      "mist_mark": {
+        "set_property": {
+          "kny:mark": 3
+        }
+      },
+      "love_mark": {
+        "set_property": {
+          "kny:mark": 4
+        }
+      },
+      "moon_mark": {
+        "set_property": {
+          "kny:mark": 5
+        }
+      },
+      "sun_mark": {
+        "set_property": {
+          "kny:mark": 6
+        }
+      },
+      "kny:treino_0": {
+        "set_property": {
+          "kny:treino": 0
+        }
+      },
+      "kny:treino_1": {
+        "set_property": {
+          "kny:treino": 1
+        }
+      },
+      "kny:treino_2": {
+        "set_property": {
+          "kny:treino": 2
+        }
+      },
+      "kny:treino_3": {
+        "set_property": {
+          "kny:treino": 3
+        }
+      },
+      "kny:treino_4": {
+        "set_property": {
+          "kny:treino": 4
+        }
+      },
+      "kny:caido_on": {
+        "add": {
+          "component_groups": [
+            "kny:caido_grp"
+          ]
+        },
+        "set_property": {
+          "kny:caido": 1
+        }
+      },
+      "kny:caido_off": {
+        "remove": {
+          "component_groups": [
+            "kny:caido_grp"
+          ]
+        },
+        "set_property": {
+          "kny:caido": 0
+        }
+      },
+      "kny:caido_interagido": {
+        "set_property": {
+          "kny:caido": 1
+        }
+      },
+      "end_forms": {
+        "set_property": {
+          "kny:forms": 0
+        }
+      },
+      "wolf_form": {
+        "set_property": {
+          "kny:forms": 1
+        }
+      },
+      "default_effects": {
+        "set_property": {
+          "kny:effects": 0
+        }
+      },
+      "serpent": {
+        "set_property": {
+          "kny:effects": 1
+        }
+      },
+      "serpent_double": {
+        "set_property": {
+          "kny:effects": 2
+        }
+      },
+      "kny:reset": {
+        "add": {
+          "component_groups": [
+            "pamobile:respawn"
+          ]
+        }
+      },
+      "kny:demon_family": {
+        "add": {
+          "component_groups": [
+            "demon_family"
+          ]
+        }
+      },
+      "kny:str1": {
+        "add": {
+          "component_groups": [
+            "str1"
+          ]
+        }
+      },
+      "kny:str2": {
+        "add": {
+          "component_groups": [
+            "str2"
+          ]
+        }
+      },
+      "kny:str3": {
+        "add": {
+          "component_groups": [
+            "str3"
+          ]
+        }
+      },
+      "kny:str4": {
+        "add": {
+          "component_groups": [
+            "str4"
+          ]
+        }
+      },
+      "kny:str5": {
+        "add": {
+          "component_groups": [
+            "str5"
+          ]
+        }
+      },
+      "kny:str6": {
+        "add": {
+          "component_groups": [
+            "str6"
+          ]
+        }
+      },
+      "kny:str7": {
+        "add": {
+          "component_groups": [
+            "str7"
+          ]
+        }
+      },
+      "kny:str8": {
+        "add": {
+          "component_groups": [
+            "str8"
+          ]
+        }
+      },
+      "kny:str9": {
+        "add": {
+          "component_groups": [
+            "str9"
+          ]
+        }
+      },
+      "kny:str10": {
+        "add": {
+          "component_groups": [
+            "str10"
+          ]
+        }
+      },
+      "kny:str11": {
+        "add": {
+          "component_groups": [
+            "str11"
+          ]
+        }
+      },
+      "kny:str12": {
+        "add": {
+          "component_groups": [
+            "str12"
+          ]
+        }
+      },
+      "kny:str13": {
+        "add": {
+          "component_groups": [
+            "str13"
+          ]
+        }
+      },
+      "kny:str14": {
+        "add": {
+          "component_groups": [
+            "str14"
+          ]
+        }
+      },
+      "kny:str15": {
+        "add": {
+          "component_groups": [
+            "str15"
+          ]
+        }
+      },
+      "kny:str16": {
+        "add": {
+          "component_groups": [
+            "str16"
+          ]
+        }
+      },
+      "kny:str17": {
+        "add": {
+          "component_groups": [
+            "str17"
+          ]
+        }
+      },
+      "kny:str18": {
+        "add": {
+          "component_groups": [
+            "str18"
+          ]
+        }
+      },
+      "kny:str19": {
+        "add": {
+          "component_groups": [
+            "str19"
+          ]
+        }
+      },
+      "kny:spd1": {
+        "add": {
+          "component_groups": [
+            "spd1"
+          ]
+        }
+      },
+      "kny:spd2": {
+        "add": {
+          "component_groups": [
+            "spd2"
+          ]
+        }
+      },
+      "kny:spd3": {
+        "add": {
+          "component_groups": [
+            "spd3"
+          ]
+        }
+      },
+      "kny:spd4": {
+        "add": {
+          "component_groups": [
+            "spd4"
+          ]
+        }
+      },
+      "kny:spd5": {
+        "add": {
+          "component_groups": [
+            "spd5"
+          ]
+        }
+      },
+      "kny:spd6": {
+        "add": {
+          "component_groups": [
+            "spd6"
+          ]
+        }
+      },
+      "kny:spd7": {
+        "add": {
+          "component_groups": [
+            "spd7"
+          ]
+        }
+      },
+      "kny:spd8": {
+        "add": {
+          "component_groups": [
+            "spd8"
+          ]
+        }
+      },
+      "kny:spd9": {
+        "add": {
+          "component_groups": [
+            "spd9"
+          ]
+        }
+      },
+      "kny:spd10": {
+        "add": {
+          "component_groups": [
+            "spd10"
+          ]
+        }
+      },
+      "kny:spd11": {
+        "add": {
+          "component_groups": [
+            "spd11"
+          ]
+        }
+      },
+      "kny:spd12": {
+        "add": {
+          "component_groups": [
+            "spd12"
+          ]
+        }
+      },
+      "kny:spd13": {
+        "add": {
+          "component_groups": [
+            "spd13"
+          ]
+        }
+      },
+      "kny:spd14": {
+        "add": {
+          "component_groups": [
+            "spd14"
+          ]
+        }
+      },
+      "kny:spd15": {
+        "add": {
+          "component_groups": [
+            "spd15"
+          ]
+        }
+      },
+      "kny:spd16": {
+        "add": {
+          "component_groups": [
+            "spd16"
+          ]
+        }
+      },
+      "kny:spd17": {
+        "add": {
+          "component_groups": [
+            "spd17"
+          ]
+        }
+      },
+      "kny:spd18": {
+        "add": {
+          "component_groups": [
+            "spd18"
+          ]
+        }
+      },
+      "kny:spd19": {
+        "add": {
+          "component_groups": [
+            "spd19"
+          ]
+        }
+      },
+      "kny:spd20": {
+        "add": {
+          "component_groups": [
+            "spd20"
+          ]
+        }
+      },
+      "kny:spd21": {
+        "add": {
+          "component_groups": [
+            "spd21"
+          ]
+        }
+      },
+      "kny:spd22": {
+        "add": {
+          "component_groups": [
+            "spd22"
+          ]
+        }
+      },
+      "kny:vida1": {
+        "add": {
+          "component_groups": [
+            "vida1"
+          ]
+        }
+      },
+      "kny:vida2": {
+        "add": {
+          "component_groups": [
+            "vida2"
+          ]
+        }
+      },
+      "kny:vida3": {
+        "add": {
+          "component_groups": [
+            "vida3"
+          ]
+        }
+      },
+      "kny:vida4": {
+        "add": {
+          "component_groups": [
+            "vida4"
+          ]
+        }
+      },
+      "kny:vida5": {
+        "add": {
+          "component_groups": [
+            "vida5"
+          ]
+        }
+      },
+      "kny:vida6": {
+        "add": {
+          "component_groups": [
+            "vida6"
+          ]
+        }
+      },
+      "kny:vida7": {
+        "add": {
+          "component_groups": [
+            "vida7"
+          ]
+        }
+      },
+      "kny:vida8": {
+        "add": {
+          "component_groups": [
+            "vida8"
+          ]
+        }
+      },
+      "kny:vida9": {
+        "add": {
+          "component_groups": [
+            "vida9"
+          ]
+        }
+      },
+      "kny:vida10": {
+        "add": {
+          "component_groups": [
+            "vida10"
+          ]
+        }
+      },
+      "kny:vida11": {
+        "add": {
+          "component_groups": [
+            "vida11"
+          ]
+        }
+      },
+      "kny:vida12": {
+        "add": {
+          "component_groups": [
+            "vida12"
+          ]
+        }
+      },
+      "kny:vida13": {
+        "add": {
+          "component_groups": [
+            "vida13"
+          ]
+        }
+      },
+      "kny:vida14": {
+        "add": {
+          "component_groups": [
+            "vida14"
+          ]
+        }
+      },
+      "kny:vida15": {
+        "add": {
+          "component_groups": [
+            "vida15"
+          ]
+        }
+      },
+      "kny:vida16": {
+        "add": {
+          "component_groups": [
+            "vida16"
+          ]
+        }
+      },
+      "kny:vida17": {
+        "add": {
+          "component_groups": [
+            "vida17"
+          ]
+        }
+      },
+      "kny:vida18": {
+        "add": {
+          "component_groups": [
+            "vida18"
+          ]
+        }
+      },
+      "kny:vida19": {
+        "add": {
+          "component_groups": [
+            "vida19"
+          ]
+        }
+      },
+      "kny:vida20": {
+        "add": {
+          "component_groups": [
+            "vida20"
+          ]
+        }
+      },
+      "kny:vida21": {
+        "add": {
+          "component_groups": [
+            "vida21"
+          ]
+        }
+      },
+      "kny:vida22": {
+        "add": {
+          "component_groups": [
+            "vida22"
+          ]
+        }
+      },
+      "kny:vida23": {
+        "add": {
+          "component_groups": [
+            "vida23"
+          ]
+        }
+      },
+      "kny:vida24": {
+        "add": {
+          "component_groups": [
+            "vida24"
+          ]
+        }
+      },
+      "kny:vida25": {
+        "add": {
+          "component_groups": [
+            "vida25"
+          ]
+        }
+      },
+      "kny:vida26": {
+        "add": {
+          "component_groups": [
+            "vida26"
+          ]
+        }
+      },
+      "kny:vida27": {
+        "add": {
+          "component_groups": [
+            "vida27"
+          ]
+        }
+      },
+      "kny:vida28": {
+        "add": {
+          "component_groups": [
+            "vida28"
+          ]
+        }
+      },
+      "kny:vida29": {
+        "add": {
+          "component_groups": [
+            "vida29"
+          ]
+        }
+      },
+      "kny:vida30": {
+        "add": {
+          "component_groups": [
+            "vida30"
+          ]
+        }
+      },
+      "kny:vida31": {
+        "add": {
+          "component_groups": [
+            "vida31"
+          ]
+        }
+      },
+      "kny:vida32": {
+        "add": {
+          "component_groups": [
+            "vida32"
+          ]
+        }
+      },
+      "kny:vida33": {
+        "add": {
+          "component_groups": [
+            "vida33"
+          ]
+        }
+      },
+      "kny:vida34": {
+        "add": {
+          "component_groups": [
+            "vida34"
+          ]
+        }
+      },
+      "kny:vida35": {
+        "add": {
+          "component_groups": [
+            "vida35"
+          ]
+        }
+      },
+      "kny:vida36": {
+        "add": {
+          "component_groups": [
+            "vida36"
+          ]
+        }
+      },
+      "kny:vida37": {
+        "add": {
+          "component_groups": [
+            "vida37"
+          ]
+        }
+      },
+      "kny:vida38": {
+        "add": {
+          "component_groups": [
+            "vida38"
+          ]
+        }
+      },
+      "kny:vida39": {
+        "add": {
+          "component_groups": [
+            "vida39"
+          ]
+        }
+      },
+      "kny:vida40": {
+        "add": {
+          "component_groups": [
+            "vida40"
+          ]
+        }
+      },
+      "kny:vida41": {
+        "add": {
+          "component_groups": [
+            "vida41"
+          ]
+        }
+      },
+      "kny:vida42": {
+        "add": {
+          "component_groups": [
+            "vida42"
+          ]
+        }
+      },
+      "kny:vida43": {
+        "add": {
+          "component_groups": [
+            "vida43"
+          ]
+        }
+      },
+      "kny:vida44": {
+        "add": {
+          "component_groups": [
+            "vida44"
+          ]
+        }
+      },
+      "kny:vida45": {
+        "add": {
+          "component_groups": [
+            "vida45"
+          ]
+        }
+      },
+      "kny:vida46": {
+        "add": {
+          "component_groups": [
+            "vida46"
+          ]
+        }
+      },
+      "kny:vida47": {
+        "add": {
+          "component_groups": [
+            "vida47"
+          ]
+        }
+      },
+      "kny:vida48": {
+        "add": {
+          "component_groups": [
+            "vida48"
+          ]
+        }
+      },
+      "kny:vida49": {
+        "add": {
+          "component_groups": [
+            "vida49"
+          ]
+        }
+      },
+      "kny:vida50": {
+        "add": {
+          "component_groups": [
+            "vida50"
+          ]
+        }
+      },
+      "kny:vida51": {
+        "add": {
+          "component_groups": [
+            "vida51"
+          ]
+        }
+      },
+      "kny:vida52": {
+        "add": {
+          "component_groups": [
+            "vida52"
+          ]
+        }
+      },
+      "kny:vida53": {
+        "add": {
+          "component_groups": [
+            "vida53"
+          ]
+        }
+      },
+      "kny:vida54": {
+        "add": {
+          "component_groups": [
+            "vida54"
+          ]
+        }
+      },
+      "kny:vida55": {
+        "add": {
+          "component_groups": [
+            "vida55"
+          ]
+        }
+      },
+      "kny:vida56": {
+        "add": {
+          "component_groups": [
+            "vida56"
+          ]
+        }
+      },
+      "kny:vida57": {
+        "add": {
+          "component_groups": [
+            "vida57"
+          ]
+        }
+      },
+      "kny:vida58": {
+        "add": {
+          "component_groups": [
+            "vida58"
+          ]
+        }
+      },
+      "kny:vida59": {
+        "add": {
+          "component_groups": [
+            "vida59"
+          ]
+        }
+      },
+      "kny:vida60": {
+        "add": {
+          "component_groups": [
+            "vida60"
+          ]
+        }
+      },
+      "kny:vida61": {
+        "add": {
+          "component_groups": [
+            "vida61"
+          ]
+        }
+      },
+      "kny:vida62": {
+        "add": {
+          "component_groups": [
+            "vida62"
+          ]
+        }
+      },
+      "kny:vida63": {
+        "add": {
+          "component_groups": [
+            "vida63"
+          ]
+        }
+      },
+      "kny:vida64": {
+        "add": {
+          "component_groups": [
+            "vida64"
+          ]
+        }
+      },
+      "kny:vida65": {
+        "add": {
+          "component_groups": [
+            "vida65"
+          ]
+        }
+      },
+      "kny:vida66": {
+        "add": {
+          "component_groups": [
+            "vida66"
+          ]
+        }
+      },
+      "kny:vida67": {
+        "add": {
+          "component_groups": [
+            "vida67"
+          ]
+        }
+      },
+      "kny:vida68": {
+        "add": {
+          "component_groups": [
+            "vida68"
+          ]
+        }
+      },
+      "kny:vida69": {
+        "add": {
+          "component_groups": [
+            "vida69"
+          ]
+        }
+      },
+      "kny:vida70": {
+        "add": {
+          "component_groups": [
+            "vida70"
+          ]
+        }
+      },
+      "kny:vida71": {
+        "add": {
+          "component_groups": [
+            "vida71"
+          ]
+        }
+      },
+      "kny:vida72": {
+        "add": {
+          "component_groups": [
+            "vida72"
+          ]
+        }
+      },
+      "kny:vida73": {
+        "add": {
+          "component_groups": [
+            "vida73"
+          ]
+        }
+      },
+      "kny:vida74": {
+        "add": {
+          "component_groups": [
+            "vida74"
+          ]
+        }
+      },
+      "kny:vida75": {
+        "add": {
+          "component_groups": [
+            "vida75"
+          ]
+        }
+      },
+      "kny:vida76": {
+        "add": {
+          "component_groups": [
+            "vida76"
+          ]
+        }
+      },
+      "kny:vida77": {
+        "add": {
+          "component_groups": [
+            "vida77"
+          ]
+        }
+      },
+      "kny:vida78": {
+        "add": {
+          "component_groups": [
+            "vida78"
+          ]
+        }
+      },
+      "kny:vida79": {
+        "add": {
+          "component_groups": [
+            "vida79"
+          ]
+        }
+      },
+      "kny:vida80": {
+        "add": {
+          "component_groups": [
+            "vida80"
+          ]
+        }
+      },
+      "kny:default_skills": {
+        "set_property": {
+          "kny:skills": 0
+        }
+      },
+      "kny:serpent": {
+        "set_property": {
+          "kny:skins": 1
+        }
+      },
+      "curse:off_status": {
+        "set_property": {
+          "curse:skin": 1
+        }
+      },
+      "curse:sukuna_status": {
+        "set_property": {
+          "curse:skin": 2
+        }
+      },
+      "curse:thunder_effect": {
+        "set_property": {
+          "curse:skin": 3
+        }
+      },
+      "kny:mugentest": {
+        "add": {
+          "component_groups": [
+            "mugen"
+          ]
+        }
+      },
+      "kny:damage_receive": {
+        "add": {
+          "component_groups": [
+            "damage_receive"
+          ]
+        }
+      },
+      "burn_daylight_on": {
+        "add": {
+          "component_groups": [
+            "burn_daylight"
+          ]
+        }
+      },
+      "burn_daylight_off": {
+        "remove": {
+          "component_groups": [
+            "burn_daylight"
+          ]
+        }
+      },
+      "kny:mugenremove": {
+        "remove": {
+          "component_groups": [
+            "mugen"
+          ]
+        }
+      },
+      "kny:half_moon2": {
+        "add": {
+          "component_groups": [
+            "kny:half_moon2"
+          ]
+        }
+      },
+      "kny:direction_arrow": {
+        "add": {
+          "component_groups": [
+            "kny:direction_arrow"
+          ]
+        }
+      },
+      "curse:sukuna_heian2": {
+        "add": {
+          "component_groups": [
+            "sukuna_heian2"
+          ]
+        }
+      },
+      "mha:player": {
+        "remove": {
+          "component_groups": [
+            "mha:test"
+          ]
+        }
+      },
+      "purple2": {
+        "add": {
+          "component_groups": [
+            "purple2"
+          ]
+        }
+      },
+      "grau4": {
+        "add": {
+          "component_groups": [
+            "grau4"
+          ]
+        }
+      },
+      "grau3": {
+        "add": {
+          "component_groups": [
+            "grau3"
+          ]
+        }
+      },
+      "grausemi2": {
+        "add": {
+          "component_groups": [
+            "grausemi2"
+          ]
+        }
+      },
+      "grau2": {
+        "add": {
+          "component_groups": [
+            "grau2"
+          ]
+        }
+      },
+      "grausemi1": {
+        "add": {
+          "component_groups": [
+            "grausemi1"
+          ]
+        }
+      },
+      "grau1": {
+        "add": {
+          "component_groups": [
+            "grau1"
+          ]
+        }
+      },
+      "especial": {
+        "add": {
+          "component_groups": [
+            "especial"
+          ]
+        }
+      },
+      "convergence": {
+        "add": {
+          "component_groups": [
+            "convergence"
+          ]
+        }
+      },
+      "thundermode": {
+        "add": {
+          "component_groups": [
+            "thundermode"
+          ]
+        }
+      },
+      "curse:campfire": {
+        "add": {
+          "component_groups": [
+            "curse:campfire"
+          ]
+        }
+      },
+      "curse:ember_insects": {
+        "add": {
+          "component_groups": [
+            "curse:ember_insects"
+          ]
+        }
+      },
+      "kny:compressed_sound": {
+        "add": {
+          "component_groups": [
+            "kny:compressed_sound"
+          ]
+        }
+      },
+      "kny:shoot": {
+        "add": {
+          "component_groups": [
+            "kny:shoot"
+          ]
+        }
+      },
+      "kny:spawn_blood_blade": {
+        "add": {
+          "component_groups": [
+            "kny:spawn_blood_blade"
+          ]
+        }
+      },
+      "curse:fish_event2": {
+        "add": {
+          "component_groups": [
+            "curse:fish_event2"
+          ]
+        }
+      },
+      "curse:open2": {
+        "add": {
+          "component_groups": [
+            "curse:open2"
+          ]
+        }
+      },
+      "curse:fish_event": {
+        "add": {
+          "component_groups": [
+            "curse:fish_event"
+          ]
+        }
+      },
+      "curse:spawn_divinedogblack": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_divinedogblack"
+          ]
+        }
+      },
+      "curse:spawn_divinedogwhite": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_divinedogwhite"
+          ]
+        }
+      },
+      "curse:spawn_divinedogtotality": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_divinedogtotality"
+          ]
+        }
+      },
+      "curse:spawn_toad": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_toad"
+          ]
+        }
+      },
+      "curse:spawn_max_elephant": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_max_elephant"
+          ]
+        }
+      },
+      "curse:spawn_rabbit": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_rabbit"
+          ]
+        }
+      },
+      "curse:spawn_garuda": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_garuda"
+          ]
+        }
+      },
+      "curse:spawn_mahoraga": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_mahoraga"
+          ]
+        }
+      },
+      "kny:scattering_lotuses": {
+        "add": {
+          "component_groups": [
+            "kny:scattering_lotuses"
+          ]
+        }
+      },
+      "curse:spawn_cento": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_cento"
+          ]
+        }
+      },
+      "curse:spawn_frog": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_frog"
+          ]
+        }
+      },
+      "curse:spawn_blue": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_blue"
+          ]
+        }
+      },
+      "curse:spawn_nariz": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_nariz"
+          ]
+        }
+      },
+      "curse:spawn_blindness": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_blindness"
+          ]
+        }
+      },
+      "curse:spawn_jogo": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_jogo"
+          ]
+        }
+      },
+      "curse:spawn_barata": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_barata"
+          ]
+        }
+      },
+      "curse:spawn_hanami": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_hanami"
+          ]
+        }
+      },
+      "curse:spawn_dagon": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_dagon"
+          ]
+        }
+      },
+      "kny:spawn_dogshadow": {
+        "add": {
+          "component_groups": [
+            "kny:spawn_dogshadow"
+          ]
+        }
+      },
+      "curse:hammer2": {
+        "add": {
+          "component_groups": [
+            "curse:hammer2"
+          ]
+        }
+      },
+      "curse:spawn_dragon": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_dragon"
+          ]
+        }
+      },
+      "curse:spawn_insect": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_insect"
+          ]
+        }
+      },
+      "curse:dismantle": {
+        "add": {
+          "component_groups": [
+            "curse:dismantle"
+          ]
+        }
+      },
+      "kny:spawn_dragon_wood": {
+        "add": {
+          "component_groups": [
+            "kny:spawn_dragon_wood"
+          ]
+        }
+      },
+      "kny:anger_thunder_death2": {
+        "add": {
+          "component_groups": [
+            "kny:anger_thunder_death2"
+          ]
+        }
+      },
+      "curse:barrage_event": {
+        "add": {
+          "component_groups": [
+            "curse:barrage_event"
+          ]
+        }
+      },
+      "curse:spawn_piercing_ox": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_piercing_ox"
+          ]
+        }
+      },
+      "curse:spawn_tiger_funeral": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_tiger_funeral"
+          ]
+        }
+      },
+      "curse:spawn_agito": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_agito"
+          ]
+        }
+      },
+      "curse:spawn_serpent": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_serpent"
+          ]
+        }
+      },
+      "curse:spawn_takada": {
+        "add": {
+          "component_groups": [
+            "curse:spawn_takada"
+          ]
+        }
+      },
+      "curse:garuda_event": {
+        "add": {
+          "component_groups": [
+            "curse:garuda_event"
+          ]
+        }
+      },
+      "curse:garuda_event2": {
+        "add": {
+          "component_groups": [
+            "curse:garuda_event2"
+          ]
+        }
+      },
+      "curse:garuda_event3": {
+        "add": {
+          "component_groups": [
+            "curse:garuda_event3"
+          ]
+        }
+      },
+      "curse:garuda_event4": {
+        "add": {
+          "component_groups": [
+            "curse:garuda_event4"
+          ]
+        }
+      },
+      "curse:garuda_event5": {
+        "add": {
+          "component_groups": [
+            "curse:garuda_event5"
+          ]
+        }
+      },
+      "kny:kemari_projetil": {
+        "add": {
+          "component_groups": [
+            "kny:kemari_projetil"
+          ]
+        }
+      },
+      "kny:air_attack": {
+        "add": {
+          "component_groups": [
+            "kny:air_attack"
+          ]
+        }
+      },
+      "kny:flowing_light_flash_event": {
+        "add": {
+          "component_groups": [
+            "kny:flowing_light_flash_event"
+          ]
+        }
+      },
+      "kny:spawn_goldfish_big": {
+        "add": {
+          "component_groups": [
+            "kny:spawn_goldfish_big"
+          ]
+        }
+      },
+      "kny:spawn_enmutentacles": {
+        "add": {
+          "component_groups": [
+            "kny:spawn_enmutentacles"
+          ]
+        }
+      },
+      "kny:eyes_basket2": {
+        "add": {
+          "component_groups": [
+            "kny:eyes_basket2"
+          ]
+        }
+      },
+      "add_creative_tag": {
+        "add": {
+          "tags": [
+            "creative_player"
+          ]
+       }
+    },
+    "remove_creative_tag": {
+       "remove": {
+          "tags": [
+            "creative_player"
+           ]
+         }
+       },
+      "kny:cutting_threads_rotation": {
+        "add": {
+          "component_groups": [
+            "kny:cutting_threads_rotation"
+          ]
+        }
+      },
+      "kny:waterprison_event": {
+        "add": {
+          "component_groups": [
+            "kny:waterprison_event"
+          ]
+        }
+      }
+    }
+  }
+}
