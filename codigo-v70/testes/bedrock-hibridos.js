@@ -18,9 +18,16 @@ const checkpoint = "kny:h_teste_prova";
 let serial = 0;
 
 function spawn(name, x = 52, z = 58) {
-  const p = spawnSimulatedPlayer({ x, y: 210, z, dimension: dim() }, name + (++serial), GameMode.Survival);
-  p.runCommand("fill ~-1 ~-1 ~-1 ~1 ~-1 ~1 stone");
+  const pos = { x: x + 0.5, y: 210, z: z + 0.5 };
+  const p = spawnSimulatedPlayer({ ...pos, dimension: dim() }, name + (++serial), GameMode.Survival);
+  p.runCommand(`fill ${x - 1} 209 ${z - 1} ${x + 1} 209 ${z + 1} stone`);
+  p.teleport(pos);
   return p;
+}
+async function esperarInicio(p) {
+  for (let i = 0; i < 30 && !p.hasTag("start"); i++) await wait(2);
+  eq(p.hasTag("start"), true, "Inicialização do jogador pelo controlador");
+  await wait(2);
 }
 function holder(p, nome) {
   const o = world.scoreboard.getObjective(nome) ?? world.scoreboard.addObjective(nome);
@@ -86,6 +93,7 @@ async function executar() {
   rei.addTag("kny_muzan");
   holder(rei, OBJ_REI);
   const p = spawn("AprendizH");
+  await esperarInicio(p);
   aprender(lider, p);
   eq(transformar(p, "rei", rei).hibrido, true, "transformação legítima");
   await wait(4);
@@ -106,6 +114,7 @@ async function executar() {
   log("transformação, patente e famílias dos três disfarces");
 
   const aprovado = spawn("SangueH");
+  await esperarInicio(aprovado);
   aprender(lider, aprovado);
   item(aprovado, "kny:blood");
   eq(aprovado.useItemInSlot(0), true, "item de sangue inicia uso nativo");
@@ -137,7 +146,7 @@ async function executar() {
   comum.addTag("hashira");
   pontuar(comum, "kf_water", 10);
   item(comum, "kny:blood");
-  comum.runCommand("function blood");
+  eq(transformar(comum, "sangue", comum, { destino: "oni" }).ok, true, "Oni comum confirmado");
   await wait(4);
   eq(getTrueRace(comum), "oni", "pontuação histórica não concedeu Híbrido");
   comum.disconnect();

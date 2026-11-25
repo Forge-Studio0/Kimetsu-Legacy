@@ -3690,6 +3690,14 @@
           ]
         }
       },
+      "kny:limpar_linhagem_oni": {
+        "remove": {
+          "component_groups": [
+            "demon_family",
+            "burn_daylight"
+          ]
+        }
+      },
       "kny:mugenremove": {
         "remove": {
           "component_groups": [

@@ -20,7 +20,7 @@ const FOLEGO_RECARGA_AGACHADO = 0.02; // fração do máximo recuperada a cada 5
 const FOLEGO_REGEN_PASSIVO = 0; // fôlego recuperado por segundo em pé (0 = só recarrega agachando)
 const CICLO = 5; // ticks entre atualizações
 const REENVIO = 40; // reenvia o painel a cada 2 s mesmo sem mudança (garante que continue na tela)
-const VERSAO = "1.0.54";
+const VERSAO = "1.0.55";
 const avisouInicio = new Set();
 
 const ultimoTitulo = new Map(); // só para diagnóstico: /scriptevent kny:painel

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { registerHooks } from "node:module";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { system, world, jogador, executarAgendados } from "./simulador.mjs";
+import { system, world, jogador, executarAgendados, executarIntervalos } from "./simulador.mjs";
 
 registerHooks({
   resolve(specifier, context, next) {
@@ -20,6 +20,7 @@ const [{ H, RESP_H_ID, ESPECIAIS }, dominio, sistema, registros, poderes, locais
   carregar("hybrid_abilities"), carregar("hybrid_locations"), carregar("hybrid_sun"), carregar("stats"), carregar("stats_config"),
 ]);
 await carregar("menu");
+await carregar("hybrid_admin");
 const staff = jogador("Staff");
 staff.addTag("kny_op");
 const lider = jogador("Professor");
@@ -67,6 +68,30 @@ function hibrido() {
   return p;
 }
 
+const sangue = (p) => system.afterEvents.scriptEventReceive.emit({ id: "kny:h_sangue", sourceEntity: p, message: "beber" });
+const comandoStaff = (p, message) => system.afterEvents.scriptEventReceive.emit({ id: "kny:h_staff", sourceEntity: p, message });
+const abrirMenu = (p) => system.afterEvents.scriptEventReceive.emit({ id: "kny:menu", sourceEntity: p, message: "classico" });
+const selecionar = (txt) => (f) => {
+  const selection = f.buttons.findIndex((b) => b.texto.replace(/§./g, "").includes(txt));
+  assert.ok(selection >= 0, txt + " em " + f.titulo);
+  return { selection };
+};
+
+function oniV72(p) {
+  const patente = stats.patenteDe(p).tag;
+  p.removeTag("slayer");
+  p.removeTag("hashira");
+  p.addTag("kny_escolheu");
+  p.addTag("demon");
+  p.addTag("muzan_curse");
+  stats.pontuar(p, "blood", 1);
+  registros.guardarPersonagem(p, {
+    v: 1, id: registros.identificador(p), estado: "ativo", raca: "oni", via: "sangue", doses: 1,
+    anterior: { patente, honra: stats.getScore(p, "upslayer"), resp: null, formas: 0 },
+  });
+  return p;
+}
+
 test("patente e placares antigos não são provas. Hashira pode completar aulas reais", () => {
   const p = cacador({ hashira: true });
   stats.pontuar(p, "kf_water", 10);
@@ -95,13 +120,184 @@ test("somente o Rei titular, a Staff autorizada ou o sangue legítimo iniciam a 
   assert.equal(sistema.transformar(p, "sangue").ok, false);
   assert.equal(dominio.registrarAula(lider, p, "water", 1), true);
   p.getComponent("minecraft:inventory").container.setItem(0, { typeId: "kny:blood", amount: 1 });
-  system.afterEvents.scriptEventReceive.emit({ id: "kny:h_sangue", sourceEntity: p, message: "beber" });
+  p.escolhas.push(selecionar("Beber e virar Oni comum"));
+  sangue(p);
   await executarAgendados();
   assert.equal(sistema.getTrueRace(p), "oni");
   assert.equal(stats.getScore(p, "blood"), 1);
   assert.equal(p.getComponent("minecraft:inventory").container.getItem(0), undefined);
   assert.equal(sistema.transformar(p, "sangue").ok, false);
   assert.equal(dominio.registrarAula(lider, p, "water", 2), false);
+});
+
+test("formas liberadas sem domínio ficam explícitas. Cancelar conserva a pilha e o personagem humano", async () => {
+  const p = cacador({ hashira: true });
+  executarIntervalos(40);
+  assert.equal(stats.getScore(p, "kf_water"), 10);
+  assert.equal(dominio.dominioHumano(p, "water"), 0);
+  p.escolhas.push(selecionar("Respirações"));
+  abrirMenu(p);
+  await executarAgendados();
+  assert.ok(p.telas.at(-1).buttons.some((b) => b.texto.includes("Liberadas 10/10 · Domínio 0/10")));
+  p.escolhas.push(selecionar("Guia"), selecionar("Domínio humano"));
+  abrirMenu(p);
+  await executarAgendados();
+  assert.match(p.telas.at(-1).corpo.replace(/§./g, ""), /Liberadas 10\/10 · Domínio\s+0\/10/);
+
+  const c = p.getComponent("minecraft:inventory").container;
+  c.setItem(0, { typeId: "kny:blood", amount: 3 });
+  assert.equal(sistema.transformar(p, "sangue").ok, false);
+  p.escolhas.push(selecionar("Continuar humano"));
+  sangue(p);
+  sangue(p);
+  await executarAgendados();
+  assert.equal(p.telas.filter((f) => f.titulo.includes("Transformação em Oni comum")).length, 1);
+  assert.equal(sistema.getTrueRace(p), "cacador");
+  assert.equal(c.getItem(0).amount, 3);
+  assert.equal(stats.getScore(p, "blood"), 0);
+  assert.equal(registros.personagem(p), undefined);
+});
+
+test("o sangue abre a escolha entre vários domínios, e a nova tentativa preserva apenas a original", async () => {
+  const p = mestre();
+  const c = p.getComponent("minecraft:inventory").container;
+  c.setItem(2, { typeId: "kny:nichirin_thunder" });
+  for (let k = 1; k <= 6; k++) assert.ok(dominio.registrarAula(lider, p, "thunder", k));
+  c.setItem(0, { typeId: "kny:blood", amount: 2 });
+  p.escolhas.push(selecionar("Definir original · Respiração do Trovão"));
+  sangue(p);
+  await executarAgendados();
+  assert.equal(p.telas.length, 1);
+  assert.equal(sistema.getTrueRace(p), "cacador");
+  assert.equal(c.getItem(0).amount, 2);
+  assert.equal(stats.getScore(p, "blood"), 0);
+  assert.equal(dominio.avaliarDominio(p).resp.obj, "thunder");
+  sangue(p);
+  await executarAgendados();
+  assert.equal(sistema.racaHibrida(p).resp, "thunder");
+  assert.equal(c.getItem(0).amount, 1);
+  assert.equal(stats.getScore(p, "blood"), 1);
+});
+
+test("troca da dose, alteração do domínio e histórico inválido impedem confirmar um resultado antigo", async () => {
+  const p = cacador();
+  const c = p.getComponent("minecraft:inventory").container;
+  c.setItem(0, { typeId: "kny:blood", amount: 2 });
+  p.escolhas.push((f) => {
+    c.setItem(0, { typeId: "kny:blood", amount: 3 });
+    return selecionar("Beber e virar Oni comum")(f);
+  });
+  sangue(p);
+  await executarAgendados();
+  assert.match(p.mensagens.at(-1), /pilha de sangue mudou/);
+  assert.equal(c.getItem(0).amount, 3);
+
+  p.escolhas.push((f) => {
+    for (let k = 1; k <= 10; k++) assert.ok(dominio.registrarAula(lider, p, "water", k));
+    return selecionar("Beber e virar Oni comum")(f);
+  });
+  sangue(p);
+  await executarAgendados();
+  assert.match(p.mensagens.at(-1), /resultado mudou/);
+  assert.equal(c.getItem(0).amount, 3);
+  assert.equal(sistema.getTrueRace(p), "cacador");
+  p.setDynamicProperty(registros.CHAVE_DOMINIO, "{");
+  sangue(p);
+  await executarAgendados();
+  assert.match(p.mensagens.at(-1), /Histórico de domínio incompatível/);
+  assert.equal(c.getItem(0).amount, 3);
+  assert.equal(stats.getScore(p, "blood"), 0);
+});
+
+test("Rei titular e cargo administrativo exigem a decisão de virar Oni comum", async () => {
+  const p = cacador();
+  assert.equal(sistema.transformar(p, "rei", rei).ok, false);
+  assert.equal(sistema.transformar(p, "rei", rei, { destino: "oni" }).ok, true);
+  assert.equal(sistema.getTrueRace(p), "oni");
+  const candidato = cacador();
+  candidato.addTag("kny_op");
+  assert.equal(sistema.transformar(candidato, "sangue").ok, false);
+  candidato.addTag("kny_set_rei");
+  candidato.escolhas.push(selecionar("Continuar humano"));
+  executarIntervalos(10);
+  await executarAgendados();
+  assert.equal(sistema.getTrueRace(candidato), "cacador");
+  assert.equal(stats.titularDe(OBJ_REI), rei.name);
+});
+
+test("aula selecionada antes de outro registro exige selecionar novamente a próxima forma", async () => {
+  const p = cacador({ nome: "Concorrencia" });
+  lider.escolhas.push(selecionar("Ensinar Respiração"), selecionar("Respiração da Água"), (f) => {
+    const selecao = selecionar(p.name)(f);
+    assert.ok(dominio.registrarAula(lider, p, "water", 1));
+    return selecao;
+  });
+  abrirMenu(lider);
+  await executarAgendados();
+  assert.equal(dominio.dominioHumano(p, "water"), 1);
+  assert.match(lider.mensagens.at(-1), /O progresso mudou/);
+  p.desconectar();
+});
+
+test("diagnóstico e recuperação de Oni da v72 mantêm progressão, saldo e quantidade de sangue", () => {
+  const p = oniV72(cacador({ hashira: true, nome: "Legado Teste" }));
+  const id = registros.idExistente(p);
+  const c = p.getComponent("minecraft:inventory").container;
+  c.setItem(0, { typeId: "kny:blood", amount: 4 });
+  stats.pontuar(p, "kf_water", 10);
+  stats.pontuar(p, "updemon", 250);
+  stats.pontuar(p, "blood", 5);
+  stats.pontuar(p, "kny_dinheiro", 1234);
+  p.addTag("lower5");
+  p.removeTag("muzan_curse");
+  p.addTag("breakcurse");
+  const saldo = stats.disponiveis(p);
+  comandoStaff(p, 'recuperar "Legado Teste" water Prova verificável de aprendizado humano');
+  assert.equal(sistema.getTrueRace(p), "oni");
+  comandoStaff(staff, "diagnostico " + id);
+  assert.match(staff.mensagens.at(-1), /water · liberadas 10\/10 · comprovadas 0\/10/);
+  comandoStaff(staff, 'recuperar "Legado Teste" water');
+  assert.match(staff.mensagens.at(-1), /sem comprovação/);
+  p.addTag("kny_op");
+  comandoStaff(p, 'recuperar "Legado Teste" water Prova verificável de aprendizado humano');
+  assert.match(p.mensagens.at(-1), /outra pessoa da Staff/);
+
+  comandoStaff(staff, 'recuperar "Legado Teste" water Registro das dez aulas humanas verificado pela Staff');
+  assert.equal(sistema.racaHibrida(p)?.resp, "water");
+  assert.equal(registros.personagem(p).id, id);
+  assert.equal(stats.getScore(p, "updemon"), 250);
+  assert.equal(stats.getScore(p, "blood"), 5);
+  assert.equal(stats.getScore(p, "kny_dinheiro"), 1234);
+  assert.equal(stats.disponiveis(p), saldo);
+  assert.equal(stats.patenteDe(p).tag, "lower5");
+  assert.equal(p.hasTag("breakcurse"), true);
+  assert.equal(p.hasTag("muzan_curse"), false);
+  assert.equal(c.getItem(0).amount, 4);
+  comandoStaff(staff, "recuperar " + id + " water");
+  assert.match(staff.mensagens.at(-1), /não contém transformação ativa/);
+});
+
+test("Staff pode recuperar o próprio personagem se o domínio completo já estava comprovado", () => {
+  const p = oniV72(mestre());
+  p.addTag("kny_op");
+  assert.equal(sistema.recuperarHibridoV72(p, p, "thunder").ok, false);
+  assert.equal(sistema.recuperarHibridoV72(p, p, "water").ok, true);
+  assert.equal(sistema.getTrueRace(p), "hibrido");
+  const outro = cacador();
+  outro.addTag("demon");
+  assert.equal(sistema.recuperarHibridoV72(staff, outro, "water").ok, false);
+});
+
+test("a cura devolve acesso ao contrato anterior e às aulas, sem recriar o personagem", () => {
+  const p = oniV72(cacador());
+  const id = registros.idExistente(p);
+  p.removeTag("demon");
+  system.afterEvents.scriptEventReceive.emit({ id: "kny:h_curado", sourceEntity: p, message: "antidoto" });
+  assert.equal(registros.personagem(p).estado, "curado");
+  assert.equal(sistema.getTrueRace(p), "cacador");
+  assert.ok(dominio.registrarAula(lider, p, "water", 1));
+  assert.equal(registros.idExistente(p), id);
+  assert.equal(stats.getScore(p, "blood"), 1);
 });
 
 test("múltiplas respirações são resolvidas antes de transformar. A arte fica vinculada", () => {
@@ -160,9 +356,11 @@ test("uma transformação interrompida é retomada sem duplicar dose, saldo ou i
   const parcial = registros.personagem(p);
   assert.equal(parcial.estado, "transformando");
   assert.equal(c.getItem(0).amount, 2);
+  assert.equal(parcial.dose, undefined);
+  c.setItem(0, { typeId: "kny:blood", amount: 3 });
   p.triggerEvent = originalTrigger;
   sistema.restaurarRaca(p);
-  assert.equal(c.getItem(0).amount, 2);
+  assert.equal(c.getItem(0).amount, 3);
   assert.equal(stats.getScore(p, "blood"), 1);
   assert.equal(sistema.racaHibrida(p).id, parcial.id);
   assert.equal(stats.disponiveis(p), pre);

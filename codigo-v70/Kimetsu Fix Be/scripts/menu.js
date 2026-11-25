@@ -3,8 +3,8 @@ import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { RESPIRACOES, KEKKIJUTSUS, ITEM_OBJ } from "./menu_data.js";
 import { H, ARTE_H_ID, DOMINAVEL, RESP_H_ID, ROTULOS } from "./hybrid_config.js";
-import { dominioHumano, ehCacadorHumano, progressoDominio, registrarAula, selecionarOriginal } from "./hybrid_mastery.js";
-import { canUseBreathing, canUseKekkijutsu, ehStaff, isHybrid, racaHibrida, transformar, trocarDisfarce } from "./hybrid_system.js";
+import { DISTANCIA_AULA, dominioHumano, ehCacadorHumano, formasLiberadas, possuiItemRespiracao, progressoDominio, registrarAula, selecionarOriginal } from "./hybrid_mastery.js";
+import { canUseBreathing, canUseKekkijutsu, doseEmMaos, ehStaff, estadoBloqueado, isHybrid, preverTransformacao, racaHibrida, transformar, trocarDisfarce } from "./hybrid_system.js";
 import { ativarHabilidade, danoEspecialEmCurso, habilidadeDe } from "./hybrid_abilities.js";
 import { canAccessLocation, configurarLocal, locais, viajar } from "./hybrid_locations.js";
 import {
@@ -288,21 +288,28 @@ function reportar(p, e) {
 }
 
 // Uma sessão por jogador, do primeiro formulário até fechar o último submenu.
-function pedirAbertura(p, classico = false) {
-  if (!p?.isValid || p.typeId !== "minecraft:player" || sessoesMenu.has(p.id)) return;
+function abrirSessaoMenu(p, acao) {
+  if (!p?.isValid || p.typeId !== "minecraft:player" || sessoesMenu.has(p.id)) return false;
   const id = p.id;
   const sessao = {};
   sessoesMenu.set(id, sessao);
   system.run(async () => {
     try {
       if (!p.isValid || p.hasTag("kny_caido")) return;
-      if (classico) p.addTag(TAG_CLASSICO);
-      await (jaEscolheu(p) ? menuPrincipal(p) : escolha(p));
+      await acao();
     } catch (e) {
       if (p.isValid) reportar(p, e);
     } finally {
       if (sessoesMenu.get(id) === sessao) sessoesMenu.delete(id);
     }
+  });
+  return true;
+}
+
+function pedirAbertura(p, classico = false) {
+  abrirSessaoMenu(p, () => {
+    if (classico) p.addTag(TAG_CLASSICO);
+    return jaEscolheu(p) ? menuPrincipal(p) : escolha(p);
   });
 }
 
@@ -321,6 +328,13 @@ system.beforeEvents.startup.subscribe(({ itemComponentRegistry }) => {
 try {
   system.afterEvents?.scriptEventReceive?.subscribe((ev) => {
     if (ev.id === "kny:menu") pedirAbertura(ev.sourceEntity, ev.message?.trim() === "classico");
+    if (ev.id === "kny:h_sangue" && ev.message === "beber") {
+      const p = ev.sourceEntity;
+      if (!p?.isValid || p.typeId !== "minecraft:player" || sessoesMenu.has(p.id)) return;
+      const dose = doseEmMaos(p);
+      if (!dose) return p.sendMessage("§cEmpunhe o sangue para usá-lo.");
+      abrirSessaoMenu(p, () => usarSangue(p, dose));
+    }
   });
 } catch (e) {
   console.warn("[Menu Kimetsu] scriptEvent indisponível: " + e);
@@ -331,9 +345,9 @@ try {
    APRENDIZADO POR HABILIDADE
    - Cada respiração (e a Respiração Básica das lâminas coloridas) tem várias
      habilidades (formas). Elas são aprendidas UMA POR UMA, em ordem, com um Hashira.
-   - kf_<respiração> guarda quantas habilidades já foram aprendidas.
+   - kf_<respiração> guarda quantas habilidades estão liberadas.
    - Os controllers do addon só liberam a forma N se kf_<respiração> >= N.
-   - Hashira dominam todas as habilidades e são os únicos que ensinam.
+   - A patente Hashira libera as formas para combate. Aulas registram o domínio humano.
    - Requisitos para aprender a habilidade K:
        respirações: possuir uma espada daquela respiração e 10 de honra por forma anterior;
        Respiração Básica: possuir uma lâmina colorida e 5 de honra por forma anterior.
@@ -351,13 +365,12 @@ const TODAS_RESPIRACOES = [BASICA, ...RESPIRACOES];
 const POR_OBJ = {};
 for (const g of TODAS_RESPIRACOES) POR_OBJ[g.obj] = g;
 
-const DIST_ENSINO = 12; // blocos
+const DIST_ENSINO = DISTANCIA_AULA;
 const HONRA_POR_FORMA = 10;
 const HONRA_POR_FORMA_BASICA = 5;
 
 const objForma = (g) => "kf_" + g.obj;
 const ehHashira = (p) => p.hasTag("hashira") && !isOni(p);
-const formasAprendidas = (p, g) => (ehHashira(p) ? g.formas.length : Math.min(g.formas.length, getScore(p, objForma(g))));
 
 function marcarForma(p, g, k) {
   const nome = objForma(g);
@@ -365,46 +378,15 @@ function marcarForma(p, g, k) {
   obj.setScore(p, k);
 }
 
-function inventarioDe(p) {
-  try {
-    return p.getComponent("minecraft:inventory").container;
-  } catch {
-    return null;
-  }
-}
-
-function temEspada(p, g) {
-  const c = inventarioDe(p);
-  if (!c) return false;
-  const itens = RESP_H_ID.get(g.obj)?.itens ?? [];
-  for (let i = 0; i < c.size; i++) {
-    const it = c.getItem(i);
-    if (it && (ITEM_OBJ[it.typeId] === g.obj || itens.includes(it.typeId))) return true;
-  }
-  return false;
-}
-
-function temLamina(p) {
-  const c = inventarioDe(p);
-  if (!c) return false;
-  for (let i = 0; i < c.size; i++) {
-    const it = c.getItem(i);
-    if (it && LAMINA_POR_ITEM[it.typeId]) return true;
-  }
-  return false;
-}
-
 // requisitos para aprender a PRÓXIMA habilidade: { k: número da forma (0 = já sabe tudo), faltas: [...] }
 function requisitosProximaForma(p, g) {
-  const k = (DOMINAVEL(g.obj) ? dominioHumano(p, g.obj) : formasAprendidas(p, g)) + 1;
+  const k = (DOMINAVEL(g.obj) ? dominioHumano(p, g.obj) : formasLiberadas(p, g)) + 1;
   if (k > g.formas.length) return { k: 0, faltas: [] };
   const faltas = [];
   const minimo = (g.basica ? HONRA_POR_FORMA_BASICA : HONRA_POR_FORMA) * (k - 1);
   const honra = getScore(p, "upslayer");
-  if (g.basica) {
-    if (!temLamina(p)) faltas.push("possuir uma lâmina colorida");
-  } else if (!temEspada(p, g)) {
-    faltas.push(`possuir uma espada da ${g.nome}`);
+  if (!possuiItemRespiracao(p, RESP_H_ID.get(g.obj))) {
+    faltas.push(g.basica ? "possuir uma lâmina colorida" : `possuir uma espada da ${g.nome}`);
   }
   if (honra < minimo) faltas.push(`${minimo} de honra (você tem ${honra})`);
   return { k, faltas };
@@ -432,7 +414,7 @@ const FAMILIAS_ANTIGAS = {
   pedra: ["gyomei"], som: ["uzui"], serpente: ["obanai"], flor: ["flower"], morte: ["death"],
 };
 
-// Hashira dominam tudo; migração do sistema antigo; seleção inicial da Respiração Básica
+// Acesso por patente, migração do sistema antigo e seleção inicial da Respiração Básica.
 system.runInterval(() => {
   for (const p of world.getPlayers()) {
     try {
@@ -542,7 +524,13 @@ system.runInterval(() => {
       const obj = lamina ? "basica" : it ? ITEM_OBJ[it.typeId] : undefined;
       const g = obj ? GRUPOS[obj] : undefined;
       if (g && g.formas.length > 0) {
-        const aprendidas = oni ? g.formas.length : formasAprendidas(p, g);
+        const hibrido = racaHibrida(p);
+        const respiracao = RESP_H_ID.has(obj);
+        if (hibrido && (respiracao ? hibrido.resp !== obj : hibrido.arte !== obj)) {
+          if (!p.hasTag(TAG_DICA_OFF)) p.onScreenDisplay.setActionBar(`§c${g.nome} fora do vínculo Híbrido`);
+          continue;
+        }
+        const aprendidas = oni ? g.formas.length : formasLiberadas(p, g);
         if (!oni && aprendidas < 1) {
           p.onScreenDisplay.setActionBar(`§c§l${g.nome} bloqueada§r §8| §7aprenda com um Hashira`);
           continue;
@@ -612,7 +600,7 @@ async function painelPrincipal(p) {
     if (ehRei(p)) extras.push(["Transf.", t.icones.personagem, () => transformarMenu(p)]);
     if (ehOperador(p)) extras.push(["Cargo", t.icones.config, () => alterarCargo(p)]);
   } else {
-    if (ehLider(p) || ehHashira(p)) extras.push([ehLider(p) ? "Ensinar" : "Domínio", "textures/icons/menu_teach", () => ensinar(p)]);
+    if (ehLider(p) || ehHashira(p)) extras.push([ehLider(p) ? "Ensinar" : "Aulas", "textures/icons/menu_teach", () => ensinar(p)]);
     if (ehOperador(p)) extras.push(["Cargo", t.icones.config, () => alterarCargo(p)]);
   }
   for (const [txt, icone, acao] of [...nav, ...extras].slice(0, 6)) add("R:", txt, icone, acao);
@@ -689,7 +677,7 @@ async function menuClassico(p) {
     f.button(hibrido ? "§l§4Personagem Híbrido\n§r§8Poderes, disfarces e castelo" : "§l§4Kekkijutsu\n§r§8Artes demoníacas", t.icones.arte);
     f.button("§l§4Configurações\n§r§8Ajustes do menu", t.icones.config);
     f.button("§l§4Personagem\n§r§8Sua forma demoníaca", t.icones.personagem);
-    f.button("§l§4Como Jogar\n§r§8Guia do oni", t.icones.comoJogar);
+    f.button("§l§4Guia\n§r§8Como jogar e acessos", t.icones.comoJogar);
     f.button("§l§4Missões\n§r§8Caçadas e conquistas", t.icones.missoes);
     f.button("§l§4Status\n§r§8Atributos e stamina", t.icones.status);
     f.button("§l§4Menu em painel\n§r§8Moldura vermelha", t.icones.status);
@@ -708,7 +696,7 @@ async function menuClassico(p) {
     f.button("§l§cRespirações\n§r§7Estilos e formas", t.icones.arte);
     f.button("§l§cConfigurações\n§r§7Ajustes do menu", t.icones.config);
     f.button("§l§cPersonagem\n§r§7Rank e status", t.icones.personagem);
-    f.button("§l§cComo Jogar\n§r§7Guia do caçador", t.icones.comoJogar);
+    f.button("§l§cGuia\n§r§7Como jogar e acessos", t.icones.comoJogar);
     f.button("§l§cMissões\n§r§7Objetivos da jornada", t.icones.missoes);
     f.button("§l§cStatus\n§r§7Atributos e stamina", t.icones.status);
     f.button("§l§cMenu em painel\n§r§7Moldura vermelha", t.icones.status);
@@ -761,27 +749,45 @@ async function guiaEAcessos(p) {
   if (!r.canceled) return acoes[r.selection]?.();
 }
 
-async function menuDominio(p) {
+async function menuDominio(p, peloSangue = false) {
   if (!ehCacadorHumano(p)) return;
   const d = progressoDominio(p);
-  const completas = d.lista.filter((g) => g.aprendidas === g.formas.length);
-  const resumo = d.lista.filter((g) => g.aprendidas > 0).map((g) =>
-    `${g.nome} ${g.aprendidas}/${g.formas.length}`).join("\n");
-  const original = RESP_H_ID.get(d.original ?? (completas.length === 1 ? completas[0].obj : undefined));
+  const estilos = d.lista.filter((g) => g.aprendidas > 0 || g.liberadas > 0).sort((a, b) => b.aprendidas - a.aprendidas);
+  const resumo = estilos.slice(0, 5).map((g) =>
+    `${g.nome}\nLiberadas ${g.liberadas}/${g.formas.length} · Domínio ${g.elegivel ? g.aprendidas + "/" + g.formas.length : "inelegível"}`).join("\n");
+  const outros = estilos.length > 5 ? "\nConfira os demais estilos na tela Respirações." : "";
+  const previa = preverTransformacao(p);
   const f = novoForm(p).title("§lDOMÍNIO HUMANO").body(
-    (d.valido ? `Respiração original ${original?.nome ?? "a definir"}\n${resumo || "Nenhuma aula registrada."}\n\n` +
-      (original ? "Domínio comprovado. Uma transformação legítima em Oni pode despertar a raça Híbrida."
-        : completas.length > 1 ? "Escolha a respiração original entre os domínios comprovados."
-          : "Complete todas as aulas da mesma respiração com o Líder dos Hashiras. Formas concedidas pela patente são registradas separadamente.")
-      : "Histórico incompatível. Consulte a Staff.")
+    (d.invalido ? "Histórico incompatível. Consulte a Staff."
+      : `${previa.resp ? "Híbrido pronto · " + previa.resp.nome : previa.motivo}\n\n` +
+        (resumo || "Nenhuma forma ou aula registrada. Procure o Líder dos Hashiras para iniciar o domínio.") + outros +
+        (peloSangue ? "\n\nEscolha a original e use o sangue de novo." : ""))
   ).button(TXT_VOLTAR);
-  for (const g of completas) f.button("Definir original · " + g.nome);
+  for (const g of d.completas) f.button("Definir original · " + g.nome);
   const r = await mostrar(f, p);
   if (r.canceled) return;
-  if (r.selection === 0) return guiaEAcessos(p);
-  const alvo = completas[r.selection - 1];
-  if (alvo && selecionarOriginal(p, alvo.obj)) p.sendMessage("§aRespiração original registrada.");
-  return menuDominio(p);
+  if (r.selection === 0) return peloSangue ? undefined : guiaEAcessos(p);
+  const alvo = d.completas[r.selection - 1];
+  if (alvo && selecionarOriginal(p, alvo.obj)) {
+    p.sendMessage(peloSangue ? "§aRespiração original registrada. Use o sangue novamente." : "§aRespiração original registrada.");
+    if (peloSangue) return;
+  }
+  return menuDominio(p, peloSangue);
+}
+
+async function confirmarOniComum(p, motivo, acao) {
+  const f = novoForm(p).title("Transformação em Oni comum").body(motivo)
+    .button("Continuar humano").button(acao);
+  const r = await mostrar(f, p);
+  return !r.canceled && r.selection === 1;
+}
+
+async function usarSangue(p, dose) {
+  const previa = preverTransformacao(p);
+  if (previa.destino === "escolher") return menuDominio(p, true);
+  if (previa.destino === "oni" && !await confirmarOniComum(p, previa.motivo, "Beber e virar Oni comum")) return;
+  const r = transformar(p, "sangue", p, { dose, destino: previa.resp?.obj ?? previa.destino });
+  if (!r.ok) p.sendMessage("§c" + r.motivo);
 }
 
 async function menuHibrido(p) {
@@ -892,6 +898,12 @@ async function menuAcessos(p) {
   }
 }
 
+function resumoRespiracao(p, g) {
+  const total = g.formas.length;
+  const dominio = DOMINAVEL(g.obj) ? `${dominioHumano(p, g.obj)}/${total}` : "inelegível";
+  return `Liberadas ${formasLiberadas(p, g)}/${total} · Domínio ${dominio}`;
+}
+
 /* ---------------------------------------------------------------------
    RESPIRAÇÕES (caçador) / KEKKIJUTSU (oni)
 --------------------------------------------------------------------- */
@@ -942,11 +954,7 @@ async function painelArtes(p, pagina = 0) {
   }
   for (const g of itens) {
     const marca = g.obj === objMao ? "§a> §r" : "";
-    let sub = `${g.formas.length} formas`;
-    if (!oni) {
-      const n = formasAprendidas(p, g);
-      sub = n >= g.formas.length ? "todas aprendidas" : `${n}/${g.formas.length} aprendidas`;
-    }
+    const sub = oni ? `${g.formas.length} formas` : resumoRespiracao(p, g);
     add("L:", `${marca}§f§l${g.nome}\n§r§7${sub}`, null, () => painelDetalheArte(p, g, pagina));
   }
   if (paginar) add("L:", `§6§lPróxima página §7(${pagina + 1}/${total})`, null, () => painelArtes(p, pagina + 1));
@@ -964,7 +972,7 @@ async function painelArtes(p, pagina = 0) {
 // habilidades (formas) de uma respiração / kekkijutsu, com a imagem da espada ou da arte
 async function painelDetalheArte(p, g, voltarPag = 0, pagina = 0) {
   const oni = isOni(p);
-  const aprendidas = oni ? g.formas.length : formasAprendidas(p, g);
+  const aprendidas = oni ? g.formas.length : formasLiberadas(p, g);
   const paginar = g.formas.length > 6;
   const porPag = paginar ? 5 : 6;
   const total = Math.max(1, Math.ceil(g.formas.length / porPag));
@@ -982,12 +990,12 @@ async function painelDetalheArte(p, g, voltarPag = 0, pagina = 0) {
 
   add("B:", TXT_VOLTAR, null, () => painelArtes(p, voltarPag));
 
-  let resumo = `§l${g.nome}§r\n§7Habilidades: §f${aprendidas}/${g.formas.length}\n`;
+  let resumo = `§l${g.nome}§r\n§7${oni ? `${g.formas.length} formas` : resumoRespiracao(p, g)}\n`;
   if (!oni) {
     const r = requisitosProximaForma(p, g);
-    if (r.k === 0) resumo += "§aVocê conhece todas as habilidades.\n";
-    else if (r.faltas.length === 0) resumo += `§7Próxima (${r.k}): §fpeça a um Hashira para ensinar.\n`;
-    else resumo += `§7Próxima (${r.k}), pendente:\n§c- ${r.faltas.join("\n§c- ")}\n`;
+    if (r.k === 0 && DOMINAVEL(g.obj)) resumo += "§aDomínio completo. Confira a original em Guia → Domínio humano.\n";
+    else if (r.k > 0 && r.faltas.length === 0) resumo += `§7Próxima aula (${r.k}): §fprocure o Líder dos Hashiras.\n`;
+    else if (r.k > 0) resumo += `§7Próxima aula (${r.k}), pendente:\n§c- ${r.faltas.join("\n§c- ")}\n`;
   }
   resumo += `§8Agache para trocar a habilidade e segure o botão de usar para executar.`;
   add("G:", resumo, g.icon, null);
@@ -1035,11 +1043,7 @@ async function listaArtesClassica(p) {
 
   for (const g of ordem) {
     const marca = g.obj === objMao ? "§a> §r" : "";
-    let sub = `${g.formas.length} formas`;
-    if (!oni) {
-      const n = formasAprendidas(p, g);
-      sub = n >= g.formas.length ? "todas aprendidas" : `${n}/${g.formas.length} aprendidas`;
-    }
+    const sub = oni ? `${g.formas.length} formas` : resumoRespiracao(p, g);
     f.button(`${marca}§l${t.destaque}${g.nome}\n§r${t.suave}${sub}`, g.icon);
   }
 
@@ -1052,7 +1056,7 @@ async function listaArtesClassica(p) {
 async function detalheArte(p, g) {
   const t = tema(p);
   const oni = isOni(p);
-  const aprendidas = oni ? g.formas.length : formasAprendidas(p, g);
+  const aprendidas = oni ? g.formas.length : formasLiberadas(p, g);
   let corpo = `${t.linha}\n${t.texto}§l${g.nome}§r\n${t.linha}\n`;
   g.formas.forEach((nome, i) => {
     if (oni) corpo += `${t.destaque}${i + 1}. ${t.texto}${nome}\n`;
@@ -1061,13 +1065,13 @@ async function detalheArte(p, g) {
 
   if (!oni) {
     const r = requisitosProximaForma(p, g);
-    corpo += `\n${t.linha}\n`;
-    if (r.k === 0) {
-      corpo += `§aVocê conhece todas as habilidades.\n`;
-    } else if (r.faltas.length === 0) {
-      corpo += `${t.suave}Próxima habilidade (${r.k}): ${t.texto}requisitos cumpridos. Peça a um Hashira para ensinar.\n`;
-    } else {
-      corpo += `${t.suave}Próxima habilidade (${r.k}). Requisitos pendentes:\n§c- ${r.faltas.join("\n§c- ")}\n`;
+    corpo += `\n${t.linha}\n${resumoRespiracao(p, g)}\n`;
+    if (r.k === 0 && DOMINAVEL(g.obj)) {
+      corpo += "§aDomínio completo. Confira a original em Guia → Domínio humano.\n";
+    } else if (r.k > 0 && r.faltas.length === 0) {
+      corpo += `${t.suave}Próxima aula (${r.k}): ${t.texto}procure o Líder dos Hashiras.\n`;
+    } else if (r.k > 0) {
+      corpo += `${t.suave}Próxima aula (${r.k}). Requisitos pendentes:\n§c- ${r.faltas.join("\n§c- ")}\n`;
     }
   }
   corpo +=
@@ -1215,8 +1219,8 @@ async function personagem(p) {
     c += `${t.suave}Honra: ${t.texto}${r.pontos}\n`;
     const marca = Object.keys(MARCAS).find((k) => p.hasTag(k));
     c += `${t.suave}Última respiração usada: ${t.texto}${marca ? MARCAS[marca] : "nenhuma ainda"}\n`;
-    const resumo = TODAS_RESPIRACOES.filter((g) => formasAprendidas(p, g) > 0).map(
-      (g) => `${g.nome.replace(/^Respiração d[aoe]s? /, "").replace(/^Respiração /, "")} ${formasAprendidas(p, g)}/${g.formas.length}`
+    const resumo = TODAS_RESPIRACOES.filter((g) => formasLiberadas(p, g) > 0).map(
+      (g) => `${g.nome.replace(/^Respiração d[aoe]s? /, "").replace(/^Respiração /, "")} ${resumoRespiracao(p, g)}`
     );
     c += `${t.suave}Respirações: ${t.texto}${ehHashira(p) ? "todas (Hashira)" : resumo.length ? resumo.join(", ") : "nenhuma ainda"}\n`;
     const lm = laminaNaMao(p);
@@ -1335,26 +1339,34 @@ async function transformarMenu(p) {
   const res = await mostrar(f, p);
   if (res.canceled) return;
   if (res.selection === 0) return menuPrincipal(p);
-  return confirmarTransformacao(p, alvos[res.selection - 1]);
+  const alvo = alvos[res.selection - 1];
+  if (alvo?.isValid) return confirmarTransformacao(p, alvo);
 }
 
 async function confirmarTransformacao(p, alvo) {
   const t = TEMA_ONI;
+  const previa = preverTransformacao(alvo);
+  if (!previa.destino || previa.destino === "escolher" || previa.destino === "dose") {
+    if (previa.destino === "escolher") alvo.sendMessage("§e" + previa.motivo);
+    p.sendMessage("§e" + (previa.motivo ?? "O jogador já é da linhagem Oni."));
+    return menuPrincipal(p);
+  }
+  const resultado = previa.resp ? "Híbrido com " + previa.resp.nome : "Oni comum";
   const f = novoForm(p)
     .title("§l§4CONFIRMAR")
     .body(
-      `${t.linha}\n${t.texto}Transformar §l${alvo.name}§r${t.texto}?\n\n${t.suave}O cargo humano se encerra. O domínio comprovado pode despertar um Híbrido.\n${t.linha}`
+      `${t.linha}\n${t.texto}${alvo.name} vai se tornar ${resultado}. A patente humana se encerra.\n\n${t.suave}${previa.motivo ?? ""}\n${t.linha}`
     )
-    .button(`§l${t.destaque}Transformar`, t.icones.arte)
+    .button(`§l${t.destaque}Transformar em ${previa.resp ? "Híbrido" : "Oni comum"}`, t.icones.arte)
     .button(`§l${t.destaque}Cancelar`, t.icones.voltar);
   const res = await mostrar(f, p);
   if (res.canceled || res.selection !== 0) return menuPrincipal(p);
-  transformarEmOni(p, alvo);
+  transformarEmOni(p, alvo, previa.resp?.obj ?? "oni");
 }
 
-function transformarEmOni(p, alvo) {
+function transformarEmOni(p, alvo, destino) {
   try {
-    const r = transformar(alvo, "rei", p);
+    const r = transformar(alvo, "rei", p, { destino });
     if (!r.ok) return p.sendMessage("§c" + r.motivo);
     p.sendMessage(`§4Você transformou §l${alvo.name}§r§4 em ${r.hibrido ? "Híbrido" : "Oni"}.`);
     som(alvo, "ambient.cave", 0.6, 0.8);
@@ -1452,6 +1464,22 @@ async function alterarCargo(p) {
    (só quem tem permissão de comando consegue adicionar essas tags)
 --------------------------------------------------------------------- */
 
+async function assumirRei(p) {
+  if (!ehOperador(p)) return;
+  if (!isOni(p)) {
+    const previa = preverTransformacao(p);
+    if (previa.destino === "oni" && !await confirmarOniComum(p, previa.motivo, "Virar Oni comum e assumir o cargo")) return;
+    const r = transformar(p, "cargo", p, { destino: previa.resp?.obj ?? previa.destino });
+    if (!r.ok) return p.sendMessage("§c" + r.motivo);
+  }
+  await wait(20);
+  if (!ehOperador(p) || !isOni(p)) return;
+  p.addTag(TAG_ESCOLHEU);
+  definirCargoOni(p, RANKS_ONI.length);
+  p.sendMessage("§4Cargo definido: §lRei dos Onis§r§4.");
+  if (!isHybrid(p)) world.sendMessage(`§4[Kimetsu] §c${p.name} se tornou §lRei dos Onis§r§4.`);
+}
+
 system.runInterval(() => {
   for (const p of world.getPlayers()) {
     try {
@@ -1476,27 +1504,9 @@ system.runInterval(() => {
         p.removeTag("kny_set_rei");
         p.removeTag("kny_set_muzan");
         if (!ehOperador(p)) continue;
-        if (!isOni(p)) {
-          const r = transformar(p, "cargo");
-          if (!r.ok) {
-            p.sendMessage("§c" + r.motivo);
-            continue;
-          }
+        if (!abrirSessaoMenu(p, () => assumirRei(p))) {
+          p.sendMessage("§eFeche o Menu Kimetsu e tente o comando de cargo novamente.");
         }
-        system.runTimeout(() => {
-          try {
-            if (!ehOperador(p) || !isOni(p)) {
-              p.sendMessage("§c[Menu Kimetsu] Não foi possível transformar você em oni para assumir o cargo de Rei dos Onis.");
-              return;
-            }
-            p.addTag(TAG_ESCOLHEU);
-            definirCargoOni(p, RANKS_ONI.length);
-            p.sendMessage("§4Cargo definido: §lRei dos Onis§r§4.");
-            if (!isHybrid(p)) world.sendMessage(`§4[Kimetsu] §c${p.name} se tornou §lRei dos Onis§r§c.`);
-          } catch (e) {
-            reportar(p, e);
-          }
-        }, 20);
       }
     } catch {}
   }
@@ -2291,7 +2301,7 @@ system.runInterval(() => {
 }, 2);
 
 /* ---------------------------------------------------------------------
-   ENSINAR RESPIRAÇÃO (somente Hashira): uma habilidade por vez
+   ENSINAR RESPIRAÇÃO: uma habilidade por vez
 --------------------------------------------------------------------- */
 
 function alunosPerto(p, g) {
@@ -2299,7 +2309,7 @@ function alunosPerto(p, g) {
   for (const q of world.getPlayers()) {
     try {
       if (q.id === p.id || q.dimension.id !== p.dimension.id) continue;
-      if (!ehCacadorHumano(q) || requisitosProximaForma(q, g).k === 0) continue;
+      if (!ehCacadorHumano(q) || estadoBloqueado(q) || requisitosProximaForma(q, g).k === 0) continue;
       if (!ehLider(p) && (!DOMINAVEL(g.obj) || !["hashira", "hashira_lider"].includes(patenteDe(q).tag))) continue;
       const d = Math.hypot(q.location.x - p.location.x, q.location.y - p.location.y, q.location.z - p.location.z);
       if (d <= DIST_ENSINO) lista.push(q);
@@ -2310,43 +2320,29 @@ function alunosPerto(p, g) {
 
 async function ensinarClassico(p) {
   const t = TEMA_CACADOR;
-  const hashira = ehLider(p) || ehHashira(p);
-  const op = false;
-  if (!hashira) {
-    p.sendMessage("§cSomente o Líder dos Hashiras pode ensinar respirações.");
-    return;
-  }
+  if (!ehLider(p) && !ehHashira(p)) return;
   const f = novoForm(p)
     .title("§l§cENSINAR RESPIRAÇÃO")
     .body(
-      hashira
-        ? `${t.linha}\n${t.suave}Escolha a respiração. Cada aluno aprende uma habilidade por vez, em ordem, se cumprir os requisitos. Ele precisa estar a até ${DIST_ENSINO} blocos.\n${t.linha}`
-        : `${t.linha}\n${t.suave}Somente Hashira ensinam respirações. Como operador, você pode alterar o seu cargo abaixo.\n${t.linha}`
+      `${t.linha}\n${t.suave}Escolha a respiração. A aula registra uma forma por vez, em ordem. O aluno precisa estar a até ${DIST_ENSINO} blocos.\n${t.linha}`
     )
     .button(`§l${t.destaque}Voltar`, t.icones.voltar);
   const acoes = ["voltar"];
-  if (op) {
-    f.button(`§l${t.destaque}Alterar meu cargo\n§r${t.suave}Somente operadores`, t.icones.config);
-    acoes.push("cargo");
-  }
-  if (hashira) {
-    for (const g of TODAS_RESPIRACOES) {
-      f.button(`§l${t.destaque}${g.nome}\n§r${t.suave}${g.formas.length} habilidades`, g.icon);
-      acoes.push(g);
-    }
+  for (const g of TODAS_RESPIRACOES) {
+    f.button(`§l${t.destaque}${g.nome}\n§r${t.suave}${g.formas.length} habilidades`, g.icon);
+    acoes.push(g);
   }
 
   const res = await mostrar(f, p);
   if (res.canceled) return;
   const a = acoes[res.selection];
   if (a === "voltar") return menuPrincipal(p);
-  if (a === "cargo") return alterarCargo(p);
-  return escolherAluno(p, a);
+  if (a) return escolherAluno(p, a);
 }
 
 async function escolherAlunoClassico(p, g) {
   const t = TEMA_CACADOR;
-  const alunos = alunosPerto(p, g);
+  const alunos = alunosPerto(p, g).map((aluno) => ({ aluno, ...requisitosProximaForma(aluno, g) }));
   const f = novoForm(p).title(`§l§c${g.nome.toUpperCase()}`);
   if (alunos.length === 0) {
     f.body(
@@ -2357,18 +2353,18 @@ async function escolherAlunoClassico(p, g) {
     return;
   }
   f.body(`${t.linha}\n${t.suave}Quem vai aprender a próxima habilidade da ${g.nome}?\n${t.linha}`).button(`§l${t.destaque}Voltar`, t.icones.voltar);
-  for (const q of alunos) {
-    const r = requisitosProximaForma(q, g);
-    f.button(`§l${t.destaque}${q.name}\n§r${t.suave}forma ${r.k}/${g.formas.length}${r.faltas.length ? " · requisitos pendentes" : ""}`, t.icones.personagem);
+  for (const { aluno, k, faltas } of alunos) {
+    f.button(`§l${t.destaque}${aluno.name}\n§r${t.suave}aula ${k}/${g.formas.length}${faltas.length ? " · requisitos pendentes" : ""}`, t.icones.personagem);
   }
 
   const res = await mostrar(f, p);
   if (res.canceled) return;
   if (res.selection === 0) return ensinar(p);
-  return ensinarPara(p, alunos[res.selection - 1], g);
+  const escolhido = alunos[res.selection - 1];
+  if (escolhido) return ensinarPara(p, escolhido.aluno, g, escolhido.k);
 }
 
-// ENSINAR no painel (mesma moldura das respirações): só o Líder dos Hashiras
+// Aulas no painel com as mesmas permissões da interface clássica.
 async function painelEnsinar(p, pagina = 0) {
   const lista = TODAS_RESPIRACOES;
   const paginar = lista.length > 6;
@@ -2433,8 +2429,8 @@ async function painelAlunos(p, g, pagina = 0) {
   );
   for (const q of itens) {
     const r = requisitosProximaForma(q, g);
-    add("L:", `§f§l${q.name}\n§r§7forma ${r.k}/${g.formas.length}${r.faltas.length ? " · requisitos pendentes" : ""}`, null, () =>
-      ensinarPara(p, q, g)
+    add("L:", `§f§l${q.name}\n§r§7aula ${r.k}/${g.formas.length}${r.faltas.length ? " · requisitos pendentes" : ""}`, null, () =>
+      ensinarPara(p, q, g, r.k)
     );
   }
   if (paginar) add("L:", `§6§lPróxima página §7(${pagina + 1}/${total})`, null, () => painelAlunos(p, g, pagina + 1));
@@ -2460,12 +2456,12 @@ async function escolherAluno(p, g) {
   return escolherAlunoClassico(p, g);
 }
 
-async function ensinarPara(p, aluno, g) {
+async function ensinarPara(p, aluno, g, formaMostrada) {
   try {
     if (!(ehLider(p) || ehHashira(p)) || !aluno?.isValid || !alunosPerto(p, g).some((q) => q.id === aluno.id)) return;
     const r = requisitosProximaForma(aluno, g);
-    if (r.k === 0) {
-      p.sendMessage(`§c${aluno.name} já conhece todas as habilidades da ${g.nome}.`);
+    if (r.k !== formaMostrada) {
+      p.sendMessage("§eO progresso mudou. Confira a aula atual antes de ensinar.");
     } else if (r.faltas.length) {
       p.sendMessage(`§c${aluno.name} ainda não pode aprender a forma ${r.k}. Requisitos: ${r.faltas.join("; ")}.`);
       aluno.sendMessage(`§cPara aprender a forma ${r.k} da ${g.nome} você precisa de: ${r.faltas.join("; ")}.`);
@@ -2481,6 +2477,10 @@ async function ensinarPara(p, aluno, g) {
       const nomeForma = g.formas[r.k - 1];
       p.sendMessage(`§cVocê ensinou a forma ${r.k} da ${g.nome} (${nomeForma}) a §l${aluno.name}§r§c.`);
       aluno.sendMessage(`§cO Hashira §l${p.name}§r§c ensinou a forma ${r.k} da ${g.nome}: ${nomeForma}.`);
+      if (DOMINAVEL(g.obj)) {
+        aluno.sendMessage(`§aDomínio comprovado ${r.k}/${g.formas.length}.` +
+          (r.k === g.formas.length ? " Confira se esta é a sua original em Guia → Domínio humano." : ""));
+      }
       som(p, "random.levelup", 1.2, 0.6);
       som(aluno, "random.levelup", 1.2, 0.8);
     }
@@ -2509,7 +2509,8 @@ const GUIA_CACADOR = [
     texto:
       "Ninguém nasce sabendo respirar: toda habilidade precisa ser ensinada por um §cHashira§f, uma por vez e em ordem. A Respiração do Trovão, por exemplo, tem 6 habilidades, e você aprende as 6 uma a uma.\n\n" +
       "Requisitos para a habilidade K: possuir uma espada daquela respiração e 10 de honra por habilidade anterior (a Respiração Básica pede uma lâmina colorida e 5 de honra por habilidade anterior).\n\n" +
-      "Fique perto de um Hashira (até 12 blocos). Ele abre o Menu Kimetsu, escolhe §cEnsinar Respiração§f, a respiração e o seu nome. Quem vira Hashira domina todas.",
+      "Fique a até 12 blocos do Líder dos Hashiras. Ele abre o Menu Kimetsu, escolhe §cEnsinar Respiração§f, a respiração e o seu nome. Entre Hashiras, um colega pode usar §cAulas de domínio§f.\n\n" +
+      "A patente Hashira libera formas para combate. O domínio humano avança com aulas registradas ou histórico certificado. Confira o progresso em §cGuia → Domínio humano§f.",
   },
   {
     nome: "Lâminas coloridas",
@@ -2546,9 +2547,9 @@ const GUIA_CACADOR = [
   {
     nome: "Perigos",
     texto:
-      "O oni que alcança o cargo de §cRei dos Onis§f pode transformar qualquer jogador em oni: nesse caso o rank e as respirações de caçador são perdidos " +
-      "e você passa a usar o menu dos oni.\n\n" +
-      "O antídoto reverte a transformação. A maldição do Rei dos Onis só se quebra falando com Tamayo.\n\n" +
+      "O §cRei dos Onis§f e o sangue podem transformar um humano. Quem completou o domínio humano torna-se Híbrido com a respiração original. " +
+      "Quando a transformação produz um Oni comum, a tela exibe o resultado antes de confirmar.\n\n" +
+      "O antídoto reverte a transformação de Oni comum. Tamayo quebra a maldição do Rei dos Onis.\n\n" +
       "Cuidado com os chefes: Luas Inferiores e Superiores são muito mais fortes que demônios comuns.",
   },
 ];

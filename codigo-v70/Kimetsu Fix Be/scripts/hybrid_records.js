@@ -25,6 +25,11 @@ export function gravarJson(obj, chave, dados) {
 
 const idValido = (id) => typeof id === "string" && /^h[1-9][0-9]*$/.test(id);
 const numeroSeguro = (v) => Number.isSafeInteger(v) && v >= 0;
+export const idExistente = (p) => {
+  const id = p.getDynamicProperty(IDENTIFICADOR);
+  return idValido(id) ? id : undefined;
+};
+
 export function identificador(p) {
   const antigo = p.getDynamicProperty(IDENTIFICADOR);
   if (idValido(antigo)) return antigo;
@@ -42,9 +47,11 @@ export function personagem(p) {
   if (!d) return d;
   if (!idValido(d.id) || p.getDynamicProperty(IDENTIFICADOR) !== d.id) return null;
   if (!["oni", "hibrido"].includes(d.raca) || !["transformando", "ativo", "curado"].includes(d.estado)) return null;
-  if (d.raca === "hibrido" && (!RESP_H_ID.has(d.resp) || !ARTE_H_ID.has(d.arte) ||
+  if (d.raca === "hibrido" && (d.estado === "curado" || !RESP_H_ID.has(d.resp) || !ARTE_H_ID.has(d.arte) ||
       !Object.hasOwn(IDENTIDADES, d.publico) || !numeroSeguro(d.formas) || d.formas !== RESP_H_ID.get(d.resp).formas.length)) return null;
   if (d.estado === "transformando" && (!d.anterior || !numeroSeguro(d.doses))) return null;
+  if (d.dose !== undefined && (d.estado !== "transformando" || !numeroSeguro(d.dose?.slot) || d.dose.slot > 8 ||
+      !numeroSeguro(d.dose.quantidade) || d.dose.quantidade < 1 || d.dose.quantidade > 64)) return null;
   return d;
 }
 

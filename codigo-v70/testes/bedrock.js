@@ -1,6 +1,7 @@
 import { GameMode, ItemStack, system, world } from "@minecraft/server";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
 import * as stats from "./stats.js";
+import { transformar } from "./hybrid_system.js";
 import {
   ATR, ATRIBUTOS, PATENTES, POR_PATENTE, PTS_INICIAIS, NIVEL_MAXIMO, PONTOS_POR_ONI, ePatenteOni,
   custoMelhoria, vidaMax, movimentoMax, staminaMax, folegoMax, efeitoForca, efeitoPoder, reducaoDefesa,
@@ -173,7 +174,8 @@ async function legadoERaca(sufixo) {
   stats.pontuar(p, "blood", 0);
   stats.pontuar(p, "kny_stam", 999);
   p.getComponent("minecraft:inventory").container.setItem(p.selectedSlotIndex, new ItemStack("kny:blood", 1));
-  p.runCommand("function blood");
+  const transformacao = transformar(p, "sangue", p, { destino: "oni" });
+  eq(transformacao.ok, true, "confirma transformação em Oni comum");
   await wait(3);
   eq(stats.patenteDe(p).tag, "oni", "transformação original usa raça Oni");
   eq(stats.efetivo(p, ATR.for), 8, "aplica apenas teto Oni");

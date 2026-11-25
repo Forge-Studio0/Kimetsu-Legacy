@@ -1,6 +1,6 @@
 import { system, world } from "@minecraft/server";
 import { H, ARTE_H_ID, ARTES_H, IDENTIDADES, RESP_H_ID, ROTULOS } from "./hybrid_config.js";
-import { avaliarDominio, ehCacadorHumano } from "./hybrid_mastery.js";
+import { avaliarDominio, dominioParaRecuperacao, ehCacadorHumano } from "./hybrid_mastery.js";
 import { guardarPersonagem, identificador, indexarHibrido, personagem, registrarAuditoria } from "./hybrid_records.js";
 import { agendarStats, getScore, patenteDe, pontuar, titularDe } from "./stats.js";
 import { OBJ_REI, OBJ_LIDER, RANKS_CACADOR, RANKS_ONI } from "./stats_config.js";
@@ -12,6 +12,8 @@ const tagH = "kny_hybrid";
 const jogador = (p) => p?.isValid && p.typeId === "minecraft:player";
 const ligado = (d) => d?.estado === "ativo";
 const bloqueios = ["kny_caido", "animacao", "kny_finalizando", "kny_finalizado"];
+const REVISAO_TRANSFORMACAO = 73;
+const MAX_PLACAR = 2147483647;
 
 export function ehStaff(p) {
   if (!jogador(p)) return false;
@@ -113,22 +115,42 @@ export function trocarDisfarce(p, publico) {
   return `Identidade pública agora é ${ROTULOS[publico]}.`;
 }
 
-function doseEmMaos(p) {
+export function doseEmMaos(p) {
   const slot = p.selectedSlotIndex;
   const item = p.getComponent("minecraft:inventory")?.container?.getItem(slot);
   return item?.typeId === "kny:blood" ? { slot, quantidade: item.amount } : undefined;
 }
 
 function consumirDose(p, dose) {
-  if (!dose) return;
   const inventario = p.getComponent("minecraft:inventory")?.container;
   const item = inventario?.getItem(dose.slot);
-  if (item?.typeId !== "kny:blood" || item.amount < dose.quantidade) return;
+  if (item?.typeId !== "kny:blood" || item.amount !== dose.quantidade) return undefined;
   if (dose.quantidade === 1) inventario.setItem(dose.slot, undefined);
   else {
     item.amount = dose.quantidade - 1;
     inventario.setItem(dose.slot, item);
   }
+  return () => {
+    item.amount = dose.quantidade;
+    inventario.setItem(dose.slot, item);
+  };
+}
+
+function registrarDosePaga(p, d) {
+  if (!d.dose) return d;
+  const estornar = consumirDose(p, d.dose);
+  if (!estornar && d.revisao === REVISAO_TRANSFORMACAO) {
+    throw new Error("A pilha de sangue da transformação mudou.");
+  }
+  const pago = { ...d };
+  delete pago.dose;
+  try {
+    guardarPersonagem(p, pago);
+  } catch (e) {
+    estornar?.();
+    throw e;
+  }
+  return pago;
 }
 
 function escolherArte(p) {
@@ -148,8 +170,7 @@ function limparPatentes(p, lista) {
   }
 }
 
-function terminar(p, d) {
-  consumirDose(p, d.dose);
+function aplicarLinhagemOniInicial(p, d) {
   const lider = world.scoreboard.getObjective(OBJ_LIDER);
   if (titularDe(OBJ_LIDER) === p.name) {
     for (const tit of lider.getParticipants()) if (tit.displayName === p.name) lider.removeParticipant(tit);
@@ -163,6 +184,11 @@ function terminar(p, d) {
   p.triggerEvent("kny:reset");
   pontuar(p, "updemon", 0);
   pontuar(p, "blood", Math.max(getScore(p, "blood"), d.doses));
+}
+
+function terminar(p, pendente) {
+  const d = registrarDosePaga(p, pendente);
+  if (!d.reparoV72) aplicarLinhagemOniInicial(p, d);
   if (d.raca === "hibrido") {
     const chave = "kf_" + d.resp;
     if (getScore(p, chave) < d.formas) pontuar(p, chave, d.formas);
@@ -174,63 +200,129 @@ function terminar(p, d) {
     p.triggerEvent("burn_daylight_on");
   }
   const ativo = { ...d, estado: "ativo" };
-  delete ativo.dose;
   guardarPersonagem(p, ativo);
   agendarStats(p);
-  return ativo;
+  try {
+    registrarAuditoria(d.reparoV72 ? "recuperar_v72" : "transformar", {
+      alvo: d.id, autor: d.autor, via: d.via, raca: d.raca, resp: d.resp,
+    });
+  } catch (e) {
+    console.warn("[Híbridos] Auditoria após transformação de " + d.id + ": " + e);
+  }
+  p.sendMessage(d.reparoV72 ? "§5A Staff recuperou sua linhagem Híbrida da v72."
+    : d.raca === "hibrido" ? "§5Você preservou a respiração dominada e despertou como Híbrido."
+    : "§4Você se tornou Oni comum. O sol agora é seu inimigo.");
+  try { p.playSound("biwa_sound"); } catch {}
 }
 
-export function transformar(alvo, via, autor = alvo) {
-  const falha = (motivo) => ({ ok: false, motivo });
+export function preverTransformacao(p) {
+  if (estadoBloqueado(p) || emTransformacao.has(p.id)) return { motivo: "Aguarde o fim da ação atual para transformar." };
+  const anterior = personagem(p);
+  if (anterior === null || !anterior && p.hasTag(tagH)) return { motivo: "Registro de raça inconsistente. Consulte a Staff." };
+  if (anterior?.estado === "transformando") return { motivo: "Transformação em recuperação. Reconecte para concluir." };
+  if (p.hasTag("demon")) return { destino: "dose" };
+  if (anterior?.estado === "ativo") return { motivo: "A linhagem em jogo diverge da ficha. Consulte a Staff." };
+  const dominio = avaliarDominio(p);
+  if (dominio.invalido) return { motivo: "Histórico de domínio incompatível. Consulte a Staff." };
+  if (dominio.resp) return { destino: "hibrido", resp: dominio.resp };
+  if (dominio.completas.length > 1) {
+    return { destino: "escolher", motivo: "Escolha a respiração original em Guia → Domínio humano." };
+  }
+  return { destino: "oni", motivo: "Nenhuma respiração tem domínio humano completo registrado. Formas liberadas são acesso ao combate. Confira as aulas em Guia → Domínio humano." };
+}
+
+const falha = (motivo) => ({ ok: false, motivo });
+
+export function transformar(alvo, via, autor = alvo, confirmacao = {}) {
   if (!jogador(alvo) || !jogador(autor)) return falha("Jogador indisponível.");
   const dose = via === "sangue" ? doseEmMaos(alvo) : undefined;
   const autorizado = via === "rei" ? ehReiAutor(autor) && autor.id !== alvo.id
     : via === "cargo" ? ehStaff(autor) && autor.id === alvo.id
-    : via === "sangue" ? autor.id === alvo.id && (!!dose || ehStaff(autor)) : false;
+    : via === "sangue" ? autor.id === alvo.id && !!dose : false;
   if (!autorizado) return falha("Transformação sem autoridade válida ou sangue em mãos.");
-  if (estadoBloqueado(alvo) || emTransformacao.has(alvo.id)) return falha("Aguarde o fim da ação atual para transformar.");
-  const anterior = personagem(alvo);
-  if (anterior === null || !anterior && alvo.hasTag(tagH)) return falha("Registro de raça inconsistente. Consulte a Staff.");
-
-  if (anterior?.estado === "transformando") {
-    return falha("Transformação em recuperação. Reconecte para concluir.");
+  if (confirmacao.dose && (confirmacao.dose.slot !== dose?.slot || confirmacao.dose.quantidade !== dose?.quantidade)) {
+    return falha("A pilha de sangue mudou. Empunhe a dose e use o item novamente.");
   }
-  if (isDemonLineage(alvo)) {
+  const previa = preverTransformacao(alvo);
+  if (!previa.destino || previa.destino === "escolher") return falha(previa.motivo);
+  const destino = previa.resp?.obj ?? previa.destino;
+  if (confirmacao.destino && confirmacao.destino !== destino) return falha("O resultado mudou. Confira o domínio e tente novamente.");
+  if (destino === "oni" && confirmacao.destino !== "oni") return falha(previa.motivo);
+
+  const doses = Math.max(0, getScore(alvo, "blood")) + 1;
+  if (doses > MAX_PLACAR) return falha("O placar de sangue já atingiu o limite.");
+  if (destino === "dose") {
     if (!dose) return falha("O jogador já pertence à linhagem Oni.");
-    consumirDose(alvo, dose);
-    pontuar(alvo, "blood", getScore(alvo, "blood") + 1);
+    const estornar = consumirDose(alvo, dose);
+    if (!estornar) return falha("A pilha de sangue mudou. Tente novamente.");
+    try { pontuar(alvo, "blood", doses); }
+    catch (e) { estornar(); throw e; }
     agendarStats(alvo);
     return { ok: true, dose: true };
   }
 
-  const dominio = avaliarDominio(alvo);
-  if (dominio.invalido || anterior?.raca === "hibrido") return falha("Histórico conflitante. Consulte a Staff.");
-  if (!dominio.resp && dominio.completas?.length > 1) {
-    alvo.sendMessage("§eEscolha a respiração original entre as dominadas no menu Domínio.");
-    return falha("O caçador precisa escolher a respiração original.");
-  }
   // Congele o resultado antes da remoção de tags humanas. A retomada usa a mesma ficha.
-  const r = dominio.resp;
+  const r = previa.resp;
   const d = {
-    v: 1, id: identificador(alvo), estado: "transformando", raca: r ? "hibrido" : "oni",
-    via, doses: Math.max(0, getScore(alvo, "blood")) + 1, dose,
+    v: 1, revisao: REVISAO_TRANSFORMACAO, id: identificador(alvo), estado: "transformando",
+    raca: r ? "hibrido" : "oni", autor: identificador(autor), via, doses, dose,
     anterior: { patente: patenteDe(alvo).tag, honra: getScore(alvo, "upslayer"), resp: r?.obj ?? null, formas: r?.formas.length ?? 0 },
     ...(r ? { resp: r.obj, formas: r.formas.length, arte: escolherArte(alvo), publico: "oni", disfarceAte: 0 } : {}),
   };
-  emTransformacao.add(alvo.id);
+  return iniciarTransformacao(alvo, d);
+}
+
+function iniciarTransformacao(p, d) {
+  emTransformacao.add(p.id);
+  let iniciou = false;
   try {
-    guardarPersonagem(alvo, d);
-    const ativo = terminar(alvo, d);
-    registrarAuditoria("transformar", { alvo: d.id, autor: identificador(autor), via, raca: ativo.raca, resp: ativo.resp });
-    alvo.sendMessage(r ? "§5Você preservou a respiração dominada e despertou como Híbrido." : "§4Você se tornou Oni. O sol agora é seu inimigo.");
-    try { alvo.playSound("biwa_sound"); } catch {}
-    return { ok: true, hibrido: !!r };
+    guardarPersonagem(p, d);
+    iniciou = true;
+    terminar(p, d);
+    return { ok: true, hibrido: d.raca === "hibrido" };
   } catch (e) {
-    console.warn("[Híbridos] Transformação em recuperação. " + e);
-    return falha("Transformação em recuperação. Reconecte para concluir.");
+    console.warn("[Híbridos] Falha ao aplicar a transformação. " + e);
+    return falha(iniciou ? "Transformação em recuperação. Reconecte para concluir." : "Não foi possível gravar a transformação. Consulte a Staff.");
   } finally {
-    emTransformacao.delete(alvo.id);
+    emTransformacao.delete(p.id);
   }
+}
+
+const foiCacador = (d) => RANKS_CACADOR.some((r) => r.tag === d?.anterior?.patente);
+
+export function candidatoRecuperacaoV72(p, d = personagem(p)) {
+  return p.hasTag("demon") && !p.hasTag(tagH) && d?.estado === "ativo" && d.raca === "oni" &&
+    d.revisao === undefined && ["sangue", "rei", "cargo"].includes(d.via) &&
+    foiCacador(d) && d.anterior.resp === null && d.anterior.formas === 0 &&
+    Number.isSafeInteger(d.doses) && d.doses > 0;
+}
+
+export function recuperarHibridoV72(autor, alvo, id, prova) {
+  if (!ehStaff(autor) || !jogador(alvo)) return falha("A recuperação exige Staff e jogador online.");
+  if (estadoBloqueado(alvo) || emCombate(alvo) || emTransformacao.has(alvo.id)) return falha("O jogador precisa aguardar o fim da ação ou do combate.");
+  const d = personagem(alvo);
+  if (!candidatoRecuperacaoV72(alvo, d)) return falha("A ficha não contém transformação ativa de Caçador em Oni comum pela v72.");
+  const r = dominioParaRecuperacao(autor, alvo, id, prova);
+  if (!r) return falha("Domínio humano sem comprovação para essa respiração. Confira o diagnóstico. Certificação por evidência exige outra pessoa da Staff.");
+  const autorId = identificador(autor);
+  registrarAuditoria("solicitar_recuperacao_v72", { autor: autorId, alvo: d.id, via: d.via, resp: r.obj });
+  return iniciarTransformacao(alvo, {
+    ...d, revisao: REVISAO_TRANSFORMACAO, autor: autorId, estado: "transformando", raca: "hibrido",
+    reparoV72: true, resp: r.obj, formas: r.formas.length, arte: escolherArte(alvo), publico: "oni", disfarceAte: 0,
+  });
+}
+
+function restaurarContratoCurado(p, d) {
+  if (d?.estado !== "curado" || p.hasTag("demon")) return;
+  p.triggerEvent("kny:limpar_linhagem_oni");
+  if (ehCacadorHumano(p)) return;
+  if (foiCacador(d)) {
+    for (const tag of ["slayer", "slayer2", "mizunoto", "mizunoto2", "kny_escolheu"]) p.addTag(tag);
+    p.triggerEvent("kny:damage_receive");
+  } else {
+    p.removeTag("kny_escolheu");
+  }
+  agendarStats(p);
 }
 
 export function restaurarRaca(p, reaplicar = true, renasceu = true) {
@@ -242,7 +334,11 @@ export function restaurarRaca(p, reaplicar = true, renasceu = true) {
     return;
   }
   if (d?.estado === "transformando") {
-    if (!estadoBloqueado(p) && !emTransformacao.has(p.id)) terminar(p, d);
+    if (!estadoBloqueado(p) && !emTransformacao.has(p.id)) {
+      emTransformacao.add(p.id);
+      try { terminar(p, d); }
+      finally { emTransformacao.delete(p.id); }
+    }
     return;
   }
   if (d?.raca === "hibrido") {
@@ -253,6 +349,7 @@ export function restaurarRaca(p, reaplicar = true, renasceu = true) {
     }
   } else {
     prop(p, "kny:h_linhagem", d?.raca === "oni" && p.hasTag("demon") ? 1 : 0);
+    restaurarContratoCurado(p, d);
   }
 }
 
@@ -285,10 +382,6 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damageSource, damage }) =>
 
 system.afterEvents.scriptEventReceive.subscribe(({ id, sourceEntity: p, message }) => {
   if (!jogador(p)) return;
-  if (id === "kny:h_sangue") {
-    const r = transformar(p, "sangue");
-    if (!r.ok) p.sendMessage("§c" + r.motivo);
-  }
   if (id === "kny:h_curado" && !p.hasTag("demon")) {
     const d = personagem(p);
     if (d?.raca === "oni" && d.estado === "ativo") guardarPersonagem(p, { ...d, estado: "curado" });
