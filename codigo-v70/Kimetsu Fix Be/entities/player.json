@@ -92,7 +92,7 @@
         "hp": "controller.animation.hp",
         "start": "controller.animation.start",
         "sun_protection": "animation.sun_protection",
-        "breathings_hold":"controller.animation.breathings_hold",
+        "breathings_hold": "controller.animation.breathings_hold",
         "rengoku_hold": "controller.animation.rengoku_hold",
         "rengoku1": "animation.rengoku1",
         "rengoku2": "animation.rengoku2",
@@ -192,13 +192,13 @@
         "inosuke2": "animation.inosuke2",
         "inosuke3": "animation.inosuke3",
         "inosuke4": "animation.inosuke4",
-        "inosuke5": "animation.inosuke5",     
+        "inosuke5": "animation.inosuke5",
         "gyomei_hold": "controller.animation.gyomei_hold",
         "gyomei1": "animation.gyomei1",
         "gyomei2": "animation.gyomei2",
         "gyomei3": "animation.gyomei3",
         "gyomei4": "animation.gyomei4",
-        "gyomei5": "animation.gyomei5",   
+        "gyomei5": "animation.gyomei5",
         "obanai_hold": "controller.animation.obanai_hold",
         "obanai1": "animation.obanai1",
         "obanai2": "animation.obanai2",
@@ -263,77 +263,139 @@
         "nakime2": "animation.nakime2"
       },
       "properties": {
-	    "kny:mark": {
-		  "client_sync": true,
-          "type": "int",
-          "range":[ 0, 20 ],
-          "default": 0
-		},
-	    "kny:effects": {
-		  "client_sync": true,
-          "type": "int",
-          "range":[ 0, 20 ],
-          "default": 0
-		},
-		"kny:forms": {
-		  "client_sync": true,
-          "type": "int",
-          "range":[ 0, 20 ],
-          "default": 0
-		},
-		"kny:treino": {
+        "kny:mark": {
           "client_sync": true,
           "type": "int",
-          "range":[ 0, 4 ],
+          "range": [
+            0,
+            20
+          ],
           "default": 0
-		},
-		"kny:caido": {
-		  "client_sync": true,
+        },
+        "kny:effects": {
+          "client_sync": true,
           "type": "int",
-          "range":[ 0, 1 ],
+          "range": [
+            0,
+            20
+          ],
           "default": 0
-		},
-		"kny:skills": {
-		  "client_sync": true,
+        },
+        "kny:forms": {
+          "client_sync": true,
           "type": "int",
-          "range":[ 0, 20 ],
+          "range": [
+            0,
+            20
+          ],
           "default": 0
-		}
+        },
+        "kny:treino": {
+          "client_sync": true,
+          "type": "int",
+          "range": [
+            0,
+            4
+          ],
+          "default": 0
+        },
+        "kny:caido": {
+          "client_sync": true,
+          "type": "int",
+          "range": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        "kny:skills": {
+          "client_sync": true,
+          "type": "int",
+          "range": [
+            0,
+            20
+          ],
+          "default": 0
+        },
+        "kny:h_linhagem": {
+          "type": "int",
+          "range": [
+            0,
+            3
+          ],
+          "default": 0
+        },
+        "kny:h_resp": {
+          "type": "int",
+          "range": [
+            0,
+            64
+          ],
+          "default": 0
+        },
+        "kny:h_arte": {
+          "type": "int",
+          "range": [
+            0,
+            64
+          ],
+          "default": 0
+        },
+        "kny:h_publico": {
+          "type": "int",
+          "range": [
+            0,
+            3
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "kny:h_ocupado": {
+          "type": "bool",
+          "default": false
+        },
+        "kny:h_revelar": {
+          "type": "bool",
+          "default": true
+        }
       }
     },
     "component_groups": {
-        "kny:caido_grp": {
-          "minecraft:interact": {
-            "interactions": [
-              {
-                "on_interact": {
-                  "filters": {
-                    "test": "is_family",
-                    "subject": "other",
-                    "value": "player"
-                  },
-                  "event": "kny:caido_interagido",
-                  "target": "self"
+      "kny:caido_grp": {
+        "minecraft:interact": {
+          "interactions": [
+            {
+              "on_interact": {
+                "filters": {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
                 },
-                "interact_text": "Carregar / Reanimar",
-                "use_item": false,
-                "swing": false
-              }
-            ]
-          }
-        },
-        "minecraft:display_info": {
+                "event": "kny:caido_interagido",
+                "target": "self"
+              },
+              "interact_text": "Carregar / Reanimar",
+              "use_item": false,
+              "swing": false
+            }
+          ]
+        }
+      },
+      "minecraft:display_info": {
         "show_health": false,
         "show_hunger": true,
         "show_air": true,
         "show_experience": true
-     },
+      },
       "mha:player": {
         "minecraft:movement": {
           "value": 0.2
         },
         "minecraft:type_family": {
-          "family": [ "player", "slayer" ]
+          "family": [
+            "player",
+            "slayer"
+          ]
         }
       },
       "pamobile:respawn": {
@@ -352,7 +414,7 @@
           "height": 1.8
         },
         "minecraft:scale": {
-          "value": 1.0
+          "value": 1
         },
         "minecraft:movement": {
           "value": 0.1
@@ -361,11 +423,12 @@
           "damage": 2
         },
         "minecraft:type_family": {
-          "family": [ "player" ]
+          "family": [
+            "player"
+          ]
         },
         "minecraft:spell_effects": {
-          "remove_effects": [
-          ]
+          "remove_effects": []
         }
       },
       "burn_daylight": {
@@ -377,7 +440,9 @@
         },
         "minecraft:burns_in_daylight": {},
         "minecraft:type_family": {
-          "family": [ "player_demon" ]
+          "family": [
+            "player_demon"
+          ]
         }
       },
       "str1": {
@@ -1065,38 +1130,76 @@
           "max": 100
         }
       },
-      "mugen":{
+      "mugen": {
         "minecraft:damage_sensor": {
-          "triggers":[
-            {"cause":"starve","deals_damage":true},
-            {"cause":"wither","deals_damage":true},
-            {"cause": "fall","deals_damage": true},
-            {"cause":"lightning","deals_damage":true},
-            {"cause":"freezing","deals_damage":true},
+          "triggers": [
+            {
+              "cause": "starve",
+              "deals_damage": true
+            },
+            {
+              "cause": "wither",
+              "deals_damage": true
+            },
+            {
+              "cause": "fall",
+              "deals_damage": true
+            },
+            {
+              "cause": "lightning",
+              "deals_damage": true
+            },
+            {
+              "cause": "freezing",
+              "deals_damage": true
+            },
             {
               "on_damage": {
                 "filters": {
-                  "any_of":[
-                    {"test":"is_family","subject":"other","value":"demon"},
-                    {"test":"is_family","subject":"other","value":"monster"},
-                    {"test":"is_family","subject":"other","value":"human"},
-                    {"test":"is_family","subject":"other","value":"player"},
-                    {"test":"is_family","subject":"other","value":"slayer"}
+                  "any_of": [
+                    {
+                      "test": "is_family",
+                      "subject": "other",
+                      "value": "demon"
+                    },
+                    {
+                      "test": "is_family",
+                      "subject": "other",
+                      "value": "monster"
+                    },
+                    {
+                      "test": "is_family",
+                      "subject": "other",
+                      "value": "human"
+                    },
+                    {
+                      "test": "is_family",
+                      "subject": "other",
+                      "value": "player"
+                    },
+                    {
+                      "test": "is_family",
+                      "subject": "other",
+                      "value": "slayer"
+                    }
                   ]
                 },
-                "event":"parry_effect"
+                "event": "parry_effect"
               },
               "deals_damage": false
             }
           ]
         }
-      },      
+      },
       "purple2": {
         "minecraft:mark_variant": {
           "value": 99991
-          },
+        },
         "minecraft:type_family": {
-          "family": [ "player", "slayer" ]
+          "family": [
+            "player",
+            "slayer"
+          ]
         }
       },
       "grau4": {
@@ -1193,7 +1296,7 @@
           "height": 1.8
         },
         "minecraft:scale": {
-          "value": 1.0
+          "value": 1
         },
         "minecraft:movement": {
           "value": 0.1
@@ -1202,11 +1305,13 @@
           "damage": 2
         },
         "minecraft:type_family": {
-          "family": [ "player", "slayer" ]
+          "family": [
+            "player",
+            "slayer"
+          ]
         },
         "minecraft:spell_effects": {
-          "remove_effects": [
-          ]
+          "remove_effects": []
         }
       },
       "kny:half_moon2": {
@@ -1686,7 +1791,7 @@
             "should_leash": true,
             "spawn_entity": "curse:open2",
             "num_to_spawn": 1
-            }
+          }
         ]
       },
       "curse:fish_event2": {
@@ -1845,7 +1950,7 @@
           }
         ]
       },
-    "kny:anger_thunder_death2": {
+      "kny:anger_thunder_death2": {
         "minecraft:spawn_entity": [
           {
             "min_wait_time": 0,
@@ -1854,12 +1959,47 @@
             "should_leash": true,
             "spawn_entity": "kny:anger_thunder_death2",
             "num_to_spawn": 1
-            }
+          }
+        ]
+      },
+      "kny:h_cacador": {
+        "minecraft:type_family": {
+          "family": [
+            "player",
+            "slayer"
           ]
+        },
+        "minecraft:mark_variant": {
+          "value": 0
         }
-     },
+      },
+      "kny:h_oni": {
+        "minecraft:type_family": {
+          "family": [
+            "player_demon"
+          ]
+        },
+        "minecraft:mark_variant": {
+          "value": 2
+        }
+      },
+      "kny:h_revelado": {
+        "minecraft:type_family": {
+          "family": [
+            "player_demon",
+            "kny_hybrid"
+          ]
+        },
+        "minecraft:mark_variant": {
+          "value": 2
+        }
+      }
+    },
     "components": {
-      "minecraft:health": { "value": 40, "max": 40 },
+      "minecraft:health": {
+        "value": 40,
+        "max": 40
+      },
       "minecraft:type_family": {
         "family": [
           "player"
@@ -1905,9 +2045,9 @@
               ]
             },
             "event": "add_creative_tag"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -1920,8 +2060,8 @@
               ]
             },
             "event": "remove_creative_tag"
-            }
-         },
+          }
+        },
         {
           "on_environment": {
             "filters": {
@@ -1935,9 +2075,9 @@
               ]
             },
             "event": "purple2"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -1950,9 +2090,9 @@
               ]
             },
             "event": "grau4"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -1965,9 +2105,9 @@
               ]
             },
             "event": "grau3"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -1980,9 +2120,9 @@
               ]
             },
             "event": "grausemi2"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -1995,9 +2135,9 @@
               ]
             },
             "event": "grau2"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2010,9 +2150,9 @@
               ]
             },
             "event": "grausemi1"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2025,9 +2165,9 @@
               ]
             },
             "event": "grau1"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2040,9 +2180,9 @@
               ]
             },
             "event": "especial"
-            }
-          },
-         {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2054,10 +2194,10 @@
                 }
               ]
             },
-            "event": "curse:mugentest"            
-            }
-          },
-         {
+            "event": "curse:mugentest"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2070,9 +2210,9 @@
               ]
             },
             "event": "convergence"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2085,9 +2225,9 @@
               ]
             },
             "event": "thundermode"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2100,9 +2240,9 @@
               ]
             },
             "event": "thunder_face"
-            }
-          },
-          {
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2114,10 +2254,10 @@
                 }
               ]
             },
-            "event": "blank"            
-            }
-          },
-          {
+            "event": "blank"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2129,10 +2269,10 @@
                 }
               ]
             },
-            "event": "blank_char"            
-            }
-          },
-          {
+            "event": "blank_char"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2144,10 +2284,10 @@
                 }
               ]
             },
-            "event": "curse:sukuna_heian2"            
-            }
-          },
-          {
+            "event": "curse:sukuna_heian2"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2159,10 +2299,10 @@
                 }
               ]
             },
-            "event": "nanami_domain"            
-            }
-          },
-          {
+            "event": "nanami_domain"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2174,10 +2314,10 @@
                 }
               ]
             },
-            "event": "megumi_domain"            
-            }
-          },
-          {
+            "event": "megumi_domain"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2189,10 +2329,10 @@
                 }
               ]
             },
-            "event": "choso_domain"            
-            }
-          },
-          {
+            "event": "choso_domain"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2204,10 +2344,10 @@
                 }
               ]
             },
-            "event": "yuta_domain"            
-            }
-          },
-          {
+            "event": "yuta_domain"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2219,10 +2359,10 @@
                 }
               ]
             },
-            "event": "higuruma_domain"            
-            }
-          },
-          {
+            "event": "higuruma_domain"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2234,10 +2374,10 @@
                 }
               ]
             },
-            "event": "hajime_domain"            
-            }
-          },
-          {
+            "event": "hajime_domain"
+          }
+        },
+        {
           "on_environment": {
             "filters": {
               "all_of": [
@@ -2249,9 +2389,9 @@
                 }
               ]
             },
-            "event": "gojo_domain"            
-            }
-          },
+            "event": "gojo_domain"
+          }
+        },
         {
           "on_environment": {
             "filters": {
@@ -2329,24 +2469,133 @@
       "minecraft:scaffolding_climber": {}
     },
     "events": {
-      "kny:stats_limpar_grupos": { "remove": { "component_groups": [
-        "str1", "str2", "str3", "str4", "str5", "str6", "str7", "str8",
-        "str9", "str10", "str11", "str12", "str13", "str14", "str15", "str16",
-        "str17", "str18", "str19", "spd1", "spd2", "spd3", "spd4", "spd5",
-        "spd6", "spd7", "spd8", "spd9", "spd10", "spd11", "spd12", "spd13",
-        "spd14", "spd15", "spd16", "spd17", "spd18", "spd19", "spd20", "spd21",
-        "spd22", "vida1", "vida2", "vida3", "vida4", "vida5", "vida6", "vida7",
-        "vida8", "vida9", "vida10", "vida11", "vida12", "vida13", "vida14", "vida15",
-        "vida16", "vida17", "vida18", "vida19", "vida20", "vida21", "vida22", "vida23",
-        "vida24", "vida25", "vida26", "vida27", "vida28", "vida29", "vida30", "vida31",
-        "vida32", "vida33", "vida34", "vida35", "vida36", "vida37", "vida38", "vida39",
-        "vida40", "vida41", "vida42", "vida43", "vida44", "vida45", "vida46", "vida47",
-        "vida48", "vida49", "vida50", "vida51", "vida52", "vida53", "vida54", "vida55",
-        "vida56", "vida57", "vida58", "vida59", "vida60", "vida61", "vida62", "vida63",
-        "vida64", "vida65", "vida66", "vida67", "vida68", "vida69", "vida70", "vida71",
-        "vida72", "vida73", "vida74", "vida75", "vida76", "vida77", "vida78", "vida79",
-        "vida80"
-      ] } },
+      "kny:stats_limpar_grupos": {
+        "remove": {
+          "component_groups": [
+            "str1",
+            "str2",
+            "str3",
+            "str4",
+            "str5",
+            "str6",
+            "str7",
+            "str8",
+            "str9",
+            "str10",
+            "str11",
+            "str12",
+            "str13",
+            "str14",
+            "str15",
+            "str16",
+            "str17",
+            "str18",
+            "str19",
+            "spd1",
+            "spd2",
+            "spd3",
+            "spd4",
+            "spd5",
+            "spd6",
+            "spd7",
+            "spd8",
+            "spd9",
+            "spd10",
+            "spd11",
+            "spd12",
+            "spd13",
+            "spd14",
+            "spd15",
+            "spd16",
+            "spd17",
+            "spd18",
+            "spd19",
+            "spd20",
+            "spd21",
+            "spd22",
+            "vida1",
+            "vida2",
+            "vida3",
+            "vida4",
+            "vida5",
+            "vida6",
+            "vida7",
+            "vida8",
+            "vida9",
+            "vida10",
+            "vida11",
+            "vida12",
+            "vida13",
+            "vida14",
+            "vida15",
+            "vida16",
+            "vida17",
+            "vida18",
+            "vida19",
+            "vida20",
+            "vida21",
+            "vida22",
+            "vida23",
+            "vida24",
+            "vida25",
+            "vida26",
+            "vida27",
+            "vida28",
+            "vida29",
+            "vida30",
+            "vida31",
+            "vida32",
+            "vida33",
+            "vida34",
+            "vida35",
+            "vida36",
+            "vida37",
+            "vida38",
+            "vida39",
+            "vida40",
+            "vida41",
+            "vida42",
+            "vida43",
+            "vida44",
+            "vida45",
+            "vida46",
+            "vida47",
+            "vida48",
+            "vida49",
+            "vida50",
+            "vida51",
+            "vida52",
+            "vida53",
+            "vida54",
+            "vida55",
+            "vida56",
+            "vida57",
+            "vida58",
+            "vida59",
+            "vida60",
+            "vida61",
+            "vida62",
+            "vida63",
+            "vida64",
+            "vida65",
+            "vida66",
+            "vida67",
+            "vida68",
+            "vida69",
+            "vida70",
+            "vida71",
+            "vida72",
+            "vida73",
+            "vida74",
+            "vida75",
+            "vida76",
+            "vida77",
+            "vida78",
+            "vida79",
+            "vida80"
+          ]
+        }
+      },
       "pamobile:refresh_player": {
         "add": {
           "component_groups": [
@@ -2383,15 +2632,20 @@
         }
       },
       "parry_effect": {
-        "queue_command":{
-          "command":["particle kny:attack_hit ^^1^1.5","playsound parry @a[r=5]"]
+        "queue_command": {
+          "command": [
+            "particle kny:attack_hit ^^1^1.5",
+            "playsound parry @a[r=5]"
+          ]
         }
-     },
-     "damage_event": {
-        "queue_command":{
-          "command":["function skills/damage"]
+      },
+      "damage_event": {
+        "queue_command": {
+          "command": [
+            "function skills/damage"
+          ]
         }
-     },
+      },
       "minecraft:entity_spawned": {
         "add": {
           "component_groups": [
@@ -2522,6 +2776,12 @@
           "component_groups": [
             "demon_family"
           ]
+        },
+        "filters": {
+          "test": "int_property",
+          "domain": "kny:h_linhagem",
+          "operator": "<",
+          "value": 2
         }
       },
       "kny:str1": {
@@ -3415,6 +3675,12 @@
           "component_groups": [
             "burn_daylight"
           ]
+        },
+        "filters": {
+          "test": "int_property",
+          "domain": "kny:h_linhagem",
+          "operator": "<",
+          "value": 2
         }
       },
       "burn_daylight_off": {
@@ -3884,15 +4150,15 @@
           "tags": [
             "creative_player"
           ]
-       }
-    },
-    "remove_creative_tag": {
-       "remove": {
+        }
+      },
+      "remove_creative_tag": {
+        "remove": {
           "tags": [
             "creative_player"
-           ]
-         }
-       },
+          ]
+        }
+      },
       "kny:cutting_threads_rotation": {
         "add": {
           "component_groups": [
@@ -3906,6 +4172,69 @@
             "kny:waterprison_event"
           ]
         }
+      },
+      "kny:h_publico_cacador": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "demon_family",
+                "burn_daylight",
+                "kny:h_oni",
+                "kny:h_revelado"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": [
+                "kny:h_cacador"
+              ]
+            }
+          }
+        ]
+      },
+      "kny:h_publico_oni": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "demon_family",
+                "burn_daylight",
+                "kny:h_cacador",
+                "kny:h_revelado"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": [
+                "kny:h_oni"
+              ]
+            }
+          }
+        ]
+      },
+      "kny:h_publico_revelado": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "demon_family",
+                "burn_daylight",
+                "kny:h_cacador",
+                "kny:h_oni"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": [
+                "kny:h_revelado"
+              ]
+            }
+          }
+        ]
       }
     }
   }

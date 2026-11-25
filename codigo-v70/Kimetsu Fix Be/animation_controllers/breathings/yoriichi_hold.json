@@ -1,0 +1,234 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.yoriichi_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_resp_yoriichi": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2 && (((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 6) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 6) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 7) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 7) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 8) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 8) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 9) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 9) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 10) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 11) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 11) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 12) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 12) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 13) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 13) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))))"
+            },
+            {
+              "yoriichi1": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi2": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi3": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi4": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi5": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi6": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 6) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 6) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi7": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 7) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 7) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi8": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 8) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 8) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi9": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 9) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 9) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi10": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 10) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi11": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 11) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 11) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi12": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 12) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 12) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "yoriichi13": "((query.equipped_item_any_tag('slot.weapon.mainhand','yoriichi') && query.is_using_item && query.scoreboard('yoriichi') == 13) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_yoriichi') >= 13) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            }
+          ]
+        },
+        "yoriichi1": {
+          "animations": [
+            "yoriichi1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi2": {
+          "animations": [
+            "yoriichi2"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi3": {
+          "animations": [
+            "yoriichi3"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi4": {
+          "animations": [
+            "yoriichi4"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi5": {
+          "animations": [
+            "yoriichi5"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi6": {
+          "animations": [
+            "yoriichi6"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi7": {
+          "animations": [
+            "yoriichi7"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi8": {
+          "animations": [
+            "yoriichi8"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi9": {
+          "animations": [
+            "yoriichi9"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi10": {
+          "animations": [
+            "yoriichi10"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi11": {
+          "animations": [
+            "yoriichi11"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi12": {
+          "animations": [
+            "yoriichi12"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "yoriichi13": {
+          "animations": [
+            "yoriichi13"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_resp_yoriichi": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar resp yoriichi"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

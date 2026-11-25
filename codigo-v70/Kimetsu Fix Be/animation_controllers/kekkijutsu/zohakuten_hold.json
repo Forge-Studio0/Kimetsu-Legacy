@@ -1,0 +1,122 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.zohakuten_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_arte_zohakuten": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1 && (((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 3) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 4) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 5) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 6) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))))"
+            },
+            {
+              "zohakuten1": "((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            },
+            {
+              "zohakuten2": "((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            },
+            {
+              "zohakuten3": "((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 3) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            },
+            {
+              "zohakuten4": "((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 4) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            },
+            {
+              "zohakuten5": "((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 5) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            },
+            {
+              "zohakuten6": "((query.equipped_item_any_tag('slot.weapon.mainhand','zohakuten') && query.is_using_item && query.scoreboard('zohakuten') == 6) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            }
+          ]
+        },
+        "zohakuten1": {
+          "animations": [
+            "zohakuten1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "zohakuten2": {
+          "animations": [
+            "zohakuten2"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "zohakuten3": {
+          "animations": [
+            "zohakuten3"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "zohakuten4": {
+          "animations": [
+            "zohakuten4"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "zohakuten5": {
+          "animations": [
+            "zohakuten6"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "zohakuten6": {
+          "animations": [
+            "zohakuten6"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_arte_zohakuten": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar arte zohakuten"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

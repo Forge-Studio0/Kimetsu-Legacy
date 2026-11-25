@@ -1,0 +1,106 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.zenitsu_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_resp_zenitsu": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2 && (((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))))"
+            },
+            {
+              "zenitsu1": "((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "zenitsu2": "((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "zenitsu3": "((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "zenitsu4": "((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "zenitsu5": "((query.equipped_item_any_tag('slot.weapon.mainhand','zenitsu') && query.is_using_item && query.scoreboard('zenitsu') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_zenitsu') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            }
+          ]
+        },
+        "zenitsu1": {
+          "animations": [
+            "zenitsu1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "zenitsu2": {
+          "animations": [
+            "zenitsu2"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "zenitsu3": {
+          "animations": [
+            "zenitsu3"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "zenitsu4": {
+          "animations": [
+            "zenitsu4"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "zenitsu5": {
+          "animations": [
+            "zenitsu5"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_resp_zenitsu": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar resp zenitsu"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

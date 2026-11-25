@@ -1,0 +1,106 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.mitsuri_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_resp_mitsuri": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2 && (((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))))"
+            },
+            {
+              "mitsuri1": "((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "mitsuri2": "((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "mitsuri3": "((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "mitsuri4": "((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "mitsuri5": "((query.equipped_item_any_tag('slot.weapon.mainhand','mitsuri') && query.is_using_item && query.scoreboard('mitsuri') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mitsuri') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            }
+          ]
+        },
+        "mitsuri1": {
+          "animations": [
+            "mitsuri1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "mitsuri2": {
+          "animations": [
+            "mitsuri2"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "mitsuri3": {
+          "animations": [
+            "mitsuri3"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "mitsuri4": {
+          "animations": [
+            "mitsuri4"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "mitsuri5": {
+          "animations": [
+            "mitsuri5"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_resp_mitsuri": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar resp mitsuri"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

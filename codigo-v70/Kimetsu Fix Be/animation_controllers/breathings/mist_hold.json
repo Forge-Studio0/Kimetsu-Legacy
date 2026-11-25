@@ -1,0 +1,122 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.mist_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_resp_mist": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2 && (((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 6) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 6) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))))"
+            },
+            {
+              "muichiro1": "((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "muichiro2": "((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "muichiro3": "((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "muichiro4": "((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "muichiro5": "((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "muichiro6": "((query.equipped_item_any_tag('slot.weapon.mainhand','mist') && query.is_using_item && query.scoreboard('mist') == 6) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_mist') >= 6) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            }
+          ]
+        },
+        "muichiro1": {
+          "animations": [
+            "muichiro1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "muichiro2": {
+          "animations": [
+            "muichiro2"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "muichiro3": {
+          "animations": [
+            "muichiro3"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "muichiro4": {
+          "animations": [
+            "muichiro4"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "muichiro5": {
+          "animations": [
+            "muichiro5"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "muichiro6": {
+          "animations": [
+            "muichiro6"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_resp_mist": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar resp mist"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

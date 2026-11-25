@@ -204,7 +204,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 100) {
-      kcmd(player, `say atingiu a meta §2[Lower Rank 6]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Lower Rank 6]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.015.slideshow_0.textures/icons/kamanue_hand"}]}`);
       player.addTag("lower6");
       player.addTag("lower62");
@@ -223,7 +223,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 200) {
-      kcmd(player, `say atingiu a meta §2[Lower Rank 5]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Lower Rank 5]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.016.slideshow_0.textures/icons/rui_kekkijutsu"}]}`);
       player.addTag("lower5");
       player.addTag("lower52");
@@ -242,7 +242,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 300) {
-      kcmd(player, `say atingiu a meta §2[Lower Rank 4]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Lower Rank 4]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.017.slideshow_0.textures/icons/blood"}]}`);
       player.addTag("lower4");
       player.addTag("lower42");
@@ -261,7 +261,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 400) {
-      kcmd(player, `say atingiu a meta §2[Lower Rank 3]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Lower Rank 3]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.018.slideshow_0.textures/icons/blood"}]}`);
       player.addTag("lower3");
       player.addTag("lower32");
@@ -280,7 +280,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 500) {
-      kcmd(player, `say atingiu a meta §2[Lower Rank 2]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Lower Rank 2]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.019.slideshow_0.textures/icons/blooddemonart_rokuro"}]}`);
       player.addTag("lower2");
       player.addTag("lower22");
@@ -299,7 +299,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 600) {
-      kcmd(player, `say atingiu a meta §2[Lower Rank 1]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Lower Rank 1]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.020.slideshow_0.textures/icons/enmu_hand"}]}`);
       player.addTag("lower1");
       player.addTag("lower12");
@@ -318,7 +318,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 700) {
-      kcmd(player, `say atingiu a meta §2[Upper Rank 6]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Upper Rank 6]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.021.slideshow_0.textures/icons/chigama"}]}`);
       player.addTag("upper6");
       player.addTag("upper62");
@@ -337,7 +337,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 800) {
-      kcmd(player, `say atingiu a meta §2[Upper Rank 5]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Upper Rank 5]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.022.slideshow_0.textures/icons/blooddemonart_gyokko"}]}`);
       player.addTag("upper5");
       player.addTag("upper52");
@@ -356,7 +356,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 900) {
-      kcmd(player, `say atingiu a meta §2[Upper Rank 4]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Upper Rank 4]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.023.slideshow_0.textures/icons/demonart_zohakuten"}]}`);
       player.addTag("upper4");
       player.addTag("upper42");
@@ -375,7 +375,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 1000) {
-      kcmd(player, `say atingiu a meta §2[Upper Rank 3]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Upper Rank 3]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.024.slideshow_0.textures/icons/compass_needle"}]}`);
       player.addTag("upper3");
       player.addTag("upper32");
@@ -394,7 +394,7 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 1100) {
-      kcmd(player, `say atingiu a meta §2[Upper Rank 2]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §2[Upper Rank 2]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.01.body.024.slideshow_0.textures/icons/blooddemonart_doma"}]}`);
       player.addTag("upper2");
       player.addTag("upper22");
@@ -413,8 +413,8 @@ mc.system.runInterval(() => {
     const up = hash.getScore(player, "updemon");
 
     if (up >= 1200) {
-      kcmd(player, `say atingiu a meta §5§l[Upper Rank 1]`);
-      kcmd(player, `say atingiu a meta §5§l[Strongest]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §5§l[Upper Rank 1]`);
+      if (!player.hasTag("kny_hybrid")) kcmd(player, `say atingiu a meta §5§l[Strongest]`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.02.body.025.slideshow_0.textures/icons/nichirin_kokushibo"}]}`);
       kcmd(player, `tellraw @s{"rawtext":[{"text":"_r4ui:toast_0.header.02.body.014.slideshow_0.textures/icons/demon"}]}`);
       kcmd(player, `playsound challenge_complete2 @s`);

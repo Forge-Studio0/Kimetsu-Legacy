@@ -1,0 +1,170 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.sanemi_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_resp_sanemi": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2 && (((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 6) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 6) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 7) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 7) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 8) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 8) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 9) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 9) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))))"
+            },
+            {
+              "sanemi1": "((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 1) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "sanemi2": "((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 2) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 2) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "sanemi3": "((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 3) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 3) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "sanemi4": "((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 4) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 4) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "sanemi5": "((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 5) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 5) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "sanemi6": "((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 6) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 6) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "sanemi7": "((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 7) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 7) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "sanemi8": "((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 8) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 8) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "sanemi9": "((query.equipped_item_any_tag('slot.weapon.mainhand','sanemi') && query.is_using_item && query.scoreboard('sanemi') == 9) && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 10 && query.scoreboard('kf_sanemi') >= 9) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            }
+          ]
+        },
+        "sanemi1": {
+          "animations": [
+            "sanemi1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "sanemi2": {
+          "animations": [
+            "sanemi2"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "sanemi3": {
+          "animations": [
+            "sanemi3"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "sanemi4": {
+          "animations": [
+            "sanemi4"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "sanemi5": {
+          "animations": [
+            "sanemi5"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "sanemi6": {
+          "animations": [
+            "sanemi6"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "sanemi7": {
+          "animations": [
+            "sanemi7"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "sanemi8": {
+          "animations": [
+            "sanemi8"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "sanemi9": {
+          "animations": [
+            "sanemi9"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_resp_sanemi": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar resp sanemi"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

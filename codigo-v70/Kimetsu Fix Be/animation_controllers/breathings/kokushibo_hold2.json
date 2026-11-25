@@ -1,0 +1,138 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.kokushibo_hold2": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_resp_kokushibo2": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2 && ((((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 1) && query.scoreboard('kf_kokushibo2') >= 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) || (((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 2) && query.scoreboard('kf_kokushibo2') >= 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) || (((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 3) && query.scoreboard('kf_kokushibo2') >= 3) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) || (((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 4) && query.scoreboard('kf_kokushibo2') >= 4) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) || (((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 5) && query.scoreboard('kf_kokushibo2') >= 5) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) || (((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 6) && query.scoreboard('kf_kokushibo2') >= 6) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) || (((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 7) && query.scoreboard('kf_kokushibo2') >= 7) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))))"
+            },
+            {
+              "kokushibo1": "(((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 1) && query.scoreboard('kf_kokushibo2') >= 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "kokushibo2": "(((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 2) && query.scoreboard('kf_kokushibo2') >= 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "kokushibo3": "(((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 3) && query.scoreboard('kf_kokushibo2') >= 3) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "kokushibo4": "(((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 4) && query.scoreboard('kf_kokushibo2') >= 4) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "kokushibo5": "(((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 5) && query.scoreboard('kf_kokushibo2') >= 5) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "kokushibo6": "(((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 6) && query.scoreboard('kf_kokushibo2') >= 6) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "kokushibo7": "(((query.equipped_item_any_tag('slot.weapon.mainhand','kokushibo2') && query.is_using_item && query.scoreboard('kokushibo2') == 7) && query.scoreboard('kf_kokushibo2') >= 7) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            }
+          ]
+        },
+        "kokushibo1": {
+          "animations": [
+            "kokushibo7"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kokushibo2": {
+          "animations": [
+            "kokushibo8"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kokushibo3": {
+          "animations": [
+            "kokushibo9"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kokushibo4": {
+          "animations": [
+            "kokushibo10"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kokushibo5": {
+          "animations": [
+            "kokushibo11"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kokushibo6": {
+          "animations": [
+            "kokushibo12"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kokushibo7": {
+          "animations": [
+            "kokushibo13"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_resp_kokushibo2": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar resp kokushibo2"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

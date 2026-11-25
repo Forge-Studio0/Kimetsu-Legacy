@@ -2,6 +2,11 @@ import { kcmd, knockback } from "./compat.js";
 import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { RESPIRACOES, KEKKIJUTSUS, ITEM_OBJ } from "./menu_data.js";
+import { H, ARTE_H_ID, DOMINAVEL, RESP_H_ID, ROTULOS } from "./hybrid_config.js";
+import { dominioHumano, ehCacadorHumano, progressoDominio, registrarAula, selecionarOriginal } from "./hybrid_mastery.js";
+import { canUseBreathing, canUseKekkijutsu, ehStaff, isHybrid, racaHibrida, transformar, trocarDisfarce } from "./hybrid_system.js";
+import { ativarHabilidade, danoEspecialEmCurso, habilidadeDe } from "./hybrid_abilities.js";
+import { canAccessLocation, configurarLocal, locais, viajar } from "./hybrid_locations.js";
 import {
   ATRIBUTOS, ATR, RANKS_CACADOR, RANKS_ONI, OBJ_REI, OBJ_LIDER, REPS_POR_PONTO, TAPAS_POR_PONTO,
   NIVEL_MAXIMO, SERIES_POR_MELHORIA, CREDITO_POR_SERIE, PONTOS_POR_ONI,
@@ -371,9 +376,10 @@ function inventarioDe(p) {
 function temEspada(p, g) {
   const c = inventarioDe(p);
   if (!c) return false;
+  const itens = RESP_H_ID.get(g.obj)?.itens ?? [];
   for (let i = 0; i < c.size; i++) {
     const it = c.getItem(i);
-    if (it && ITEM_OBJ[it.typeId] === g.obj) return true;
+    if (it && (ITEM_OBJ[it.typeId] === g.obj || itens.includes(it.typeId))) return true;
   }
   return false;
 }
@@ -390,7 +396,7 @@ function temLamina(p) {
 
 // requisitos para aprender a PRÓXIMA habilidade: { k: número da forma (0 = já sabe tudo), faltas: [...] }
 function requisitosProximaForma(p, g) {
-  const k = formasAprendidas(p, g) + 1;
+  const k = (DOMINAVEL(g.obj) ? dominioHumano(p, g.obj) : formasAprendidas(p, g)) + 1;
   if (k > g.formas.length) return { k: 0, faltas: [] };
   const faltas = [];
   const minimo = (g.basica ? HONRA_POR_FORMA_BASICA : HONRA_POR_FORMA) * (k - 1);
@@ -571,11 +577,12 @@ const MARCA_PAINEL = "kny_painel|";
 async function painelPrincipal(p) {
   const t = tema(p);
   const oni = isOni(p);
+  const hibrido = isHybrid(p);
   atualizarStats(p);
   const sta = staminaDe(p);
   const r = infoRank(p);
   const acoes = [];
-  const f = new ActionFormData().title(`${MARCA_PAINEL}§l${oni ? "PAINEL DO ONI" : "PAINEL DO CAÇADOR"}`).body(" ");
+  const f = new ActionFormData().title(`${MARCA_PAINEL}§l${hibrido ? "PAINEL DO HÍBRIDO" : oni ? "PAINEL DO ONI" : "PAINEL DO CAÇADOR"}`).body(" ");
   const add = (prefixo, texto, icone, acao) => {
     if (icone) f.button(prefixo + texto, icone);
     else f.button(prefixo + texto);
@@ -594,9 +601,9 @@ async function painelPrincipal(p) {
 
   // quadrados da direita: navegação
   const nav = [
-    [oni ? "Kekki." : "Respir.", t.icones.arte, () => listaArtes(p)],
+    [hibrido ? "Híbrido" : oni ? "Kekki." : "Respir.", t.icones.arte, () => hibrido ? menuHibrido(p) : listaArtes(p)],
     ["Config.", t.icones.config, () => configuracoes(p)],
-    ["Guia", t.icones.comoJogar, () => comoJogar(p)],
+    ["Guia", t.icones.comoJogar, () => guiaEAcessos(p)],
     ["Missões", t.icones.missoes, () => missoes(p)],
     ["Treino", t.icones.status, () => painelTreino(p)],
   ];
@@ -605,7 +612,7 @@ async function painelPrincipal(p) {
     if (ehRei(p)) extras.push(["Transf.", t.icones.personagem, () => transformarMenu(p)]);
     if (ehOperador(p)) extras.push(["Cargo", t.icones.config, () => alterarCargo(p)]);
   } else {
-    if (ehLider(p)) extras.push(["Ensinar", "textures/icons/menu_teach", () => ensinar(p)]);
+    if (ehLider(p) || ehHashira(p)) extras.push([ehLider(p) ? "Ensinar" : "Domínio", "textures/icons/menu_teach", () => ensinar(p)]);
     if (ehOperador(p)) extras.push(["Cargo", t.icones.config, () => alterarCargo(p)]);
   }
   for (const [txt, icone, acao] of [...nav, ...extras].slice(0, 6)) add("R:", txt, icone, acao);
@@ -675,10 +682,11 @@ async function menuClassico(p) {
   }
   corpo += `${t.linha}`;
 
-  const f = novoForm(p).title(t.titulo).body(corpo);
+  const hibrido = isHybrid(p);
+  const f = novoForm(p).title(hibrido ? "§l§4MENU DO HÍBRIDO" : t.titulo).body(corpo);
   const extras = [];
   if (oni) {
-    f.button("§l§4Kekkijutsu\n§r§8Artes demoníacas", t.icones.arte);
+    f.button(hibrido ? "§l§4Personagem Híbrido\n§r§8Poderes, disfarces e castelo" : "§l§4Kekkijutsu\n§r§8Artes demoníacas", t.icones.arte);
     f.button("§l§4Configurações\n§r§8Ajustes do menu", t.icones.config);
     f.button("§l§4Personagem\n§r§8Sua forma demoníaca", t.icones.personagem);
     f.button("§l§4Como Jogar\n§r§8Guia do oni", t.icones.comoJogar);
@@ -707,8 +715,8 @@ async function menuClassico(p) {
     extras.push("painel");
     f.button("§l§cTreinamento\n§r§7Exercícios e dummy", t.icones.status);
     extras.push("treino");
-    if (ehLider(p)) {
-      f.button("§l§cEnsinar Respiração\n§r§7Líder dos Hashiras", "textures/icons/menu_teach");
+    if (ehLider(p) || ehHashira(p)) {
+      f.button(ehLider(p) ? "§l§cEnsinar Respiração\n§r§7Líder dos Hashiras" : "§l§cAulas de domínio\n§r§7Entre Hashiras", "textures/icons/menu_teach");
       extras.push("ensinar");
     }
     if (ehOperador(p)) {
@@ -720,10 +728,10 @@ async function menuClassico(p) {
   const res = await mostrar(f, p);
   if (res.canceled) return;
   switch (res.selection) {
-    case 0: return listaArtes(p);
+    case 0: return hibrido ? menuHibrido(p) : listaArtes(p);
     case 1: return configuracoes(p);
     case 2: return personagem(p);
-    case 3: return comoJogar(p);
+    case 3: return guiaEAcessos(p);
     case 4: return missoes(p);
     case 5: return statusMenu(p);
   }
@@ -736,6 +744,152 @@ async function menuClassico(p) {
   if (acao === "ensinar") return ensinar(p);
   if (acao === "transformar") return transformarMenu(p);
   if (acao === "cargo") return alterarCargo(p);
+}
+
+async function guiaEAcessos(p) {
+  const f = novoForm(p).title("§lGUIA E ACESSOS").button(TXT_VOLTAR).button("Como jogar").button("Acessos de facção");
+  const acoes = [() => menuPrincipal(p), () => comoJogar(p), () => menuAcessos(p)];
+  if (ehCacadorHumano(p)) {
+    f.button("Domínio humano");
+    acoes.push(() => menuDominio(p));
+  }
+  if (ehStaff(p)) {
+    f.button("Configurar Castelo Infinito");
+    acoes.push(() => menuCasteloStaff(p));
+  }
+  const r = await mostrar(f, p);
+  if (!r.canceled) return acoes[r.selection]?.();
+}
+
+async function menuDominio(p) {
+  if (!ehCacadorHumano(p)) return;
+  const d = progressoDominio(p);
+  const completas = d.lista.filter((g) => g.aprendidas === g.formas.length);
+  const resumo = d.lista.filter((g) => g.aprendidas > 0).map((g) =>
+    `${g.nome} ${g.aprendidas}/${g.formas.length}`).join("\n");
+  const original = RESP_H_ID.get(d.original ?? (completas.length === 1 ? completas[0].obj : undefined));
+  const f = novoForm(p).title("§lDOMÍNIO HUMANO").body(
+    (d.valido ? `Respiração original ${original?.nome ?? "a definir"}\n${resumo || "Nenhuma aula registrada."}\n\n` +
+      (original ? "Domínio comprovado. Uma transformação legítima em Oni pode despertar a raça Híbrida."
+        : completas.length > 1 ? "Escolha a respiração original entre os domínios comprovados."
+          : "Complete todas as aulas da mesma respiração com o Líder dos Hashiras. Formas concedidas pela patente são registradas separadamente.")
+      : "Histórico incompatível. Consulte a Staff.")
+  ).button(TXT_VOLTAR);
+  for (const g of completas) f.button("Definir original · " + g.nome);
+  const r = await mostrar(f, p);
+  if (r.canceled) return;
+  if (r.selection === 0) return guiaEAcessos(p);
+  const alvo = completas[r.selection - 1];
+  if (alvo && selecionarOriginal(p, alvo.obj)) p.sendMessage("§aRespiração original registrada.");
+  return menuDominio(p);
+}
+
+async function menuHibrido(p) {
+  const d = racaHibrida(p);
+  if (!d) return;
+  const resp = RESP_H_ID.get(d.resp);
+  const arte = ARTE_H_ID.get(d.arte);
+  const poder = habilidadeDe(p);
+  const castelo = locais()?.castelo;
+  const f = novoForm(p).title("§l§4KIMETSU LEGACY · HÍBRIDO").body(
+    `Patente verdadeira ${patenteDe(p).nome}\nRespiração ${resp.nome} · ${d.formas}/${resp.formas.length}\n` +
+    `Kekkijutsu ${arte.nome}\nHabilidade ${poder?.nome ?? "aguardando atribuição"}\n` +
+    `Identidade pública ${ROTULOS[d.publico]}\nResistência solar parcial\n` +
+    `Castelo ${castelo?.entrada && castelo.saida ? "configurado" : "aguardando configuração"}`
+  );
+  const passos = [
+    [TXT_VOLTAR, () => menuPrincipal(p)],
+    ["Respiração original", () => detalhesH(p, resp.nome, resp.formas.map((n, i) => `${i + 1}. ${n}`).join("\n"))],
+    ["Kekkijutsu vinculado", () => detalhesH(p, arte.nome, `Use ${arte.item} para acessar esta arte. Ela é vinculada ao personagem.\n${(arte.formas ?? []).join("\n")}`)],
+    ["Habilidade exclusiva", () => telaPoderH(p)],
+    ["Disfarces", () => telaDisfarceH(p)],
+    ["Castelo Infinito", () => telaCasteloH(p)],
+    ["Status", () => statusMenu(p)],
+    ["Treinamento", () => painelTreino(p)],
+    ["Acessos de facção", () => menuAcessos(p)],
+    ["Configurações", () => configuracoes(p)],
+  ];
+  for (const [nome] of passos) f.button(nome);
+  const r = await mostrar(f, p);
+  if (!r.canceled) return passos[r.selection]?.[1]();
+}
+
+async function detalhesH(p, titulo, corpo) {
+  const r = await mostrar(novoForm(p).title(titulo).body(corpo).button(TXT_VOLTAR), p);
+  if (!r.canceled) return menuHibrido(p);
+}
+
+async function telaPoderH(p) {
+  const poder = habilidadeDe(p);
+  const f = novoForm(p).title(poder?.nome ?? "Habilidade exclusiva").button(TXT_VOLTAR);
+  f.body(poder ? `${poder.texto}\nFôlego ${poder.folego} · Stamina ${poder.stamina}\n` +
+    `Recarga ${poder.ms / 1000}s · Restam ${Math.max(0, Math.ceil((poder.ate - Date.now()) / 1000))}s\n` +
+    (poder.ativo ? "Aponte antes de abrir o menu e selecione Ativar." : "Desativada pela Staff.") : "Habilidade exclusiva aguardando atribuição.");
+  if (poder?.ativo) f.button("Ativar");
+  const r = await mostrar(f, p);
+  if (r.canceled) return;
+  if (r.selection === 0) return menuHibrido(p);
+  if (r.selection === 1) {
+    const erro = ativarHabilidade(p);
+    if (erro) p.sendMessage("§e" + erro);
+  }
+}
+
+async function telaDisfarceH(p) {
+  const d = racaHibrida(p);
+  if (!d) return;
+  const identidades = Object.keys(ROTULOS);
+  const falta = Math.max(0, Math.ceil(((d.disfarceAte ?? 0) - Date.now()) / 1000));
+  const f = novoForm(p).title("Disfarces").body(
+    `Identidade atual ${ROTULOS[d.publico]}\nRecarga ${falta}s\nAguarde o fim do combate para trocar.` +
+    (H.revelarPoder ? "\nPoderes incompatíveis revelam sua forma verdadeira." : "")
+  ).button(TXT_VOLTAR);
+  for (const [id, nome] of Object.entries(ROTULOS)) f.button(id === d.publico ? nome + " · ativo" : nome);
+  const r = await mostrar(f, p);
+  if (r.canceled) return;
+  if (r.selection === 0) return menuHibrido(p);
+  if (identidades[r.selection - 1]) p.sendMessage("§e" + trocarDisfarce(p, identidades[r.selection - 1]));
+}
+
+async function telaCasteloH(p) {
+  if (!isHybrid(p)) return;
+  const cfg = locais()?.castelo;
+  const pronto = cfg?.entrada && cfg.saida;
+  const f = novoForm(p).title("Castelo Infinito").body(pronto
+    ? `A entrada aceita a identidade Oni ou a forma verdadeira. Preparação de ${cfg.ticks / 20}s. Saia pelo ponto registrado pela Staff.`
+    : "O Castelo Infinito ainda não foi configurado pela administração.").button(TXT_VOLTAR);
+  if (pronto) f.button("Entrar no Castelo").button("Sair do Castelo");
+  const r = await mostrar(f, p);
+  if (r.canceled) return;
+  if (r.selection === 0) return menuHibrido(p);
+  if (pronto && [1, 2].includes(r.selection)) {
+    const erro = viajar(p, "castelo", r.selection === 1 ? "entrada" : "saida");
+    if (erro) p.sendMessage("§e" + erro);
+  }
+}
+
+async function menuCasteloStaff(p) {
+  if (!ehStaff(p)) return;
+  const f = novoForm(p).title("Castelo · Staff").body("Registre sua posição atual como entrada ou saída. Os pontos precisam ter piso seguro.")
+    .button(TXT_VOLTAR).button("Registrar entrada").button("Registrar saída");
+  const r = await mostrar(f, p);
+  if (r.canceled) return;
+  if (r.selection === 0) return guiaEAcessos(p);
+  if (r.selection === 1 || r.selection === 2) p.sendMessage("§e" + configurarLocal(p, ["castelo", r.selection === 1 ? "entrada" : "saida"]));
+}
+
+async function menuAcessos(p) {
+  const acessos = Object.keys(locais()?.acessos ?? {}).filter((id) => canAccessLocation(p, id));
+  const f = novoForm(p).title("Acessos de facção").body("Aproxime-se de um dos pontos registrados pela Staff.").button(TXT_VOLTAR);
+  for (const id of acessos) f.button("Entrar · " + id).button("Sair · " + id);
+  const r = await mostrar(f, p);
+  if (r.canceled) return;
+  if (r.selection === 0) return isHybrid(p) ? menuHibrido(p) : guiaEAcessos(p);
+  const id = acessos[Math.floor((r.selection - 1) / 2)];
+  if (id) {
+    const erro = viajar(p, id, r.selection % 2 ? "entrada" : "saida");
+    if (erro) p.sendMessage("§e" + erro);
+  }
 }
 
 /* ---------------------------------------------------------------------
@@ -1143,7 +1297,8 @@ function verificarCargo(p, c, ehDoLado, tagRank, objPontos) {
   if (ehDoLado(p) && p.hasTag(tagRank) && getScore(p, objPontos) >= PONTOS_CARGO_MAXIMO) {
     if (!titular) {
       definirTitular(p, c);
-      world.sendMessage(`§4[Kimetsu] §c${p.name} se tornou §l${c.nome}§r§c.`);
+      if (isHybrid(p)) p.sendMessage(`§4Você assumiu o cargo de ${c.nome}.`);
+      else world.sendMessage(`§4[Kimetsu] §c${p.name} se tornou §l${c.nome}§r§c.`);
     } else if (!c.avisados.has(p.id)) {
       c.avisados.add(p.id);
       p.sendMessage(`§cO cargo de ${c.nome} já pertence a §l${titular}§r§c.`);
@@ -1188,7 +1343,7 @@ async function confirmarTransformacao(p, alvo) {
   const f = novoForm(p)
     .title("§l§4CONFIRMAR")
     .body(
-      `${t.linha}\n${t.texto}Transformar §l${alvo.name}§r${t.texto} em oni?\n\n${t.suave}Ele perde o rank e as respirações de caçador.\n${t.linha}`
+      `${t.linha}\n${t.texto}Transformar §l${alvo.name}§r${t.texto}?\n\n${t.suave}O cargo humano se encerra. O domínio comprovado pode despertar um Híbrido.\n${t.linha}`
     )
     .button(`§l${t.destaque}Transformar`, t.icones.arte)
     .button(`§l${t.destaque}Cancelar`, t.icones.voltar);
@@ -1199,17 +1354,9 @@ async function confirmarTransformacao(p, alvo) {
 
 function transformarEmOni(p, alvo) {
   try {
-    if (!ehRei(p)) return;
-    if (isOni(alvo)) {
-      p.sendMessage(`§c${alvo.name} já é um oni.`);
-      return;
-    }
-    // mesmo caminho do addon ao virar oni (tag demon, sol queima, perde o rank de caçador)
-    kcmd(alvo, "function blood");
-    alvo.addTag(TAG_ESCOLHEU);
-    p.sendMessage(`§4Você transformou §l${alvo.name}§r§4 em oni.`);
-    alvo.sendMessage(`§4O Rei dos Onis §l${p.name}§r§4 transformou você em oni. O sol agora é seu inimigo.`);
-    world.sendMessage(`§4[Kimetsu] §c${p.name} transformou ${alvo.name} em oni.`);
+    const r = transformar(alvo, "rei", p);
+    if (!r.ok) return p.sendMessage("§c" + r.motivo);
+    p.sendMessage(`§4Você transformou §l${alvo.name}§r§4 em ${r.hibrido ? "Híbrido" : "Oni"}.`);
     som(alvo, "ambient.cave", 0.6, 0.8);
   } catch (e) {
     reportar(p, e);
@@ -1221,13 +1368,7 @@ function transformarEmOni(p, alvo) {
 --------------------------------------------------------------------- */
 
 function ehOperador(p) {
-  try {
-    if (typeof p.isOp === "function" && p.isOp()) return true;
-  } catch {}
-  try {
-    if (p.playerPermissionLevel === 2) return true;
-  } catch {}
-  return p.hasTag("kny_op"); // alternativa: /tag NOME add kny_op
+  return ehStaff(p);
 }
 
 function definirCargoCacador(p, idx) {
@@ -1291,6 +1432,7 @@ async function alterarCargo(p) {
   if (res.canceled) return;
   if (res.selection === 0) return menuPrincipal(p);
   const idx = res.selection - 1;
+  if (!ehOperador(p) || isOni(p) !== oni || !nomes[idx]) return;
   try {
     if (oni) definirCargoOni(p, idx);
     else definirCargoCacador(p, idx);
@@ -1320,6 +1462,7 @@ system.runInterval(() => {
       }
       if (p.hasTag("kny_set_lider")) {
         p.removeTag("kny_set_lider");
+        if (!ehOperador(p)) continue;
         if (isOni(p)) {
           p.sendMessage("§cLíder dos Hashiras é um cargo de caçador. Você é um oni: volte a ser humano primeiro.");
         } else {
@@ -1332,17 +1475,24 @@ system.runInterval(() => {
       if (p.hasTag("kny_set_rei") || p.hasTag("kny_set_muzan")) {
         p.removeTag("kny_set_rei");
         p.removeTag("kny_set_muzan");
-        if (!isOni(p)) kcmd(p, "function blood"); // vira oni antes de assumir o cargo
+        if (!ehOperador(p)) continue;
+        if (!isOni(p)) {
+          const r = transformar(p, "cargo");
+          if (!r.ok) {
+            p.sendMessage("§c" + r.motivo);
+            continue;
+          }
+        }
         system.runTimeout(() => {
           try {
-            if (!isOni(p)) {
+            if (!ehOperador(p) || !isOni(p)) {
               p.sendMessage("§c[Menu Kimetsu] Não foi possível transformar você em oni para assumir o cargo de Rei dos Onis.");
               return;
             }
             p.addTag(TAG_ESCOLHEU);
             definirCargoOni(p, RANKS_ONI.length);
             p.sendMessage("§4Cargo definido: §lRei dos Onis§r§4.");
-            world.sendMessage(`§4[Kimetsu] §c${p.name} se tornou §lRei dos Onis§r§c.`);
+            if (!isHybrid(p)) world.sendMessage(`§4[Kimetsu] §c${p.name} se tornou §lRei dos Onis§r§c.`);
           } catch (e) {
             reportar(p, e);
           }
@@ -1793,7 +1943,8 @@ world.beforeEvents.entityHurt.subscribe((ev) => {
     if (atacante?.typeId === "minecraft:player" && atacante.id !== vitima.id) {
       const a = efetivos(atacante);
       const forca = efeitoForca(a.for.nivel);
-      const poder = ehTecnica(itemNaMao(atacante)) ? efeitoPoder(a.pod.nivel) : 0;
+      const especial = damageSource.cause === "magic" && danoEspecialEmCurso(atacante, vitima);
+      const poder = (especial || ehTecnica(itemNaMao(atacante), atacante)) ? efeitoPoder(a.pod.nivel) : 0;
       ataque += (forca + poder) / 100;
     }
     const defesa = vitima.typeId === "minecraft:player" && !vitima.hasTag("kny_caido")
@@ -1957,7 +2108,11 @@ const LAMINAS = [
 const LAMINA_POR_ITEM = {};
 for (const l of LAMINAS) LAMINA_POR_ITEM[`kny:lamina_${l.id}`] = l;
 
-const ehTecnica = (it) => !!it && !!(ITEM_OBJ[it.typeId] || LAMINA_POR_ITEM[it.typeId]);
+function ehTecnica(it, p) {
+  const d = racaHibrida(p);
+  if (d) return canUseBreathing(p, d.resp, it, 1) || canUseKekkijutsu(p, d.arte, it);
+  return !!it && !!(ITEM_OBJ[it.typeId] || LAMINA_POR_ITEM[it.typeId]);
+}
 const laminaNaMao = (p) => {
   const it = itemNaMao(p);
   return it ? LAMINA_POR_ITEM[it.typeId] : undefined;
@@ -2144,7 +2299,8 @@ function alunosPerto(p, g) {
   for (const q of world.getPlayers()) {
     try {
       if (q.id === p.id || q.dimension.id !== p.dimension.id) continue;
-      if (isOni(q) || !jaEscolheu(q) || formasAprendidas(q, g) >= g.formas.length) continue;
+      if (!ehCacadorHumano(q) || requisitosProximaForma(q, g).k === 0) continue;
+      if (!ehLider(p) && (!DOMINAVEL(g.obj) || !["hashira", "hashira_lider"].includes(patenteDe(q).tag))) continue;
       const d = Math.hypot(q.location.x - p.location.x, q.location.y - p.location.y, q.location.z - p.location.z);
       if (d <= DIST_ENSINO) lista.push(q);
     } catch {}
@@ -2154,7 +2310,7 @@ function alunosPerto(p, g) {
 
 async function ensinarClassico(p) {
   const t = TEMA_CACADOR;
-  const hashira = ehLider(p);
+  const hashira = ehLider(p) || ehHashira(p);
   const op = false;
   if (!hashira) {
     p.sendMessage("§cSomente o Líder dos Hashiras pode ensinar respirações.");
@@ -2291,8 +2447,8 @@ async function painelAlunos(p, g, pagina = 0) {
 }
 
 async function ensinar(p) {
-  if (!ehLider(p)) {
-    p.sendMessage("§cSomente o Líder dos Hashiras pode ensinar respirações.");
+  if (!ehLider(p) && !ehHashira(p)) {
+    p.sendMessage("§cSomente Hashiras têm acesso às aulas.");
     return;
   }
   if (!p.hasTag(TAG_CLASSICO)) return painelEnsinar(p, 0);
@@ -2306,7 +2462,7 @@ async function escolherAluno(p, g) {
 
 async function ensinarPara(p, aluno, g) {
   try {
-    if (!ehHashira(p)) return;
+    if (!(ehLider(p) || ehHashira(p)) || !aluno?.isValid || !alunosPerto(p, g).some((q) => q.id === aluno.id)) return;
     const r = requisitosProximaForma(aluno, g);
     if (r.k === 0) {
       p.sendMessage(`§c${aluno.name} já conhece todas as habilidades da ${g.nome}.`);
@@ -2314,7 +2470,14 @@ async function ensinarPara(p, aluno, g) {
       p.sendMessage(`§c${aluno.name} ainda não pode aprender a forma ${r.k}. Requisitos: ${r.faltas.join("; ")}.`);
       aluno.sendMessage(`§cPara aprender a forma ${r.k} da ${g.nome} você precisa de: ${r.faltas.join("; ")}.`);
     } else {
-      marcarForma(aluno, g, r.k);
+      if (DOMINAVEL(g.obj)) {
+        if (!registrarAula(p, aluno, g.obj, r.k)) {
+          p.sendMessage("§cA aula não pôde ser registrada. Confira a presença e o histórico do aluno.");
+          return escolherAluno(p, g);
+        }
+      } else {
+        marcarForma(aluno, g, r.k);
+      }
       const nomeForma = g.formas[r.k - 1];
       p.sendMessage(`§cVocê ensinou a forma ${r.k} da ${g.nome} (${nomeForma}) a §l${aluno.name}§r§c.`);
       aluno.sendMessage(`§cO Hashira §l${p.name}§r§c ensinou a forma ${r.k} da ${g.nome}: ${nomeForma}.`);

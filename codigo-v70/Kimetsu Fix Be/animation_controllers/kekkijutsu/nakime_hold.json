@@ -1,0 +1,58 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.nakime_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_arte_biwa": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1 && (((query.equipped_item_any_tag('slot.weapon.mainhand','nakime') && query.is_using_item && query.scoreboard('biwa') == 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:biwa'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','nakime') && query.is_using_item && query.scoreboard('biwa') == 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:biwa'))))"
+            },
+            {
+              "nakime1": "((query.equipped_item_any_tag('slot.weapon.mainhand','nakime') && query.is_using_item && query.scoreboard('biwa') == 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:biwa'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            },
+            {
+              "nakime2": "((query.equipped_item_any_tag('slot.weapon.mainhand','nakime') && query.is_using_item && query.scoreboard('biwa') == 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:biwa'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            }
+          ]
+        },
+        "nakime1": {
+          "animations": [
+            "nakime1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "nakime2": {
+          "animations": [
+            "nakime2"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_arte_biwa": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar arte biwa"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

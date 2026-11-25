@@ -1,8 +1,8 @@
-KIMETSU LEGACY v71
+KIMETSU LEGACY v72
 Código-fonte e testes
 
-Kimetsu_Fix_v71_Completo.mcaddon inclui o Behavior Pack e o Resource Pack,
-ambos na versão interna 1.0.53. Importe o arquivo no Minecraft Bedrock,
+Kimetsu_Fix_v72_Completo.mcaddon inclui o Behavior Pack e o Resource Pack,
+ambos na versão interna 1.0.54. Importe o arquivo no Minecraft Bedrock,
 ative os dois pacotes e habilite APIs Beta no mundo.
 
 Selecione Menu Kimetsu ou o livro e use o item. No toque, use o botão
@@ -29,6 +29,10 @@ salva uma ficha para conferir a leitura após o reinício do servidor.
 Para testar o uso nativo dos itens, instale bedrock-menu.js da mesma forma,
 no lugar de bedrock.js. O teste simula as respostas dos formulários.
 
-Use o Resource Pack 1.0.53 do .mcaddon completo para testar a interface no
-cliente. No servidor dedicado, configure os dois pacotes na versão 1.0.53 na
+Para testar a Prioridade 05, execute também testes/hibridos.test.mjs. Use
+bedrock-hibridos.js no lugar de bedrock.js para a integração no Bedrock.
+O manual e o relatório ficam em docs/ no repositório.
+
+Use o Resource Pack 1.0.54 do .mcaddon completo para testar a interface no
+cliente. No servidor dedicado, configure os dois pacotes na versão 1.0.54 na
 lista de pacotes do mundo.

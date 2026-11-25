@@ -1,0 +1,42 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.nezuko_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_arte_nezuko": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1 && (((query.equipped_item_any_tag('slot.weapon.mainhand','nezuko') && query.is_using_item) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 10 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nezuko_kekkijutsu'))))"
+            },
+            {
+              "nezuko1": "((query.equipped_item_any_tag('slot.weapon.mainhand','nezuko') && query.is_using_item) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 10 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nezuko_kekkijutsu'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            }
+          ]
+        },
+        "nezuko1": {
+          "animations": [
+            "nezuko1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_arte_nezuko": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar arte nezuko"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

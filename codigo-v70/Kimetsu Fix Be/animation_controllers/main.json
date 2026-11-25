@@ -1,0 +1,701 @@
+{
+  "format_version": "1.16.100",
+  "animation_controllers": {
+    "controller.animation.main": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_resp_basica": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2 && (((query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor') && query.is_using_item && query.scoreboard('kny_bas') <= 1 && query.scoreboard('kf_basica') >= 1 && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 5)) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 26 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor') && query.is_using_item && query.scoreboard('kny_bas') == 2 && query.scoreboard('kf_basica') >= 2 && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 5)) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 26 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor') && query.is_using_item && query.scoreboard('kny_bas') == 3 && query.scoreboard('kf_basica') >= 3 && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 5)) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 26 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor'))))"
+            },
+            {
+              "medicine": "query.equipped_item_any_tag('slot.weapon.mainhand','antidote') && query.is_using_item"
+            },
+            {
+              "nichirin_blade": "query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_blade') && query.is_using_item"
+            },
+            {
+              "blood": "query.equipped_item_any_tag('slot.weapon.mainhand','blood') && query.is_using_item"
+            },
+            {
+              "zenitsu": "((query.get_equipped_item_name == 'nichirin_zenitsu' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_zenitsu') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 11 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_zenitsu')))"
+            },
+            {
+              "kaigaku": "((query.get_equipped_item_name == 'nichirin_kaigaku' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_kaigaku') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 12 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kaigaku')))"
+            },
+            {
+              "rengoku": "((query.get_equipped_item_name == 'nichirin_rengoku' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_rengoku') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 5 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_rengoku')))"
+            },
+            {
+              "tomioka": "((query.get_equipped_item_name == 'nichirin_tomioka' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_tomioka') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 2 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_tomioka')))"
+            },
+            {
+              "tanjiro": "((query.get_equipped_item_name == 'nichirin_tanjiro' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_tanjiro') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 3 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_tanjiro')))"
+            },
+            {
+              "tanjiro2": "((query.get_equipped_item_name == 'nichirin_tanjiro2' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_yoriichi') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2')))"
+            },
+            {
+              "sanemi": "((query.get_equipped_item_name == 'nichirin_sanemi' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_sanemi') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sanemi')))"
+            },
+            {
+              "uzui": "((query.get_equipped_item_name == 'nichirin_uzui' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_uzui') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 22 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_uzui')))"
+            },
+            {
+              "kokushibo": "((query.get_equipped_item_name == 'nichirin_kokushibo' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_kokushibo') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 16 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo')))"
+            },
+            {
+              "kokushibo2": "((query.get_equipped_item_name == 'nichirin_kokushibo2' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_kokushibo2') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 17 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kokushibo2')))"
+            },
+            {
+              "muichiro": "((query.get_equipped_item_name == 'nichirin_muichiro' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_muichiro') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 9 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_muichiro')))"
+            },
+            {
+              "mitsuri": "((query.get_equipped_item_name == 'nichirin_mitsuri' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_mitsuri') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 18 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mitsuri')))"
+            },
+            {
+              "yoriichi": "((query.get_equipped_item_name == 'nichirin_yoriichi' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_yoriichi') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 14 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_yoriichi', 'kny:nichirin_tanjiro2')))"
+            },
+            {
+              "shinobu": "((query.get_equipped_item_name == 'nichirin_shinobu' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_shinobu') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 19 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_shinobu')))"
+            },
+            {
+              "inosuke": "((query.get_equipped_item_name == 'nichirin_inosuke' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_inosuke') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 20 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_inosuke')))"
+            },
+            {
+              "gyomei": "((query.get_equipped_item_name == 'mangual' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_gyomei') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 21 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:mangual')))"
+            },
+            {
+              "kanao": "((query.get_equipped_item_name == 'nichirin_kanao' || query.get_equipped_item_name == 'nichirin_kanae' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_flower') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 24 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_kanao', 'kny:nichirin_kanae')))"
+            },
+            {
+              "obanai": "((query.get_equipped_item_name == 'nichirin_obanai' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_obanai') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 23 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_obanai')))"
+            },
+            {
+              "flame": "((query.get_equipped_item_name == 'nichirin_flame' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_flame') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 4 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_flame')))"
+            },
+            {
+              "wind": "((query.get_equipped_item_name == 'nichirin_wind' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_wind') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_wind')))"
+            },
+            {
+              "water": "((query.get_equipped_item_name == 'nichirin_water' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_water') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 1 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_water')))"
+            },
+            {
+              "mist": "((query.get_equipped_item_name == 'nichirin_mist' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_mist') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_mist')))"
+            },
+            {
+              "sun": "((query.get_equipped_item_name == 'nichirin_sun' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_sun') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 13 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_sun')))"
+            },
+            {
+              "moon": "((query.get_equipped_item_name == 'nichirin_moon' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_moon') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 15 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_moon')))"
+            },
+            {
+              "thunder": "((query.get_equipped_item_name == 'nichirin_thunder' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_thunder') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 10 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_thunder')))"
+            },
+            {
+              "enmu": "(query.get_equipped_item_name == 'enmu_hand' && query.is_sneaking && query.scoreboard('cooldown') == 0) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 3 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:enmu_hand')))"
+            },
+            {
+              "akaza": "(query.get_equipped_item_name == 'akaza_kekkijutsu' && query.is_sneaking && query.scoreboard('cooldown') == 0) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 1 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:akaza_kekkijutsu')))"
+            },
+            {
+              "gyutaro": "(query.get_equipped_item_name == 'chigama' && query.is_sneaking && query.scoreboard('cooldown') == 0) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 5 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:chigama')))"
+            },
+            {
+              "rokuro": "(query.get_equipped_item_name == 'blooddemonart_rokuro' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.property('kny:h_linhagem') < 2"
+            },
+            {
+              "zohakuten": "(query.get_equipped_item_name == 'demonart_zohakuten' && query.is_sneaking && query.scoreboard('cooldown') == 0) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 6 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonart_zohakuten')))"
+            },
+            {
+              "gyokko": "(query.get_equipped_item_name == 'vase' && query.is_sneaking && query.scoreboard('cooldown') == 0) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 4 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:vase')))"
+            },
+            {
+              "yahaba": "(query.get_equipped_item_name == 'yahaba_hand' && query.is_sneaking && query.scoreboard('cooldown') == 0) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 7 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:yahaba_hand')))"
+            },
+            {
+              "doma": "(query.get_equipped_item_name == 'doma_sensu' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.property('kny:h_linhagem') < 2"
+            },
+            {
+              "demonking": "(query.get_equipped_item_name == 'demonking' && query.is_sneaking && query.scoreboard('cooldown') == 0) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 2 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:demonking')))"
+            },
+            {
+              "death": "((query.get_equipped_item_name == 'nichirinsword_death' && query.is_sneaking && query.scoreboard('cooldown') == 0) && query.scoreboard('kf_death') >= 1) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 25 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirinsword_death')))"
+            },
+            {
+              "biwa": "(query.get_equipped_item_name == 'biwa' && query.is_sneaking && query.scoreboard('cooldown') == 0) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 8 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:biwa')))"
+            },
+            {
+              "parry": "variable.attack_time && query.equipped_item_any_tag('slot.weapon.mainhand','sword') &&variable.attack_time"
+            },
+            {
+              "seisei2": "variable.attack_time&&variable.attack_time"
+            },
+            {
+              "mist7": "(variable.attack_time && query.get_equipped_item_name == 'nichirin_muichiro'&&variable.attack_time) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 9 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:nichirin_muichiro')))"
+            },
+            {
+              "basica": "((query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor') && query.is_sneaking && query.scoreboard('kf_basica') >= 1)) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 26 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor')))"
+            },
+            {
+              "basica1": "((query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor') && query.is_using_item && query.scoreboard('kny_bas') <= 1 && query.scoreboard('kf_basica') >= 1 && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 5)) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 26 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "basica2": "((query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor') && query.is_using_item && query.scoreboard('kny_bas') == 2 && query.scoreboard('kf_basica') >= 2 && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 5)) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 26 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            },
+            {
+              "basica3": "((query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor') && query.is_using_item && query.scoreboard('kny_bas') == 3 && query.scoreboard('kf_basica') >= 3 && query.scoreboard('kny_exausto') == 0 && query.scoreboard('kny_folego') >= 5)) && (query.property('kny:h_linhagem') == 0 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_resp') == 26 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.equipped_item_any_tag('slot.weapon.mainhand','nichirin_cor'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 2)"
+            }
+          ]
+        },
+        "nichirin_blade": {
+          "on_entry": [
+            "/function random_nichirin"
+          ],
+          "transitions": [
+            {
+              "default": "!query.is_using_item"
+            }
+          ]
+        },
+        "medicine": {
+          "on_entry": [
+            "/function medicine"
+          ],
+          "transitions": [
+            {
+              "default": "!query.is_using_item"
+            }
+          ]
+        },
+        "blood": {
+          "on_entry": [
+            "/function blood"
+          ],
+          "transitions": [
+            {
+              "default": "!query.is_using_item"
+            }
+          ]
+        },
+        "flame": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] flame 1",
+            "/function breathings/flame"
+          ]
+        },
+        "wind": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] wind 1",
+            "/function breathings/wind"
+          ]
+        },
+        "water": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] water 1",
+            "/function breathings/water"
+          ]
+        },
+        "mist": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] mist 1",
+            "/function breathings/mist"
+          ]
+        },
+        "obanai": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] obanai 1",
+            "/function breathings/obanai"
+          ]
+        },
+        "sun": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] sun 1",
+            "/function breathings/sun"
+          ]
+        },
+        "moon": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] moon 1",
+            "/function breathings/moon"
+          ]
+        },
+        "thunder": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] thunder 1",
+            "/function breathings/thunder"
+          ]
+        },
+        "zenitsu": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] zenitsu 1",
+            "/function breathings/zenitsu"
+          ]
+        },
+        "kaigaku": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] kaigaku 1",
+            "/function breathings/kaigaku"
+          ]
+        },
+        "rengoku": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] rengoku 1",
+            "/function breathings/rengoku"
+          ]
+        },
+        "tomioka": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] tomioka 1",
+            "/function breathings/tomioka"
+          ]
+        },
+        "tanjiro": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] tanjiro 1",
+            "/function breathings/tanjiro"
+          ]
+        },
+        "sanemi": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] sanemi 1",
+            "/function breathings/sanemi"
+          ]
+        },
+        "uzui": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] uzui 1",
+            "/function breathings/uzui"
+          ]
+        },
+        "kokushibo": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] kokushibo 1",
+            "/function breathings/kokushibo"
+          ]
+        },
+        "kokushibo2": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] kokushibo2 1",
+            "/function breathings/kokushibo2"
+          ]
+        },
+        "muichiro": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] muichiro 1",
+            "/function breathings/muichiro"
+          ]
+        },
+        "mitsuri": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] mitsuri 1",
+            "/function breathings/mitsuri"
+          ]
+        },
+        "yoriichi": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] yoriichi 1",
+            "/function breathings/yoriichi"
+          ]
+        },
+        "tanjiro2": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] yoriichi 1",
+            "/function breathings/yoriichi"
+          ]
+        },
+        "shinobu": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] shinobu 1",
+            "/function breathings/shinobu"
+          ]
+        },
+        "inosuke": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] inosuke 1",
+            "/function breathings/inosuke"
+          ]
+        },
+        "gyomei": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] gyomei 1",
+            "/function breathings/gyomei"
+          ]
+        },
+        "kanao": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] flower 1",
+            "/function breathings/flowers"
+          ]
+        },
+        "biwa": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] biwa 1",
+            "/function kekkijutsus/nakime"
+          ]
+        },
+        "enmu": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] enmu 1",
+            "/function kekkijutsus/enmu"
+          ]
+        },
+        "akaza": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] akaza 1",
+            "/function kekkijutsus/akaza"
+          ]
+        },
+        "gyutaro": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] gyutaro 1",
+            "/function kekkijutsus/gyutaro"
+          ]
+        },
+        "zohakuten": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] zohakuten 1",
+            "/function kekkijutsus/zohakuten"
+          ]
+        },
+        "gyokko": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] gyokko 1",
+            "/function kekkijutsus/gyokko"
+          ]
+        },
+        "yahaba": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] yahaba 1",
+            "/function kekkijutsus/yahaba"
+          ]
+        },
+        "hairo": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] hairo 1",
+            "/function kekkijutsus/hairo"
+          ]
+        },
+        "doma": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] doma 1",
+            "/function kekkijutsus/doma"
+          ]
+        },
+        "demonking": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] demonking 1",
+            "/function kekkijutsus/demonking"
+          ]
+        },
+        "death": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players add @s cooldown 1",
+            "/scoreboard players add @s[scores={cooldown=2}] death 1",
+            "/function breathings/death"
+          ]
+        },
+        "parry": {
+          "transitions": [
+            {
+              "default": "(!variable.attack_time)"
+            }
+          ],
+          "on_entry": [
+            "/tag @s add invecible"
+          ]
+        },
+        "seisei2": {
+          "transitions": [
+            {
+              "default": "(!variable.attack_time)"
+            }
+          ],
+          "on_entry": [
+            "/execute as @s[tag=seiseiruten,tag=!kny_hybrid] at @s run function breathings/seiseiruten",
+            "/execute as @s[tag=seiseiruten,tag=kny_hybrid] at @s run scriptevent kny:h_agua golpe"
+          ]
+        },
+        "mist7": {
+          "transitions": [
+            {
+              "default": "(!variable.attack_time)"
+            }
+          ],
+          "on_entry": [
+            "/execute as @s[tag=obacuring_clouds] at @s run tp ^^1^2 facing @e",
+            "/execute as @s[tag=obacuring_clouds] at @s run playsound tp_mist @a[r=10]"
+          ]
+        },
+        "basica": {
+          "transitions": [
+            {
+              "default": "!query.is_sneaking"
+            }
+          ],
+          "on_entry": [
+            "/function respiracao_basica"
+          ]
+        },
+        "basica1": {
+          "transitions": [
+            {
+              "default": "!query.is_using_item"
+            }
+          ],
+          "on_entry": [
+            "/function basica/forma1",
+            "/scoreboard players remove @s kny_folego 5"
+          ]
+        },
+        "basica2": {
+          "transitions": [
+            {
+              "default": "!query.is_using_item"
+            }
+          ],
+          "on_entry": [
+            "/function basica/forma2",
+            "/scoreboard players remove @s kny_folego 5"
+          ]
+        },
+        "basica3": {
+          "transitions": [
+            {
+              "default": "!query.is_using_item"
+            }
+          ],
+          "on_entry": [
+            "/function basica/forma3",
+            "/scoreboard players remove @s kny_folego 5"
+          ]
+        },
+        "kny_h_revela_resp_basica": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar resp basica"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

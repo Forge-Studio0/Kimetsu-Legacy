@@ -2,6 +2,7 @@ const objetivos = new Map();
 const jogadores = new Map();
 const depois = [];
 const intervalos = [];
+const mundoDinamico = new Map();
 
 function sinais() {
   return new Proxy({}, {
@@ -27,6 +28,9 @@ const chave = (participante) => typeof participante === "string" ? "nome:" + par
 export const world = {
   beforeEvents: sinais(),
   afterEvents: sinais(),
+  getDynamicProperty(id) { return mundoDinamico.get(id); },
+  setDynamicProperty(id, value) { mundoDinamico.set(id, value); },
+  getDynamicPropertyIds() { return [...mundoDinamico.keys()]; },
   getPlayers(opts) {
     return [...jogadores.values()].filter((p) => p.isValid && (!opts?.name || p.name === opts.name));
   },
@@ -55,14 +59,18 @@ export const system = {
   currentTick: 100,
   beforeEvents: sinais(),
   afterEvents: sinais(),
-  run(fn) { depois.push(fn); },
-  runTimeout(fn, ticks) { depois.push(fn); },
+  run(fn) { return this.runTimeout(fn, 1); },
+  runTimeout(fn, ticks) { const tarefa = { fn, ticks }; depois.push(tarefa); return tarefa; },
+  clearRun(tarefa) {
+    const i = depois.indexOf(tarefa);
+    if (i >= 0) depois.splice(i, 1);
+  },
   runInterval(fn, ticks) { intervalos.push([fn, ticks]); },
 };
 
 export async function executarAgendados() {
   for (let i = 0; i < 8; i++) {
-    for (const fn of depois.splice(0)) fn();
+    for (const { fn } of depois.splice(0).sort((a, b) => a.ticks - b.ticks)) fn();
     await new Promise((resolve) => setImmediate(resolve));
   }
 }
@@ -95,6 +103,8 @@ export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
   const mensagens = [];
   const titulos = [];
   const efeitos = new Map();
+  const propriedades = new Map();
+  const estoque = new Map();
   const hp = {
     defaultValue: 40,
     currentValue: 40,
@@ -108,6 +118,7 @@ export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
   const p = {
     id, name: nome, typeId: "minecraft:player", isValid: true, tags, mensagens, titulos, dinamicos, telas: [], escolhas: [],
     scoreboardIdentity: { id, name: nome },
+    dimension: { id: "minecraft:overworld" }, location: { x: 0, y: 70, z: 0 }, selectedSlotIndex: 0,
     isSprinting: false, isSneaking: false, isOnGround: true,
     onScreenDisplay: { setTitle(t) { titulos.push(t); }, setActionBar() {} },
     getGameMode() { return "survival"; },
@@ -117,11 +128,23 @@ export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
     removeTag(t) { tags.delete(t); },
     sendMessage(t) { mensagens.push(t); },
     playSound() {},
+    getProperty(id) { return propriedades.get(id); },
+    setProperty(id, value) { propriedades.set(id, value); },
+    getHeadLocation() { return { ...this.location, y: this.location.y + 1.6 }; },
+    getViewDirection() { return { x: 1, y: 0, z: 0 }; },
+    getRotation() { return { x: 0, y: 0 }; },
+    tryTeleport(pos, op) { this.location = { ...pos }; if (op.dimension) this.dimension = op.dimension; return true; },
     triggerEvent(eventId) { world.afterEvents.dataDrivenEntityTrigger.emit({ entity: this, eventId }); },
     getComponent(nome) {
       if (nome === "minecraft:health") return hp;
       if (nome === "minecraft:movement") return movimento;
       if (nome === "minecraft:equippable") return { getEquipment: () => this.item };
+      if (nome === "minecraft:inventory") return { container: {
+        size: 36,
+        getItem(i) { return estoque.get(i); },
+        setItem(i, item) { estoque.set(i, item); },
+        addItem(item) { estoque.set(10, item); },
+      } };
     },
     getDynamicProperty(nome) { return dinamicos.get(nome); },
     setDynamicProperty(nome, valor) {
@@ -137,6 +160,15 @@ export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
     removeEffect(nome) {
       efeitos.delete(nome);
       if (nome === "health_boost") hp.currentValue = Math.min(hp.currentValue, hp.effectiveMax);
+    },
+    matches() { return false; },
+    applyDamage(damage, damageSource = {}) {
+      const ev = { damage, damageSource, hurtEntity: this, cancel: false };
+      world.beforeEvents.entityHurt.emit(ev);
+      if (ev.cancel) return false;
+      hp.setCurrentValue(Math.max(0, hp.currentValue - ev.damage));
+      world.afterEvents.entityHurt.emit(ev);
+      return true;
     },
     desconectar() {
       this.isValid = false;

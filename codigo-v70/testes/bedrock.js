@@ -172,6 +172,7 @@ async function legadoERaca(sufixo) {
 
   stats.pontuar(p, "blood", 0);
   stats.pontuar(p, "kny_stam", 999);
+  p.getComponent("minecraft:inventory").container.setItem(p.selectedSlotIndex, new ItemStack("kny:blood", 1));
   p.runCommand("function blood");
   await wait(3);
   eq(stats.patenteDe(p).tag, "oni", "transformação original usa raça Oni");
@@ -230,9 +231,13 @@ async function combateETreino(sufixo) {
   eq(b.getDynamicProperty(DADOS), antesMorte, "o progresso sobrevive à morte e ao respawn");
   assert(b.hasTag("kny_caido"), "caminho de morte da v69 marcou caído");
   eq(vida(b).currentValue, 10, "recálculo conserva os 10 PV de caído");
-  a.teleport({ ...b.location, x: b.location.x + 1 });
-  a.runCommand("setblock ~ ~-1 ~ stone");
+  // Limpe espaço e garanta um piso para ambos, inclusive ao gerar um mundo de teste novo.
+  b.runCommand("fill ~-2 ~ ~-2 ~3 ~3 ~2 air");
+  b.runCommand("fill ~-2 ~-1 ~-2 ~3 ~-1 ~2 stone");
+  const auxiliar = { ...b.location, x: b.location.x + 1 };
+  a.teleport(auxiliar);
   for (let i = 0; i < 22 && b.hasTag("kny_caido"); i++) {
+    if (Math.hypot(a.location.x - b.location.x, a.location.z - b.location.z) > 2) a.teleport(auxiliar);
     a.isSneaking = true;
     await wait(10);
   }

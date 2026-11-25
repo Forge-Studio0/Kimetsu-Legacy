@@ -1,0 +1,58 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.enmu_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_arte_enmu": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1 && (((query.equipped_item_any_tag('slot.weapon.mainhand','enmu') && query.is_using_item && query.scoreboard('enmu') == 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 3 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:enmu_hand'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','enmu') && query.is_using_item && query.scoreboard('enmu') == 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 3 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:enmu_hand'))))"
+            },
+            {
+              "enmu1": "((query.equipped_item_any_tag('slot.weapon.mainhand','enmu') && query.is_using_item && query.scoreboard('enmu') == 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 3 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:enmu_hand'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            },
+            {
+              "enmu2": "((query.equipped_item_any_tag('slot.weapon.mainhand','enmu') && query.is_using_item && query.scoreboard('enmu') == 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 3 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:enmu_hand'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            }
+          ]
+        },
+        "enmu1": {
+          "animations": [
+            "enmu1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "enmu2": {
+          "animations": [
+            "enmu2"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_arte_enmu": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar arte enmu"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

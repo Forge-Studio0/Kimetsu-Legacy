@@ -1,0 +1,17 @@
+import "./menu.js";
+import "./hybrid_sun.js";
+import "./hybrid_admin.js";
+import "./chat_local.js";
+import "./revive.js";
+import "./hud_painel.js";
+import "./bars.js";
+import "./dash.js";
+import "./damage_action.js";
+import "./uprank.js";
+import "./scripts.js";
+import "./archieviments.js";
+import "./blocks.js";
+import "./tamayo.js";
+import "./spawn_muzan.js";
+import "./bloodmoon.js";
+import "./haganezuka.js";

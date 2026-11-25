@@ -1,0 +1,74 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.gyutaro_hold": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "kny_h_revela_arte_gyutaro": "query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1 && (((query.equipped_item_any_tag('slot.weapon.mainhand','gyutaro') && query.is_using_item && query.scoreboard('gyutaro') == 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 5 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:chigama'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','gyutaro') && query.is_using_item && query.scoreboard('gyutaro') == 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 5 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:chigama'))) || ((query.equipped_item_any_tag('slot.weapon.mainhand','gyutaro') && query.is_using_item && query.scoreboard('gyutaro') == 3) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 5 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:chigama'))))"
+            },
+            {
+              "gyutaro1": "((query.equipped_item_any_tag('slot.weapon.mainhand','gyutaro') && query.is_using_item && query.scoreboard('gyutaro') == 1) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 5 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:chigama'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            },
+            {
+              "gyutaro2": "((query.equipped_item_any_tag('slot.weapon.mainhand','gyutaro') && query.is_using_item && query.scoreboard('gyutaro') == 2) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 5 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:chigama'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            },
+            {
+              "gyutaro3": "((query.equipped_item_any_tag('slot.weapon.mainhand','gyutaro') && query.is_using_item && query.scoreboard('gyutaro') == 3) && query.scoreboard('kny_folego') >= 10) && (query.property('kny:h_linhagem') < 2 || (query.property('kny:h_linhagem') == 2 && query.property('kny:h_arte') == 5 && !query.property('kny:h_ocupado') && query.property('kny:caido') == 0 && query.is_item_name_any('slot.weapon.mainhand', 0, 'kny:chigama'))) && !(query.property('kny:h_linhagem') == 2 && query.property('kny:h_revelar') && query.property('kny:h_publico') == 1)"
+            }
+          ]
+        },
+        "gyutaro1": {
+          "animations": [
+            "gyutaro1"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "gyutaro2": {
+          "animations": [
+            "gyutaro2"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "gyutaro3": {
+          "animations": [
+            "gyutaro3"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished"
+            }
+          ],
+          "on_entry": [
+            "/scoreboard players remove @s kny_folego 10"
+          ]
+        },
+        "kny_h_revela_arte_gyutaro": {
+          "on_entry": [
+            "/scriptevent kny:h_revelar arte gyutaro"
+          ],
+          "transitions": [
+            {
+              "default": "1.0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
