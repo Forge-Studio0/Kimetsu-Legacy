@@ -1,5 +1,7 @@
 # Kimetsu Legacy v72 — Sistema de Híbridos
 
+Para a explicação completa do funcionamento interno e do uso no jogo, consulte o [Relatório teórico e prático da v72](RELATORIO-TEORICO-PRATICO-V72.md).
+
 Use o `Kimetsu_Fix_v72_Completo.mcaddon` no Minecraft Bedrock. O arquivo contém o Behavior Pack e o Resource Pack completos, ambos na versão interna `1.0.54`. Os UUIDs são os mesmos da v71. Ative os dois pacotes e mantenha **APIs Beta** habilitadas. No servidor dedicado, atualize para `[1, 0, 54]` as versões dos dois pacotes na configuração do mundo.
 
 Para a instalação com packs separados, importe `Kimetsu_Fix_v72_BP.mcpack` e `Kimetsu_Fix_v72_RP.mcpack`.
