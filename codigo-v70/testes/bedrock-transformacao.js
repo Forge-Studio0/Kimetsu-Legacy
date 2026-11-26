@@ -2,7 +2,8 @@ import { GameMode, ItemStack, system, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
 import { RESP_H_ID } from "./hybrid_config.js";
-import { dominioHumano, registrarAula } from "./hybrid_mastery.js";
+import { dominioHumano, registrarAula, registrarTreinoRespiracao } from "./hybrid_mastery.js";
+import { tarefasDaForma } from "./treino_respiracao.js";
 import { guardarPersonagem, identificador } from "./hybrid_records.js";
 import { getTrueRace, racaHibrida } from "./hybrid_system.js";
 import { disponiveis, getScore, patenteDe, pontuar } from "./stats.js";
@@ -33,7 +34,8 @@ function simularCliques() {
     if (!plano) return show.call(this, p);
     const f = forms.get(this);
     plano.abertos.push(f);
-    const texto = plano.cliques.shift();
+    const resposta = plano.cliques.shift();
+    const texto = typeof resposta === "function" ? resposta() : resposta;
     if (texto === undefined) return Promise.resolve({ canceled: true, cancelationReason: "UserClosed" });
     const selection = f.buttons.findIndex((botao) => botao.includes(texto));
     if (selection < 0) throw new Error("Botão " + texto + " ausente em " + f.title);
@@ -70,7 +72,14 @@ async function usa(p, ticks = 10) {
 function aprender(p, professor, id, slot) {
   const r = RESP_H_ID.get(id);
   item(p, r.item, slot);
-  for (let i = 1; i <= r.formas.length; i++) eq(registrarAula(professor, p, id, i), true, "Aula " + id + " " + i);
+  for (let i = 1; i <= r.formas.length; i++) {
+    cumprir(p, id, i);
+    eq(registrarAula(professor, p, id, i), true, "Aula " + id + " " + i);
+  }
+}
+
+function cumprir(p, id, forma) {
+  for (const { tipo, meta } of tarefasDaForma(id, forma)) registrarTreinoRespiracao(p, tipo, meta);
 }
 
 async function testar() {
@@ -114,7 +123,15 @@ async function testar() {
   lider.teleport({ x: 52.5, y: 210, z: 58.5 });
   item(aluno, RESP_H_ID.get("water").item, 1);
   item(lider, "kny:menu_kimetsu");
-  planos.get(lider.id).cliques.push("Ensinar", "Respiração da Água", ...Array(10).fill(aluno.name));
+  const cliques = planos.get(lider.id).cliques;
+  cliques.push("Ensinar", "Respiração da Água", aluno.name);
+  for (let i = 1; i <= 10; i++) {
+    cliques.push(() => {
+      eq(dominioHumano(aluno, "water"), i - 1, "Somente aulas com treino avançam o domínio");
+      cumprir(aluno, "water", i);
+      return aluno.name;
+    });
+  }
   await usa(lider, 22);
   eq(dominioHumano(aluno, "water"), 10, "Dez aulas gravadas pela interface do Líder");
   eq(getScore(aluno, "kf_water"), 10, "Aulas também liberam o combate");
@@ -177,7 +194,7 @@ async function testar() {
   log("ficha v72 recuperada ganhou patente e painel novos com saldo e sangue preservados");
 
   for (const p of jogadores) p.disconnect();
-  log("FIM TRANSFORMAÇÃO V74");
+  log("FIM TRANSFORMAÇÃO V75");
 }
 
 system.runTimeout(() => testar().catch((e) => log("FALHA " + e + "\n" + (e.stack ?? ""))), 40);

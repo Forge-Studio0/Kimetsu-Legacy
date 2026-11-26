@@ -1,7 +1,8 @@
 import { GameMode, ItemStack, system, world } from "@minecraft/server";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
 import { ESPECIAIS, RESP_H_ID } from "./hybrid_config.js";
-import { registrarAula } from "./hybrid_mastery.js";
+import { registrarAula, registrarTreinoRespiracao, requisitosProximaForma } from "./hybrid_mastery.js";
+import { tarefasDaForma } from "./treino_respiracao.js";
 import { getTrueRace, racaHibrida, revelar, transformar, trocarDisfarce } from "./hybrid_system.js";
 import { administrarPoder, ativarHabilidade, habilidadeDe } from "./hybrid_abilities.js";
 import { configurarLocal, viajar } from "./hybrid_locations.js";
@@ -44,7 +45,13 @@ function aprender(lider, p) {
   pontuar(p, "upslayer", 120);
   const agua = RESP_H_ID.get("water");
   item(p, agua.item);
-  for (let i = 1; i <= agua.formas.length; i++) eq(registrarAula(lider, p, agua.obj, i), true, "aula " + i);
+  for (let i = 1; i <= agua.formas.length; i++) {
+    for (const { tipo, meta } of tarefasDaForma(agua.obj, i)) registrarTreinoRespiracao(p, tipo, meta);
+    const requisitos = requisitosProximaForma(p, agua.obj);
+    eq(requisitos.faltas.length, 0, "Preparação da aula " + i + " " + requisitos.faltas.join(", "));
+    const posicoes = JSON.stringify({ aluno: p.location, professor: lider.location });
+    eq(registrarAula(lider, p, agua.obj, i), true, "aula " + i + " " + posicoes);
+  }
 }
 function ficha(p) {
   const d = racaHibrida(p);
@@ -82,13 +89,18 @@ async function executar() {
   dim().runCommand("gamerule domobspawning false");
   dim().runCommand("gamerule naturalregeneration false");
   dim().runCommand("weather clear");
-  const lider = spawn("LiderH");
+  const lider = spawn("LiderH", 49, 58);
+  await esperarInicio(lider);
+  lider.runCommand("fill 48 209 55 62 209 62 stone");
+  eq(dim().getBlock({ x: 49, y: 209, z: 58 })?.isSolid, true, "piso do Líder");
+  lider.teleport({ x: 49.5, y: 210, z: 58.5 });
   lider.addTag("kny_escolheu");
   lider.addTag("slayer");
   lider.addTag("hashira");
   lider.addTag("hashira_lider");
   holder(lider, OBJ_LIDER);
-  const rei = spawn("ReiH");
+  const rei = spawn("ReiH", 50, 61);
+  await esperarInicio(rei);
   rei.addTag("demon");
   rei.addTag("kny_muzan");
   holder(rei, OBJ_REI);
@@ -117,7 +129,7 @@ async function executar() {
   eq(p.matches({ families: ["kny_hybrid"] }), true, "forma revelada");
   log("transformação, patente e famílias dos três disfarces");
 
-  const aprovado = spawn("SangueH");
+  const aprovado = spawn("SangueH", 56, 58);
   await esperarInicio(aprovado);
   aprender(lider, aprovado);
   item(aprovado, "kny:blood");

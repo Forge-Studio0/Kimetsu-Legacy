@@ -3,7 +3,11 @@ import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { RESPIRACOES, KEKKIJUTSUS, ITEM_OBJ } from "./menu_data.js";
 import { H, ARTE_H_ID, DOMINAVEL, RESP_H_ID, ROTULOS } from "./hybrid_config.js";
-import { DISTANCIA_AULA, dominioHumano, ehCacadorHumano, formasLiberadas, possuiItemRespiracao, progressoDominio, registrarAula, selecionarOriginal } from "./hybrid_mastery.js";
+import {
+  DISTANCIA_AULA, dominioHumano, ehCacadorHumano, formasLiberadas, podeTreinarRespiracao, progressoDominio, registrarAula,
+  registrarTreinoRespiracao, requisitosProximaForma, selecionarOriginal,
+} from "./hybrid_mastery.js";
+import { limparTreinosDaForma, textoTreinoDaForma } from "./treino_respiracao.js";
 import { canUseBreathing, canUseKekkijutsu, doseEmMaos, ehStaff, estadoBloqueado, isHybrid, preverTransformacao, racaHibrida, transformar, trocarDisfarce } from "./hybrid_system.js";
 import { ativarHabilidade, danoEspecialEmCurso, habilidadeDe } from "./hybrid_abilities.js";
 import { canAccessLocation, configurarLocal, locais, viajar } from "./hybrid_locations.js";
@@ -340,8 +344,7 @@ try {
    - Os controllers do addon só liberam a forma N se kf_<respiração> >= N.
    - A patente Hashira libera as formas para combate. Aulas registram o domínio humano.
    - Requisitos para aprender a habilidade K:
-       respirações: possuir uma espada daquela respiração e 10 de honra por forma anterior;
-       Respiração Básica: possuir uma lâmina colorida e 5 de honra por forma anterior.
+       respirações: espada do estilo, honra por forma anterior e a lista de treinos da próxima forma.
 --------------------------------------------------------------------- */
 
 const BASICA = {
@@ -357,8 +360,6 @@ const POR_OBJ = {};
 for (const g of TODAS_RESPIRACOES) POR_OBJ[g.obj] = g;
 
 const DIST_ENSINO = DISTANCIA_AULA;
-const HONRA_POR_FORMA = 10;
-const HONRA_POR_FORMA_BASICA = 5;
 
 const objForma = (g) => "kf_" + g.obj;
 const ehHashira = (p) => p.hasTag("hashira") && !isOni(p);
@@ -369,18 +370,15 @@ function marcarForma(p, g, k) {
   obj.setScore(p, k);
 }
 
-// requisitos para aprender a PRÓXIMA habilidade: { k: número da forma (0 = já sabe tudo), faltas: [...] }
-function requisitosProximaForma(p, g) {
-  const k = (DOMINAVEL(g.obj) ? dominioHumano(p, g.obj) : formasLiberadas(p, g)) + 1;
-  if (k > g.formas.length) return { k: 0, faltas: [] };
-  const faltas = [];
-  const minimo = (g.basica ? HONRA_POR_FORMA_BASICA : HONRA_POR_FORMA) * (k - 1);
-  const honra = getScore(p, "upslayer");
-  if (!possuiItemRespiracao(p, RESP_H_ID.get(g.obj))) {
-    faltas.push(g.basica ? "possuir uma lâmina colorida" : `possuir uma espada da ${g.nome}`);
-  }
-  if (honra < minimo) faltas.push(`${minimo} de honra (você tem ${honra})`);
-  return { k, faltas };
+function textoProximaAula(p, g) {
+  const { k, faltas, treinos, invalido } = requisitosProximaForma(p, g.obj);
+  if (invalido) return "§cHistórico de domínio incompatível. Consulte a Staff.\n";
+  if (k === 0) return DOMINAVEL(g.obj) ? "§aDomínio completo. Confira a original em Guia → Domínio humano.\n" : "";
+  const linhas = [`§7Próxima aula (${k})`];
+  for (const falta of faltas) linhas.push("§c" + falta);
+  for (const treino of treinos) if (treino.concluido) linhas.push("§a" + textoTreinoDaForma(treino));
+  if (faltas.length === 0) linhas.push("§aProcure o Líder dos Hashiras.");
+  return linhas.join("\n") + "\n";
 }
 
 // cria as pontuações no início do mundo
@@ -983,12 +981,7 @@ async function painelDetalheArte(p, g, voltarPag = 0, pagina = 0) {
   add("B:", TXT_VOLTAR, null, () => painelArtes(p, voltarPag));
 
   let resumo = `§l${g.nome}§r\n§7${oni ? `${g.formas.length} formas` : resumoRespiracao(p, g)}\n`;
-  if (!oni) {
-    const r = requisitosProximaForma(p, g);
-    if (r.k === 0 && DOMINAVEL(g.obj)) resumo += "§aDomínio completo. Confira a original em Guia → Domínio humano.\n";
-    else if (r.k > 0 && r.faltas.length === 0) resumo += `§7Próxima aula (${r.k}): §fprocure o Líder dos Hashiras.\n`;
-    else if (r.k > 0) resumo += `§7Próxima aula (${r.k}), pendente:\n§c- ${r.faltas.join("\n§c- ")}\n`;
-  }
+  if (!oni) resumo += textoProximaAula(p, g);
   resumo += `§8Agache para trocar a habilidade e segure o botão de usar para executar.`;
   add("G:", resumo, g.icon, null);
 
@@ -1055,17 +1048,7 @@ async function detalheArte(p, g) {
     else corpo += i < aprendidas ? `§a[OK] ${t.texto}${i + 1}. ${nome}\n` : `§8[  ] ${i + 1}. ${nome}\n`;
   });
 
-  if (!oni) {
-    const r = requisitosProximaForma(p, g);
-    corpo += `\n${t.linha}\n${resumoRespiracao(p, g)}\n`;
-    if (r.k === 0 && DOMINAVEL(g.obj)) {
-      corpo += "§aDomínio completo. Confira a original em Guia → Domínio humano.\n";
-    } else if (r.k > 0 && r.faltas.length === 0) {
-      corpo += `${t.suave}Próxima aula (${r.k}): ${t.texto}procure o Líder dos Hashiras.\n`;
-    } else if (r.k > 0) {
-      corpo += `${t.suave}Próxima aula (${r.k}). Requisitos pendentes:\n§c- ${r.faltas.join("\n§c- ")}\n`;
-    }
-  }
+  if (!oni) corpo += `\n${t.linha}\n${resumoRespiracao(p, g)}\n${textoProximaAula(p, g)}`;
   corpo +=
     `\n${t.linha}\n${t.suave}Como usar: empunhe ${g.basica ? "uma lâmina colorida" : "o item"}, ${t.texto}agache (Shift)${t.suave} para trocar a habilidade e ` +
     `${t.texto}segure o botão de usar${t.suave} para executá-la.\n`;
@@ -1560,11 +1543,13 @@ const TREINOS = {
   agachamento: { nome: "Agachamento", attr: "sta", anim: 4 },
 };
 const treinando = new Map(); // idJogador -> estado do treino
+const movimentoTreino = new Map();
 const ultimaTapa = new Map();
 const ultimoAvisoDummy = new Map();
 
 function limparTreino(id) {
   treinando.delete(id);
+  movimentoTreino.delete(id);
   ultimaTapa.delete(id);
   ultimoAvisoDummy.delete(id);
 }
@@ -1584,8 +1569,59 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   sessoesMenu.delete(playerId);
 });
 world.afterEvents.playerDimensionChange.subscribe(({ player }) => {
+  movimentoTreino.delete(player.id);
   if (treinando.has(player.id)) pararTreino(player, "Treino encerrado ao trocar de dimensão.");
 });
+
+const MAX_PASSO_TREINO = 2.5;
+const RECARGA_PULO = 10;
+
+function medirTreinoMovimento(p) {
+  if (!ehCacadorHumano(p) || estadoBloqueado(p) || treinando.has(p.id) || p.isGliding || p.isFlying) {
+    movimentoTreino.delete(p.id);
+    return;
+  }
+  const { x, z } = p.location;
+  const agora = system.currentTick;
+  const noChao = p.isOnGround;
+  const pulando = p.isJumping;
+  const nadando = p.isSwimming;
+  const anterior = movimentoTreino.get(p.id);
+  if (!anterior) {
+    movimentoTreino.set(p.id, { x, z, tick: agora, noChao, pulando, correr: 0, nadar: 0, ultimoPulo: -RECARGA_PULO });
+    return;
+  }
+  const distancia = Math.hypot(x - anterior.x, z - anterior.z);
+  if (agora - anterior.tick >= 2) {
+    anterior.x = x;
+    anterior.z = z;
+    anterior.tick = agora;
+    const tipo = nadando ? "nadar" : p.isSprinting ? "correr" : undefined;
+    if (tipo && distancia > 0 && distancia <= MAX_PASSO_TREINO) {
+      anterior[tipo] += distancia;
+      const metros = Math.floor(anterior[tipo]);
+      if (metros > 0) {
+        anterior[tipo] -= metros;
+        registrarTreinoRespiracao(p, tipo, metros);
+      }
+    }
+  }
+  // Um toque curto em Pular pode durar apenas um tick no Bedrock.
+  if (pulando && !anterior.pulando && anterior.noChao && !nadando && !p.isInWater &&
+      distancia <= MAX_PASSO_TREINO && agora - anterior.ultimoPulo >= RECARGA_PULO) {
+    anterior.ultimoPulo = agora;
+    registrarTreinoRespiracao(p, "pular", 1);
+  }
+  anterior.noChao = noChao;
+  anterior.pulando = pulando;
+}
+
+system.runInterval(() => {
+  for (const p of world.getPlayers()) {
+    try { medirTreinoMovimento(p); }
+    catch (e) { reportar(p, e); }
+  }
+}, 1);
 
 function contarRepeticao(p, a, origem) {
   const rep = registrarRepeticao(p, a);
@@ -1601,7 +1637,8 @@ function iniciarTreino(p, tipo) {
   if (!t || p.hasTag("kny_caido")) return;
   const a = ATR[t.attr];
   const oferta = statusAtributo(p, a);
-  if (oferta.proximo === null || oferta.series === SERIES_POR_MELHORIA) {
+  const limiteAtributo = oferta.proximo === null || oferta.series === SERIES_POR_MELHORIA;
+  if (limiteAtributo && !podeTreinarRespiracao(p, tipo)) {
     p.sendMessage("§e" + (oferta.proximo === null ? LIMITE_ATINGIDO : CREDITO_COMPLETO));
     return;
   }
@@ -1610,7 +1647,9 @@ function iniciarTreino(p, tipo) {
   treinando.set(p.id, { tipo, x: l.x, z: l.z, acum: 0, reps: 0, vida: h ? h.currentValue : 0 });
   animTreino(p, t.anim);
   p.sendMessage(
-    `§e[Treino] §f${t.nome} §7→ ${nomeAtributo(a, p)}\n§7Fique parado: 1 repetição a cada 2 segundos, e a cada ${REPS_POR_PONTO} você ganha crédito para a próxima melhoria.\n§7Para parar: abra o menu > Treino > "Parar treino", ou pule / ande.`
+    `§e[Treino] §f${t.nome} §7→ ${limiteAtributo ? "meta de respiração" : nomeAtributo(a, p)}\n§7Fique parado: 1 repetição a cada 2 segundos.` +
+    (limiteAtributo ? "" : ` A cada ${REPS_POR_PONTO} você ganha crédito para a próxima melhoria.`) +
+    '\n§7Para parar: abra o menu > Treino > "Parar treino", ou pule / ande.'
   );
 }
 
@@ -1658,7 +1697,12 @@ system.runInterval(() => {
     st.acum -= TICKS_POR_REP;
     st.reps++;
     const rep = contarRepeticao(p, a, t.nome);
+    registrarTreinoRespiracao(p, st.tipo, 1);
     if (rep.motivo !== "ok" || rep.series >= SERIES_POR_MELHORIA) {
+      if (podeTreinarRespiracao(p, st.tipo)) {
+        p.onScreenDisplay.setActionBar(`§a${t.nome} §7(Respirações) §f${st.reps} repetições nesta sessão`);
+        continue;
+      }
       const aviso = rep.motivo === "limite" ? LIMITE_ATINGIDO : CREDITO_COMPLETO;
       pararTreino(p, rep.motivo === "indisponivel" ? undefined : aviso);
       continue;
@@ -1751,6 +1795,7 @@ world.afterEvents.entityHitEntity.subscribe((ev) => {
   ultimaTapa.set(p.id, agora);
   const a = ATR.for;
   const r = contarRepeticao(p, a, "dummy");
+  registrarTreinoRespiracao(p, "dummy", 1);
   if (r.motivo !== "ok") {
     if (r.motivo !== "indisponivel" && agora - (ultimoAvisoDummy.get(p.id) ?? -100) >= 60) {
       p.sendMessage("§e" + (r.motivo === "limite" ? LIMITE_ATINGIDO : CREDITO_COMPLETO));
@@ -1904,6 +1949,7 @@ world.afterEvents.entityDie.subscribe((ev) => {
   if (!jogador && reg && system.currentTick - reg.tick <= 400) jogador = world.getPlayers().find((x) => x.id === reg.id);
   if (!jogador || jogador.hasTag("kny_caido")) return;
   const ganho = premiarOni(jogador, morto.typeId);
+  registrarTreinoRespiracao(jogador, "oni", 1);
   if (ganho > 0) {
     jogador.sendMessage(`§a+${pontosTexto(ganho)} pontos de atributo §7(oni derrotado)`);
     som(jogador, "random.orb", 1.3, 0.5);
@@ -2317,10 +2363,10 @@ function alunosPerto(p, g) {
   for (const q of world.getPlayers()) {
     try {
       if (q.id === p.id || q.dimension.id !== p.dimension.id) continue;
-      if (!ehCacadorHumano(q) || estadoBloqueado(q) || requisitosProximaForma(q, g).k === 0) continue;
+      if (!ehCacadorHumano(q) || estadoBloqueado(q)) continue;
       if (!ehLider(p) && (!DOMINAVEL(g.obj) || !["hashira", "hashira_lider"].includes(patenteDe(q).tag))) continue;
       const d = Math.hypot(q.location.x - p.location.x, q.location.y - p.location.y, q.location.z - p.location.z);
-      if (d <= DIST_ENSINO) lista.push(q);
+      if (d <= DIST_ENSINO && requisitosProximaForma(q, g.obj).k > 0) lista.push(q);
     } catch {}
   }
   return lista;
@@ -2350,7 +2396,7 @@ async function ensinarClassico(p) {
 
 async function escolherAlunoClassico(p, g) {
   const t = TEMA_CACADOR;
-  const alunos = alunosPerto(p, g).map((aluno) => ({ aluno, ...requisitosProximaForma(aluno, g) }));
+  const alunos = alunosPerto(p, g).map((aluno) => ({ aluno, ...requisitosProximaForma(aluno, g.obj) }));
   const f = novoForm(p).title(`§l§c${g.nome.toUpperCase()}`);
   if (alunos.length === 0) {
     f.body(
@@ -2436,7 +2482,7 @@ async function painelAlunos(p, g, pagina = 0) {
     null
   );
   for (const q of itens) {
-    const r = requisitosProximaForma(q, g);
+    const r = requisitosProximaForma(q, g.obj);
     add("L:", `§f§l${q.name}\n§r§7aula ${r.k}/${g.formas.length}${r.faltas.length ? " · requisitos pendentes" : ""}`, null, () =>
       ensinarPara(p, q, g, r.k)
     );
@@ -2467,7 +2513,7 @@ async function escolherAluno(p, g) {
 async function ensinarPara(p, aluno, g, formaMostrada) {
   try {
     if (!(ehLider(p) || ehHashira(p)) || !aluno?.isValid || !alunosPerto(p, g).some((q) => q.id === aluno.id)) return;
-    const r = requisitosProximaForma(aluno, g);
+    const r = requisitosProximaForma(aluno, g.obj);
     if (r.k !== formaMostrada) {
       p.sendMessage("§eO progresso mudou. Confira a aula atual antes de ensinar.");
     } else if (r.faltas.length) {
@@ -2481,6 +2527,7 @@ async function ensinarPara(p, aluno, g, formaMostrada) {
         }
       } else {
         marcarForma(aluno, g, r.k);
+        limparTreinosDaForma(aluno, g.obj, r.k);
       }
       const nomeForma = g.formas[r.k - 1];
       p.sendMessage(`§cVocê ensinou a forma ${r.k} da ${g.nome} (${nomeForma}) a §l${aluno.name}§r§c.`);
@@ -2516,7 +2563,8 @@ const GUIA_CACADOR = [
     nome: "Aprender respirações",
     texto:
       "Ninguém nasce sabendo respirar: toda habilidade precisa ser ensinada por um §cHashira§f, uma por vez e em ordem. A Respiração do Trovão, por exemplo, tem 6 habilidades, e você aprende as 6 uma a uma.\n\n" +
-      "Requisitos para a habilidade K: possuir uma espada daquela respiração e 10 de honra por habilidade anterior (a Respiração Básica pede uma lâmina colorida e 5 de honra por habilidade anterior).\n\n" +
+      "Para aprender a próxima forma, tenha a espada da respiração, 10 de honra por forma anterior e conclua os treinos mostrados em §cRespirações§f. A Respiração Básica pede uma lâmina colorida, 5 de honra por forma anterior e metas reduzidas pela metade.\n\n" +
+      "Abater onis, correr, nadar e pular contam automaticamente. Faça flexão, abdominal, meditação, agachamento e dummy no menu §cTreino§f. Cada atividade vale para a próxima forma de todas as suas respirações que pedem aquele treino. Ao aprender a forma, ela dá lugar a uma nova lista com contadores próprios.\n\n" +
       "Fique a até 12 blocos do Líder dos Hashiras. Ele abre o Menu Kimetsu, escolhe §cEnsinar Respiração§f, a respiração e o seu nome. Entre Hashiras, um colega pode usar §cAulas de domínio§f.\n\n" +
       "A patente Hashira libera formas para combate. O domínio humano avança com aulas registradas ou histórico certificado. Confira o progresso em §cGuia → Domínio humano§f.",
   },

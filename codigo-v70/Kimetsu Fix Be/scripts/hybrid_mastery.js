@@ -2,6 +2,8 @@ import { DOMINAVEL, RESP_H, RESP_H_ID } from "./hybrid_config.js";
 import { CHAVE_DOMINIO, gravarJson, identificador, lerJson, personagem, registrarAuditoria } from "./hybrid_records.js";
 import { getScore, patenteDe, pontuar } from "./stats.js";
 import { ehStaff, estadoBloqueado } from "./hybrid_system.js";
+import { modoDeJogo } from "./compat.js";
+import { haTreinoPendente, limparTreinosDaForma, somarTreino, textoTreinoDaForma, treinosDaForma } from "./treino_respiracao.js";
 
 export const DISTANCIA_AULA = 12;
 export const ehCacadorHumano = (p) => p?.isValid && !p.hasTag("demon") && !p.hasTag("kny_hybrid") &&
@@ -69,10 +71,74 @@ export function possuiItemRespiracao(p, resp) {
   return false;
 }
 
-function podeRegistrar(p) {
-  if (!ehCacadorHumano(p) || estadoBloqueado(p)) return false;
+function fichaHumana(p) {
+  if (!ehCacadorHumano(p)) return false;
   const registro = personagem(p);
   return registro === undefined || registro?.estado === "curado";
+}
+
+const podeRegistrar = (p) => fichaHumana(p) && !estadoBloqueado(p);
+
+function formaSeguinte(p, resp, d) {
+  const aprendidas = DOMINAVEL(resp.obj) ? (d.aulas[resp.obj]?.length ?? 0) : formasLiberadas(p, resp);
+  return aprendidas < resp.formas.length ? aprendidas + 1 : 0;
+}
+
+function faltasAula(p, resp, forma) {
+  const basica = resp.obj === "basica";
+  const faltas = [];
+  const minimo = (forma - 1) * (basica ? 5 : 10);
+  const honra = getScore(p, "upslayer");
+  if (!possuiItemRespiracao(p, resp)) {
+    faltas.push(basica ? "possuir uma lâmina colorida" : `possuir uma espada da ${resp.nome}`);
+  }
+  if (honra < minimo) faltas.push(`${minimo} de honra (você tem ${honra})`);
+  return faltas;
+}
+
+function requisitosDaForma(p, resp, forma) {
+  const treinos = treinosDaForma(p, resp.obj, forma);
+  const faltas = faltasAula(p, resp, forma);
+  faltas.push(...treinos.filter((t) => !t.concluido).map(textoTreinoDaForma));
+  return { k: forma, faltas, treinos };
+}
+
+export function requisitosProximaForma(p, id) {
+  const resp = RESP_H_ID.get(id);
+  const d = dominio(p);
+  const k = resp && d ? formaSeguinte(p, resp, d) : 0;
+  return k ? requisitosDaForma(p, resp, k) : { k: 0, faltas: [], treinos: [], invalido: d === null };
+}
+
+function etapasDeTreino(p) {
+  if (!fichaHumana(p) || p.hasTag("kny_caido") || modoDeJogo(p) === "spectator" ||
+      (p.getComponent("minecraft:health")?.currentValue ?? 1) <= 0) return [];
+  const d = dominio(p);
+  if (!d) return [];
+  return RESP_H
+    .map((resp) => ({ resp, forma: formaSeguinte(p, resp, d) }))
+    .filter(({ forma }) => forma > 0);
+}
+
+export function podeTreinarRespiracao(p, tipo) {
+  const etapas = etapasDeTreino(p);
+  return etapas.length > 0 && haTreinoPendente(p, etapas, tipo);
+}
+
+export function registrarTreinoRespiracao(p, tipo, quantidade) {
+  const etapas = etapasDeTreino(p);
+  if (etapas.length === 0) return;
+  const concluidas = somarTreino(p, etapas, tipo, quantidade);
+  if (concluidas.length === 0) return;
+  const onde = concluidas.length === 1 ? concluidas[0].resp.nome : `${concluidas.length} respirações`;
+  p.sendMessage(`§a[Respirações] Treino cumprido: ${concluidas[0].nome} §7(${onde})`);
+  if (!p.hasTag("kny_cfg_som_off")) {
+    try { p.playSound("random.levelup", { pitch: 1.4, volume: 0.5 }); } catch {}
+  }
+  const prontas = concluidas.filter(({ completa, resp, forma }) => completa && faltasAula(p, resp, forma).length === 0);
+  for (const { resp, forma } of prontas) {
+    p.sendMessage(`§e[Respirações] A forma ${forma} da ${resp.nome} está pronta para a aula. Procure o Líder dos Hashiras para aprender.`);
+  }
 }
 
 function registrar(p, d, resp, aulas) {
@@ -92,12 +158,13 @@ export function registrarAula(professor, aluno, id, forma) {
       professor.id === aluno.id || aluno.dimension.id !== professor.dimension.id) return false;
   const a = aluno.location;
   const b = professor.location;
-  if (Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) > DISTANCIA_AULA || !possuiItemRespiracao(aluno, resp)) return false;
+  if (Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) > DISTANCIA_AULA) return false;
   const d = dominio(aluno);
   if (!d) return false;
   const aulas = d.aulas[id] ?? [];
-  if (forma !== aulas.length + 1 || forma > resp.formas.length || getScore(aluno, "upslayer") < (forma - 1) * (id === "basica" ? 5 : 10)) return false;
+  if (forma !== aulas.length + 1 || forma > resp.formas.length || requisitosDaForma(aluno, resp, forma).faltas.length > 0) return false;
   registrar(aluno, d, resp, [...aulas, ["humano:aula", identificador(professor), Date.now()]]);
+  limparTreinosDaForma(aluno, id, forma);
   return true;
 }
 
