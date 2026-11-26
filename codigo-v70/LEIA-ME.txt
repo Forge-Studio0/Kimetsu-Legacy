@@ -1,8 +1,8 @@
-KIMETSU LEGACY v72
+KIMETSU LEGACY v74
 Código-fonte e testes
 
-Kimetsu_Fix_v72_Completo.mcaddon inclui o Behavior Pack e o Resource Pack,
-ambos na versão interna 1.0.54. Importe o arquivo no Minecraft Bedrock,
+Kimetsu_Fix_v74_Completo.mcaddon inclui o Behavior Pack e o Resource Pack,
+ambos na versão interna 1.0.56. Importe o arquivo no Minecraft Bedrock,
 ative os dois pacotes e habilite APIs Beta no mundo.
 
 Selecione Menu Kimetsu ou o livro e use o item. No toque, use o botão
@@ -15,10 +15,10 @@ relação à v69. Os pacotes inteiros podem ser extraídos do .mcaddon completo.
 Teste automatizado em Node.js
 Use Node 24 e aponte KIMETSU_BP para a pasta do Behavior Pack completo,
 com todos os arquivos e dependências internas extraídos, inclusive os que
-não mudaram. Execute node --test testes/stats.test.mjs.
+não mudaram. Execute node --test testes/*.test.mjs.
 
 Exemplo:
-KIMETSU_BP="/caminho/Kimetsu Fix Be" node --test testes/stats.test.mjs
+KIMETSU_BP="/caminho/Kimetsu Fix Be" node --test testes/*.test.mjs
 
 GameTest no Bedrock dedicado
 Use um mundo de teste separado, com Beta APIs habilitadas. Copie bedrock.js
@@ -29,10 +29,10 @@ salva uma ficha para conferir a leitura após o reinício do servidor.
 Para testar o uso nativo dos itens, instale bedrock-menu.js da mesma forma,
 no lugar de bedrock.js. O teste simula as respostas dos formulários.
 
-Para testar a Prioridade 05, execute também testes/hibridos.test.mjs. Use
-bedrock-hibridos.js no lugar de bedrock.js para a integração no Bedrock.
-O manual e o relatório ficam em docs/ no repositório.
+Use bedrock-hibridos.js ou bedrock-transformacao.js no lugar de bedrock.js
+para testar os Híbridos no Bedrock. O relatório atual está em
+docs/RELATORIO-PATENTE-HIBRIDA-V74.md.
 
-Use o Resource Pack 1.0.54 do .mcaddon completo para testar a interface no
-cliente. No servidor dedicado, configure os dois pacotes na versão 1.0.54 na
+Use o Resource Pack 1.0.56 do .mcaddon completo para testar a interface no
+cliente. No servidor dedicado, configure os dois pacotes na versão 1.0.56 na
 lista de pacotes do mundo.

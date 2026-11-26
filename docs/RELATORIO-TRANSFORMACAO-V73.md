@@ -1,5 +1,7 @@
 # Correção da transformação em Híbrido na v73
 
+A posição automática Híbrido Superior entrou na v74. [Relatório da nova patente](RELATORIO-PATENTE-HIBRIDA-V74.md).
+
 Na v72, o jogador podia ver todas as formas liberadas, usar o sangue e se tornar Oni comum sem que o jogo avisasse qual seria o resultado. A v73 mostra o domínio humano real nas telas de Respirações, pede confirmação antes de uma transformação comum e oferece à Staff uma recuperação para fichas afetadas da v72.
 
 ## Causa do erro

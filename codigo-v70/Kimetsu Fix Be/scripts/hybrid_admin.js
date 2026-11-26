@@ -3,7 +3,7 @@ import { ESPECIAIS } from "./hybrid_config.js";
 import { administrarPoder } from "./hybrid_abilities.js";
 import { configurarLocal } from "./hybrid_locations.js";
 import { certificarHistorico, progressoDominio } from "./hybrid_mastery.js";
-import { candidatoRecuperacaoV72, ehStaff, getTrueRace, recuperarHibridoV72 } from "./hybrid_system.js";
+import { candidatoRecuperacaoV72, ehStaff, getTrueRace, getTrueRank, recuperarHibridoV72 } from "./hybrid_system.js";
 import { hibridosRegistrados, idExistente, personagem, proprietarios } from "./hybrid_records.js";
 
 function jogadorOnline(chave) {
@@ -17,7 +17,7 @@ function diagnostico(p) {
   const registro = personagem(p);
   const linhas = d.lista.filter((r) => r.liberadas || r.aprendidas)
     .map((r) => `${r.obj} · liberadas ${r.liberadas}/${r.formas.length} · comprovadas ${r.aprendidas}/${r.formas.length}${r.elegivel ? "" : " · inelegível"}`);
-  const titulo = `${p.name} · ${idExistente(p) ?? "sem ID"} · raça ${getTrueRace(p)}`;
+  const titulo = `${p.name} · ${idExistente(p) ?? "sem ID"} · raça ${getTrueRace(p)} · patente ${getTrueRank(p).nome}`;
   const dominio = d.invalido ? "Histórico incompatível." : d.resp ? "Original disponível · " + d.resp.obj
     : d.completas.length > 1 ? "Há mais de um domínio completo. Confira a original." : "Sem domínio completo registrado.";
   const reparo = candidatoRecuperacaoV72(p, registro) ? "Ficha de transformação v72 disponível para revisão." : "";

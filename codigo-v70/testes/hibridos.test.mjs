@@ -15,7 +15,7 @@ registerHooks({
 });
 const dir = pathToFileURL(resolve(process.env.KIMETSU_BP ?? "Kimetsu Fix Be", "scripts") + "/");
 const carregar = (n) => import(new URL(n + ".js", dir));
-const [{ H, RESP_H_ID, ESPECIAIS }, dominio, sistema, registros, poderes, locais, sol, stats, { OBJ_LIDER, OBJ_REI, ATR }] = await Promise.all([
+const [{ H, RESP_H_ID, ESPECIAIS }, dominio, sistema, registros, poderes, locais, sol, stats, { OBJ_LIDER, OBJ_REI, ATR, HIBRIDO_SUPERIOR, ONI, REI_ONI }] = await Promise.all([
   carregar("hybrid_config"), carregar("hybrid_mastery"), carregar("hybrid_system"), carregar("hybrid_records"),
   carregar("hybrid_abilities"), carregar("hybrid_locations"), carregar("hybrid_sun"), carregar("stats"), carregar("stats_config"),
 ]);
@@ -70,7 +70,8 @@ function hibrido() {
 
 const sangue = (p) => system.afterEvents.scriptEventReceive.emit({ id: "kny:h_sangue", sourceEntity: p, message: "beber" });
 const comandoStaff = (p, message) => system.afterEvents.scriptEventReceive.emit({ id: "kny:h_staff", sourceEntity: p, message });
-const abrirMenu = (p) => system.afterEvents.scriptEventReceive.emit({ id: "kny:menu", sourceEntity: p, message: "classico" });
+const abrirMenu = (p, message = "classico") => system.afterEvents.scriptEventReceive.emit({ id: "kny:menu", sourceEntity: p, message });
+const semCor = (texto) => texto.replace(/§./g, "");
 const selecionar = (txt) => (f) => {
   const selection = f.buttons.findIndex((b) => b.texto.replace(/§./g, "").includes(txt));
   assert.ok(selection >= 0, txt + " em " + f.titulo);
@@ -107,7 +108,53 @@ test("patente e placares antigos não são provas. Hashira pode completar aulas 
   assert.equal(dominio.registrarAula(lider, p, "water", 10), false);
   assert.equal(sistema.transformar(p, "rei", rei).hibrido, true);
   assert.equal(p.hasTag("hashira"), false);
-  assert.equal(stats.patenteDe(p).tag, "oni");
+  assert.equal(stats.getScore(p, "updemon"), 0);
+  assert.equal(stats.patenteDe(p), HIBRIDO_SUPERIOR);
+  assert.equal(stats.statusAtributo(p, ATR.for).nivel, 0);
+  assert.equal(stats.statusAtributo(p, ATR.for).limite, 68);
+});
+
+test("reconexão de um Híbrido da v73 atualiza o painel e preserva a ficha de Stats", async () => {
+  const antigo = oniV72(mestre("water", { nome: "HibridoV73" }));
+  antigo.addTag("upper1");
+  stats.pontuar(antigo, "updemon", 1200);
+  stats.pontuar(antigo, "blood", 12);
+  const compra = stats.comprar(antigo, ATR.for, 2, stats.statusAtributo(antigo, ATR.for));
+  assert.equal(compra.feitas, 2);
+  const chaveStats = "kny:stats_v70";
+  const anteriores = JSON.parse(antigo.getDynamicProperty(chaveStats));
+  assert.equal(anteriores.patente, "upper1");
+  registros.guardarPersonagem(antigo, { ...registros.personagem(antigo), revisao: 73, raca: "hibrido",
+    resp: "water", formas: 10, arte: "enmu", publico: "cacador" });
+  antigo.desconectar();
+
+  const p = jogador(antigo.name, antigo.dinamicos);
+  p.dimension = dim;
+  p.addTag("kny_escolheu");
+  assert.equal(stats.patenteDe(p), HIBRIDO_SUPERIOR);
+  world.afterEvents.playerSpawn.emit({ player: p, initialSpawn: true });
+  await executarAgendados();
+  assert.deepEqual(JSON.parse(p.getDynamicProperty(chaveStats)), { ...anteriores, patente: HIBRIDO_SUPERIOR.tag });
+  assert.equal(stats.getScore(p, "updemon"), 1200);
+  assert.equal(stats.getScore(p, "blood"), 12);
+  assert.equal(p.getComponent("minecraft:health").currentValue, 40);
+  assert.equal(p.getComponent("minecraft:health").effectiveMax, 48);
+  assert.equal(p.getComponent("minecraft:movement").currentValue, 0.129);
+  assert.equal(sistema.getPublicIdentity(p), "cacador");
+  assert.doesNotMatch(sistema.nomePublico(p), /Híbrido Superior/);
+
+  abrirMenu(p, "");
+  await executarAgendados();
+  assert.match(semCor(p.telas.at(-1).buttons[0].texto), /Posição: Híbrido Superior.*Maldição: 1200/);
+  assert.ok(p.telas.at(-1).buttons.some(({ texto }) => /Força\s+2\/68/.test(semCor(texto))));
+  abrirMenu(p);
+  await executarAgendados();
+  const classico = semCor(p.telas.at(-1).corpo).replace(/\s+/g, " ");
+  assert.match(classico, /Posição: Híbrido Superior/);
+  assert.match(classico, /Rei dos Onis \(faltam 8800 de maldição\) \[ocupado\]/);
+  comandoStaff(staff, "diagnostico " + p.name);
+  assert.match(semCor(staff.mensagens.at(-1)), /raça hibrido · patente Híbrido Superior/);
+  p.desconectar();
 });
 
 test("somente o Rei titular, a Staff autorizada ou o sangue legítimo iniciam a transformação", async () => {
@@ -128,6 +175,46 @@ test("somente o Rei titular, a Staff autorizada ou o sangue legítimo iniciam a 
   assert.equal(p.getComponent("minecraft:inventory").container.getItem(0), undefined);
   assert.equal(sistema.transformar(p, "sangue").ok, false);
   assert.equal(dominio.registrarAula(lider, p, "water", 2), false);
+});
+
+test("a patente Híbrida exige ficha ativa e respeita a titularidade única do Rei", async () => {
+  const oni = oniV72(cacador({ nome: "OniComTags" }));
+  for (const tag of ["kny_hybrid", HIBRIDO_SUPERIOR.tag, REI_ONI.tag]) oni.addTag(tag);
+  assert.equal(stats.patenteDe(oni), ONI);
+  assert.equal(sistema.ehReiAutor(oni), false);
+  oni.desconectar();
+
+  const p = hibrido();
+  p.addTag("upper1");
+  stats.pontuar(p, "updemon", REI_ONI.min);
+  executarIntervalos(40);
+  assert.equal(stats.patenteDe(p), HIBRIDO_SUPERIOR);
+  assert.equal(sistema.ehReiAutor(p), false);
+  assert.equal(stats.titularDe(OBJ_REI), rei.name);
+
+  try {
+    p.addTag("kny_op");
+    p.escolhas.push(selecionar("Alterar meu cargo"), selecionar("Rei dos Onis"));
+    abrirMenu(p);
+    await executarAgendados();
+    assert.equal(stats.patenteDe(p), REI_ONI);
+    assert.equal(sistema.ehReiAutor(p), true);
+    assert.equal(sistema.ehReiAutor(rei), false);
+    assert.ok(!p.telas[1].buttons.some(({ texto }) => /Lua Superior/.test(texto)));
+
+    p.escolhas.push(selecionar("Alterar meu cargo"), selecionar("Híbrido Superior"));
+    abrirMenu(p);
+    await executarAgendados();
+    executarIntervalos(40);
+    assert.equal(stats.patenteDe(p), HIBRIDO_SUPERIOR);
+    assert.equal(stats.titularDe(OBJ_REI), null);
+    assert.equal(stats.getScore(p, "updemon"), REI_ONI.min - 1);
+    assert.equal(sistema.ehReiAutor(p), false);
+  } finally {
+    p.desconectar();
+    world.scoreboard.getObjective(OBJ_REI).setScore(rei.name, 1);
+    rei.addTag(REI_ONI.tag);
+  }
 });
 
 test("formas liberadas sem domínio ficam explícitas. Cancelar conserva a pilha e o personagem humano", async () => {
@@ -269,7 +356,8 @@ test("diagnóstico e recuperação de Oni da v72 mantêm progressão, saldo e qu
   assert.equal(stats.getScore(p, "blood"), 5);
   assert.equal(stats.getScore(p, "kny_dinheiro"), 1234);
   assert.equal(stats.disponiveis(p), saldo);
-  assert.equal(stats.patenteDe(p).tag, "lower5");
+  assert.equal(stats.patenteDe(p), HIBRIDO_SUPERIOR);
+  assert.equal(p.hasTag("lower5"), true);
   assert.equal(p.hasTag("breakcurse"), true);
   assert.equal(p.hasTag("muzan_curse"), false);
   assert.equal(c.getItem(0).amount, 4);
@@ -355,6 +443,7 @@ test("uma transformação interrompida é retomada sem duplicar dose, saldo ou i
   assert.equal(sistema.transformar(p, "sangue").ok, false);
   const parcial = registros.personagem(p);
   assert.equal(parcial.estado, "transformando");
+  assert.equal(stats.patenteDe(p), ONI);
   assert.equal(c.getItem(0).amount, 2);
   assert.equal(parcial.dose, undefined);
   c.setItem(0, { typeId: "kny:blood", amount: 3 });
@@ -374,6 +463,7 @@ test("uma transformação interrompida é retomada sem duplicar dose, saldo ou i
 test("os três disfarces separam identidade, NPCs, Técnicas e patente", async () => {
   const p = hibrido();
   const patente = stats.patenteDe(p);
+  assert.equal(patente, HIBRIDO_SUPERIOR);
   const pv = p.getComponent("minecraft:health").currentValue;
   assert.match(sistema.trocarDisfarce(p, "cacador"), /Caçador/);
   assert.match(sistema.nomePublico(p), /^\[Caçador\]/);

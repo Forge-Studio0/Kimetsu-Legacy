@@ -43,7 +43,7 @@ export const RANKS_CACADOR = [
 ];
 
 export const ONI = patente("oni", "Oni comum", 0, 8, [8, 8, 7, 7, 8], 44, 102);
-export const RANKS_ONI = [
+const LUAS = [
   patente("lower6", "Lua Inferior 6", 100,         15, [15, 13, 12, 14, 14], 44, 104),
   patente("lower5", "Lua Inferior 5", 200,         17, [17, 15, 14, 16, 16], 44, 105),
   patente("lower4", "Lua Inferior 4", 300,         19, [19, 17, 16, 18, 18], 44, 106),
@@ -56,12 +56,15 @@ export const RANKS_ONI = [
   patente("upper3", "Lua Superior 3", 1000,        55, [55, 51, 48, 53, 50], 48, 118),
   patente("upper2", "Lua Superior 2", 1100,        60, [60, 55, 52, 58, 54], 48, 119),
   patente("upper1", "Lua Superior 1", 1200,        65, [65, 60, 56, 63, 58], 48, 120),
-  patente("kny_muzan", "Rei dos Onis", 10000,       70, [70, 65, 60, 68, 63], 48, 122, true),
 ];
+// A transformação concede esta patente. O mínimo indica seu patamar nos portais.
+export const HIBRIDO_SUPERIOR = patente("kny_hibrido_superior", "Híbrido Superior", 1300, 68, [68, 63, 58, 66, 61], 48, 121);
+export const REI_ONI = patente("kny_muzan", "Rei dos Onis", 10000, 70, [70, 65, 60, 68, 63], 48, 122, true);
+export const RANKS_ONI = [...LUAS, REI_ONI];
 
-export const PATENTES = [HUMANO, ...RANKS_CACADOR, ONI, ...RANKS_ONI];
+export const PATENTES = [HUMANO, ...RANKS_CACADOR, ONI, ...LUAS, HIBRIDO_SUPERIOR, REI_ONI];
 export const POR_PATENTE = Object.fromEntries(PATENTES.map((r) => [r.tag, r]));
-export const ePatenteOni = (r) => r === ONI || RANKS_ONI.includes(r);
+export const ePatenteOni = (r) => r === ONI || r === HIBRIDO_SUPERIOR || RANKS_ONI.includes(r);
 export const OBJ_LIDER = "kny_lider";
 export const OBJ_REI = "kny_muzan";
 

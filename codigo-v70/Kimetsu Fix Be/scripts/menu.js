@@ -8,7 +8,7 @@ import { canUseBreathing, canUseKekkijutsu, doseEmMaos, ehStaff, estadoBloqueado
 import { ativarHabilidade, danoEspecialEmCurso, habilidadeDe } from "./hybrid_abilities.js";
 import { canAccessLocation, configurarLocal, locais, viajar } from "./hybrid_locations.js";
 import {
-  ATRIBUTOS, ATR, RANKS_CACADOR, RANKS_ONI, OBJ_REI, OBJ_LIDER, REPS_POR_PONTO, TAPAS_POR_PONTO,
+  ATRIBUTOS, ATR, ONI, HIBRIDO_SUPERIOR, REI_ONI, RANKS_CACADOR, RANKS_ONI, OBJ_REI, OBJ_LIDER, REPS_POR_PONTO, TAPAS_POR_PONTO,
   NIVEL_MAXIMO, SERIES_POR_MELHORIA, CREDITO_POR_SERIE, PONTOS_POR_ONI,
   efeitoForca, efeitoPoder, bonusVida, reducaoDefesa, staminaMax, folegoMax,
 } from "./stats_config.js";
@@ -199,27 +199,18 @@ function infoRank(p) {
   const oni = isOni(p);
   const lista = oni ? RANKS_ONI : RANKS_CACADOR;
   const pontos = getScore(p, oni ? "updemon" : "upslayer");
-
-  let idx = -1;
-  for (let i = lista.length - 1; i >= 0; i--) {
-    if (p.hasTag(lista[i].tag)) {
-      idx = i;
-      break;
-    }
-  }
-  // Caçador recém-chegado sem rank ainda
-  if (idx === -1 && !oni && (p.hasTag("slayer2") || p.hasTag("slayer"))) idx = 0;
-
-  const atual = idx >= 0 ? lista[idx] : null;
-  const prox = lista.slice(idx + 1).find((r) => !r.manual) ?? null;
-  const de = atual ? atual.min : 0;
+  const atual = patenteDe(p);
+  const prox = atual === HIBRIDO_SUPERIOR ? REI_ONI : lista[lista.indexOf(atual) + 1];
+  const de = atual === HIBRIDO_SUPERIOR ? 0 : atual.min;
+  const cargo = prox && cargoDoRank(prox.tag);
+  const titular = cargo && titularDe(cargo);
   return {
     pontos,
-    atual: atual ? atual.nome : oni ? "Oni sem posição" : "Sem rank",
+    atual: atual.nome,
     prox: prox ? prox.nome : null,
     faltam: prox ? Math.max(0, prox.min - pontos) : 0,
     progresso: prox ? (pontos - de) / Math.max(1, prox.min - de) : 1,
-    ocupado: !!(prox && prox.unico && cargoDoRank(prox.tag) && titularDe(cargoDoRank(prox.tag)) && titularDe(cargoDoRank(prox.tag)) !== p.name),
+    ocupado: !!titular && titular !== p.name,
   };
 }
 
@@ -584,7 +575,7 @@ async function painelPrincipal(p) {
     `§6Vida: §f${vidaTexto(p)}   §6Stamina: §f${Math.floor(sta.atual)}/${sta.max}\n` +
       `§6Pontos de atributo: §f${pontosTexto(disponiveis(p))}\n` +
       `§6Dinheiro: §f${dinheiro}\n` +
-      `§6${oni ? "Posição" : "Rank"}: §f${patenteDe(p).nome}   §6${oni ? "Maldição" : "Honra"}: §f${r.pontos}`
+      `§6${oni ? "Posição" : "Rank"}: §f${r.atual}   §6${oni ? "Maldição" : "Honra"}: §f${r.pontos}`
   );
 
   // quadrados da direita: navegação
@@ -655,12 +646,14 @@ async function menuPrincipal(p) {
 async function menuClassico(p) {
   const t = tema(p);
   const oni = isOni(p);
+  const hibrido = isHybrid(p);
   const r = infoRank(p);
   som(p, oni ? "ambient.cave" : "random.orb", oni ? 0.6 : 1.1);
 
   let corpo = `${t.linha}\n`;
   if (oni) {
-    corpo += `${t.texto}Oni ${t.suave}| ${t.suave}Posição: ${t.texto}${r.atual}\n`;
+    corpo += hibrido ? `${t.suave}Posição: ${t.texto}${r.atual}\n`
+      : `${t.texto}Oni ${t.suave}| ${t.suave}Posição: ${t.texto}${r.atual}\n`;
     corpo += `${t.suave}Maldição: ${t.texto}${r.pontos}\n`;
     corpo += r.prox ? `${t.suave}Próxima posição: ${t.texto}${r.prox} §8(faltam ${r.faltam} de maldição)${r.ocupado ? " [ocupado]" : ""}\n` : `${t.texto}Você alcançou o topo dos oni.\n`;
   } else {
@@ -670,7 +663,6 @@ async function menuClassico(p) {
   }
   corpo += `${t.linha}`;
 
-  const hibrido = isHybrid(p);
   const f = novoForm(p).title(hibrido ? "§l§4MENU DO HÍBRIDO" : t.titulo).body(corpo);
   const extras = [];
   if (oni) {
@@ -1199,18 +1191,19 @@ function vidaTexto(p) {
 async function personagem(p) {
   const t = tema(p);
   const oni = isOni(p);
+  const hibrido = isHybrid(p);
   const r = infoRank(p);
   let c = `${t.linha}\n${t.texto}§l${p.name}§r\n${t.linha}\n`;
 
   if (oni) {
-    c += `${t.suave}Raça: ${t.texto}Oni\n`;
+    c += `${t.suave}Raça: ${t.texto}${hibrido ? "Híbrido" : "Oni"}\n`;
     c += `${t.suave}Posição: ${t.texto}${r.atual}\n`;
     c += `${t.suave}Vida: ${t.texto}${vidaTexto(p)}\n`;
     c += `${t.suave}Progresso: ${barra(r.progresso * 100, 100, 20, "§4")} §8${r.prox ? `> ${r.prox}` : "(máximo)"}\n`;
     c += `${t.suave}Maldição: ${t.texto}${r.pontos}\n`;
     c += `${t.suave}Doses de sangue: ${t.texto}${getScore(p, "blood")}\n`;
     c += `${t.suave}Maldição do Rei dos Onis: ${p.hasTag("muzan_curse") ? "§4ativa" : p.hasTag("breakcurse") ? "§cquebrada" : "§8inativa"}\n`;
-    c += `${t.suave}Resistência ao sol: ${p.hasTag("sunshield") ? "§cconquistada" : "§4queima sob o sol"}\n`;
+    c += `${t.suave}Resistência ao sol: ${hibrido ? "§cparcial" : p.hasTag("sunshield") ? "§cconquistada" : "§4queima sob o sol"}\n`;
   } else {
     c += `${t.suave}Classe: ${t.texto}Caçador de Demônios\n`;
     c += `${t.suave}Rank: ${t.texto}${r.atual}\n`;
@@ -1241,13 +1234,13 @@ async function personagem(p) {
 /* ---------------------------------------------------------------------
    CARGOS ÚNICOS: REI DOS ONIS (oni) e LÍDER DOS HASHIRAS (caçador)
    - Só um jogador por vez em cada cargo (registro em pontuação).
-   - Ao alcançar 1000 pontos de rank com o rank máximo comum
+   - Ao alcançar 10000 pontos de rank com o rank máximo comum
      (Lua Superior 1 / Hashira), o cargo é assumido se estiver livre.
    - O Rei dos Onis pode transformar qualquer jogador em oni pelo menu.
 --------------------------------------------------------------------- */
 
 const PONTOS_CARGO_MAXIMO = 10000;
-const CARGO_REI = { obj: OBJ_REI, tag: "kny_muzan", nome: "Rei dos Onis", cor: "§4", avisados: new Set() };
+const CARGO_REI = { obj: OBJ_REI, tag: REI_ONI.tag, nome: REI_ONI.nome, cor: "§4", avisados: new Set() };
 const CARGO_LIDER = { obj: OBJ_LIDER, tag: "hashira_lider", nome: "Líder dos Hashiras", cor: "§9", avisados: new Set() };
 
 const cargoDoRank = (tag) => (tag === CARGO_REI.tag ? CARGO_REI : tag === CARGO_LIDER.tag ? CARGO_LIDER : null);
@@ -1421,6 +1414,16 @@ function definirCargoOni(p, idx) {
   agendarStats(p);
 }
 
+function voltarCargoHibrido(p) {
+  if (titularDe(CARGO_REI) !== p.name) return;
+  const maldicao = Math.max(0, Math.min(getScore(p, "updemon"), REI_ONI.min - 1));
+  registrarRankAdministrativo(p, "updemon", maldicao);
+  pontuar(p, "updemon", maldicao);
+  p.removeTag(CARGO_REI.tag);
+  p.removeTag(CARGO_REI.tag + "2");
+  limparTitular(CARGO_REI);
+}
+
 async function alterarCargo(p) {
   if (!ehOperador(p)) {
     p.sendMessage("§cSomente operadores podem alterar o próprio cargo.");
@@ -1428,27 +1431,32 @@ async function alterarCargo(p) {
   }
   const t = tema(p);
   const oni = isOni(p);
+  const hibrido = isHybrid(p);
   const r = infoRank(p);
-  const nomes = oni ? ["Oni sem posição", ...RANKS_ONI.map((x) => x.nome)] : RANKS_CACADOR.map((x) => x.nome);
-  const minimos = oni ? [0, ...RANKS_ONI.map((x) => x.min)] : RANKS_CACADOR.map((x) => x.min);
+  const cargos = hibrido ? [HIBRIDO_SUPERIOR, REI_ONI] : oni ? [ONI, ...RANKS_ONI] : RANKS_CACADOR;
 
   const f = novoForm(p)
     .title(oni ? "§l§4ALTERAR MEU CARGO" : "§l§cALTERAR MEU CARGO")
     .body(
-      `${t.linha}\n${t.suave}Somente operadores.\n${t.suave}Cargo atual: ${t.texto}${r.atual}\n${t.suave}Escolha o novo cargo. Pontos e bônus de vida e velocidade acompanham o cargo.\n${t.linha}`
+      `${t.linha}\n${t.suave}Somente operadores.\n${t.suave}Cargo atual: ${t.texto}${r.atual}\n${t.suave}Os limites de atributos e os bônus passivos acompanham a patente.\n${t.linha}`
     )
     .button(`§l${t.destaque}Voltar`, t.icones.voltar);
-  nomes.forEach((nome, i) => f.button(`§l${t.destaque}${nome}\n§r${t.suave}${minimos[i]} de ${oni ? "maldição" : "honra"}`, t.icones.personagem));
+  for (const cargo of cargos) {
+    const regra = cargo === HIBRIDO_SUPERIOR ? "Patente da linhagem" : `${cargo.min} de ${oni ? "maldição" : "honra"}`;
+    f.button(`§l${t.destaque}${cargo.nome}\n§r${t.suave}${regra}`, t.icones.personagem);
+  }
 
   const res = await mostrar(f, p);
   if (res.canceled) return;
   if (res.selection === 0) return menuPrincipal(p);
   const idx = res.selection - 1;
-  if (!ehOperador(p) || isOni(p) !== oni || !nomes[idx]) return;
+  const alvo = cargos[idx];
+  if (!ehOperador(p) || isOni(p) !== oni || isHybrid(p) !== hibrido || !alvo) return;
   try {
-    if (oni) definirCargoOni(p, idx);
+    if (alvo === HIBRIDO_SUPERIOR) voltarCargoHibrido(p);
+    else if (oni) definirCargoOni(p, RANKS_ONI.indexOf(alvo) + 1);
     else definirCargoCacador(p, idx);
-    p.sendMessage(`§cSeu cargo agora é §l${nomes[idx]}§r§c.`);
+    p.sendMessage(`§cSeu cargo agora é §l${alvo.nome}§r§c.`);
     som(p, "random.levelup", 1.2, 0.7);
   } catch (e) {
     reportar(p, e);
@@ -2711,16 +2719,20 @@ const MISSOES_CACADOR = [
 
 function missoesOni(p) {
   const r = infoRank(p);
+  const hibrido = isHybrid(p);
   const lista = [
     { nome: "Tornar-se oni", desc: "Seja transformado em oni.", ok: p.hasTag("demon") },
     { nome: "Superar o sol", desc: "Use qualquer respiração do Sol.", ok: p.hasTag("sunshield") },
     { nome: "Quebrar a maldição", desc: "Fale com Tamayo.", ok: p.hasTag("breakcurse") },
   ];
   for (const rk of RANKS_ONI) {
+    if (hibrido && rk === REI_ONI) {
+      lista.push({ nome: HIBRIDO_SUPERIOR.nome, desc: "Conclua a transformação com uma respiração dominada.", ok: true });
+    }
     lista.push({
       nome: rk.nome,
       desc: rk.unico ? `Alcance ${rk.min} de maldição. Só um oni por vez é Rei dos Onis.` : `Acumule ${rk.min} de maldição (você tem ${r.pontos}).`,
-      ok: p.hasTag(rk.tag),
+      ok: rk === REI_ONI ? ehRei(p) : p.hasTag(rk.tag),
     });
   }
   const lutas = [

@@ -21,9 +21,10 @@ const scripts = pathToFileURL(resolve(pack, "scripts") + "/");
 const carregar = (nome) => import(new URL(nome, scripts));
 const c = await carregar("stats_config.js");
 const s = await carregar("stats.js");
+const { guardarPersonagem, identificador } = await carregar("hybrid_records.js");
 await carregar("menu.js");
 await carregar("hud_painel.js");
-const { ATR, ATRIBUTOS, PATENTES, POR_PATENTE, CUSTOS, NIVEL_MAXIMO, LIMITE_SALDO } = c;
+const { ATR, ATRIBUTOS, HIBRIDO_SUPERIOR, REI_ONI, PATENTES, POR_PATENTE, CUSTOS, NIVEL_MAXIMO, LIMITE_SALDO } = c;
 
 const componentesMenu = new Map();
 system.beforeEvents.startup.emit({
@@ -47,7 +48,10 @@ const rank = (p, tag) => {
   const r = POR_PATENTE[tag];
   p.tags.clear();
   if (c.ePatenteOni(r)) p.addTag("demon");
-  if (!["oni", "humano"].includes(r.tag)) p.addTag(tag);
+  if (r === HIBRIDO_SUPERIOR) {
+    guardarPersonagem(p, { v: 1, id: identificador(p), estado: "ativo", raca: "hibrido",
+      resp: "water", formas: 10, arte: "enmu", publico: "oni" });
+  } else if (!["oni", "humano"].includes(r.tag)) p.addTag(tag);
   if (r.unico) {
     const obj = c.ePatenteOni(r) ? c.OBJ_REI : c.OBJ_LIDER;
     const o = world.scoreboard.getObjective(obj) ?? world.scoreboard.addObjective(obj);
@@ -95,8 +99,8 @@ test("saldo inicial, saldo exato, um abaixo, um acima, zero e níveis independen
   }
 });
 
-test("vinte e sete faixas, os cinco atributos, efeitos e tetos individuais", () => {
-  assert.equal(PATENTES.length, 27);
+test("vinte e oito faixas, os cinco atributos, efeitos e tetos individuais", () => {
+  assert.equal(PATENTES.length, 28);
   for (const r of PATENTES) {
     assert.equal(Math.max(...Object.values(r.limites)), r.geral);
     const p = novo({ tag: r.tag, saldo: 45000000 });
@@ -113,6 +117,20 @@ test("vinte e sete faixas, os cinco atributos, efeitos e tetos individuais", () 
     assert.equal(s.folegoDe(p).max, c.folegoMax(r.limites.pod));
     p.desconectar();
   }
+});
+
+test("a patente Híbrido Superior tem potencial intermediário entre Lua Superior 1 e Rei", () => {
+  const lua = POR_PATENTE.upper1;
+  for (const a of ATRIBUTOS) {
+    assert.ok(lua.limites[a.id] < HIBRIDO_SUPERIOR.limites[a.id]);
+    assert.ok(HIBRIDO_SUPERIOR.limites[a.id] < REI_ONI.limites[a.id]);
+  }
+  for (let sangue = 0; sangue <= c.MAX_MOVIMENTO_SANGUE; sangue++) {
+    assert.ok(c.movimentoMax(lua, sangue) < c.movimentoMax(HIBRIDO_SUPERIOR, sangue));
+    assert.ok(c.movimentoMax(HIBRIDO_SUPERIOR, sangue) < c.movimentoMax(REI_ONI, sangue));
+  }
+  assert.equal(c.vidaMax(HIBRIDO_SUPERIOR, HIBRIDO_SUPERIOR.limites.vid), 96);
+  assert.equal(c.vidaMax(REI_ONI, REI_ONI.limites.vid), 100);
 });
 
 test("legado pago e treino antigo contam para o preço; excesso é histórico", () => {

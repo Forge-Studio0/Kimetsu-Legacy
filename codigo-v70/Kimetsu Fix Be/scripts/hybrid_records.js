@@ -55,6 +55,11 @@ export function personagem(p) {
   return d;
 }
 
+export function hibridoAtivo(p) {
+  const d = personagem(p);
+  return d?.estado === "ativo" && d.raca === "hibrido" ? d : undefined;
+}
+
 export function guardarPersonagem(p, d) {
   gravarJson(p, CHAVE_H, d);
 }

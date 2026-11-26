@@ -2,8 +2,9 @@ import { GameMode, ItemStack, system, world } from "@minecraft/server";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
 import * as stats from "./stats.js";
 import { transformar } from "./hybrid_system.js";
+import { CHAVE_H, guardarPersonagem, identificador } from "./hybrid_records.js";
 import {
-  ATR, ATRIBUTOS, PATENTES, POR_PATENTE, PTS_INICIAIS, NIVEL_MAXIMO, PONTOS_POR_ONI, ePatenteOni,
+  ATR, ATRIBUTOS, HIBRIDO_SUPERIOR, PATENTES, POR_PATENTE, PTS_INICIAIS, NIVEL_MAXIMO, PONTOS_POR_ONI, ePatenteOni,
   custoMelhoria, vidaMax, movimentoMax, staminaMax, folegoMax, efeitoForca, efeitoPoder, reducaoDefesa,
 } from "./stats_config.js";
 
@@ -33,7 +34,10 @@ function tagPatente(p, r) {
   p.removeTag("slayer");
   p.removeTag("slayer2");
   if (ePatenteOni(r)) p.addTag("demon");
-  if (!["oni", "humano"].includes(r.tag)) p.addTag(r.tag);
+  if (r === HIBRIDO_SUPERIOR) {
+    guardarPersonagem(p, { v: 1, id: identificador(p), estado: "ativo", raca: "hibrido",
+      resp: "water", formas: 10, arte: "enmu", publico: "oni" });
+  } else if (!["oni", "humano"].includes(r.tag)) p.addTag(r.tag);
   // Atribuição manual em teste isola os tetos sem alterar a progressão do jogo.
   stats.pontuar(p, "updemon", 0);
   stats.pontuar(p, "upslayer", 0);
@@ -119,6 +123,7 @@ async function todasPatentes(sufixo) {
     eq(stats.folegoDe(p).max, folegoMax(r.limites.pod), "fôlego " + r.nome);
     reset(p);
     eq(stats.disponiveis(p), 1000000000, "saldo íntegro após o ciclo");
+    if (r === HIBRIDO_SUPERIOR) p.setDynamicProperty(CHAVE_H, undefined);
   }
   log(PATENTES.length + " faixas em todos os cinco atributos, com efeitos aplicados e compra máxima");
   await wait(2);

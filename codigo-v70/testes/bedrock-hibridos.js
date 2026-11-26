@@ -7,8 +7,8 @@ import { administrarPoder, ativarHabilidade, habilidadeDe } from "./hybrid_abili
 import { configurarLocal, viajar } from "./hybrid_locations.js";
 import { expostoAoSol } from "./hybrid_sun.js";
 import { guardarPersonagem, hibridosRegistrados } from "./hybrid_records.js";
-import { getScore, patenteDe, pontuar } from "./stats.js";
-import { OBJ_LIDER, OBJ_REI } from "./stats_config.js";
+import { getScore, patenteDe, pontuar, statusAtributo } from "./stats.js";
+import { ATR, HIBRIDO_SUPERIOR, OBJ_LIDER, OBJ_REI, REI_ONI } from "./stats_config.js";
 
 const wait = (n) => system.waitTicks(n);
 const log = (msg) => console.warn("[HIBRIDOS-TESTE] " + msg);
@@ -99,7 +99,11 @@ async function executar() {
   await wait(4);
   eq(p.matches({ families: ["player_demon"] }), true, "família Oni");
   eq(p.matches({ families: ["slayer"] }), false, "sem família humana junto");
-  eq(patenteDe(p).tag, "oni", "patente Oni base");
+  eq(patenteDe(p), HIBRIDO_SUPERIOR, "patente Híbrido Superior ao transformar");
+  eq(getScore(p, "updemon"), 0, "sem maldição exigida nem concedida");
+  eq(statusAtributo(p, ATR.for).limite, 68, "novo teto de Força");
+  eq(p.getComponent("minecraft:health").effectiveMax, 48, "teto de vida sem investimento");
+  eq(patenteDe(rei), REI_ONI, "Rei titular conserva a maior patente");
   eq(ficha(p).resp, "water", "respiração original persistida");
   eq(ficha(p).arte, "enmu", "arte inicial");
   eq(p.getProperty("kny:h_resp"), RESP_H_ID.get("water").codigo, "código autoritativo entregue aos controladores");
@@ -107,7 +111,7 @@ async function executar() {
   await wait(4);
   eq(p.matches({ families: ["slayer"] }), true, "disfarce aplica família caçador");
   eq(p.matches({ families: ["player_demon"] }), false, "família antiga removida");
-  eq(patenteDe(p).tag, "oni", "disfarce preserva Stats");
+  eq(patenteDe(p), HIBRIDO_SUPERIOR, "disfarce preserva Stats");
   revelar(p);
   await wait(4);
   eq(p.matches({ families: ["kny_hybrid"] }), true, "forma revelada");
@@ -153,6 +157,7 @@ async function executar() {
   log("sangue legítimo, duplicação e Hashira sem aulas");
 
   const staff = spawn("StaffH", 61, 58);
+  await esperarInicio(staff);
   staff.addTag("kny_op");
   const id = ficha(p).id;
   eq(administrarPoder(staff, "atribuir", "carapaca", id).includes("salva"), true, "atribuição");
@@ -166,8 +171,11 @@ async function executar() {
 
   eq(viajar(p)?.includes("não foi configurado"), true, "castelo fechado sem configuração");
   eq(configurarLocal(staff, ["castelo", "entrada"]).includes("salva"), true, "entrada");
-  staff.teleport({ x: 52, y: 210, z: 58 });
-  eq(configurarLocal(staff, ["castelo", "saida"]).includes("salva"), true, "saída");
+  staff.runCommand("setblock 52 209 58 stone");
+  staff.runCommand("fill 52 210 58 52 211 58 air");
+  staff.teleport({ x: 52.5, y: 210, z: 58.5 });
+  const saida = configurarLocal(staff, ["castelo", "saida"]);
+  eq(saida, "Configuração de acesso salva.", "saída em " + JSON.stringify(staff.location));
   configurarLocal(staff, ["castelo", "tempos", "1", "10"]);
   eq(viajar(p), undefined, "preparação de viagem");
   await wait(28);

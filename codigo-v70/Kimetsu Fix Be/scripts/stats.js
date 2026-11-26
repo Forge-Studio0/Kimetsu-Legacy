@@ -1,11 +1,13 @@
 import { world, system } from "@minecraft/server";
 import {
-  ATRIBUTOS, ATR, HUMANO, ONI, RANKS_CACADOR, RANKS_ONI, POR_PATENTE, OBJ_LIDER, OBJ_REI, ePatenteOni,
+  ATRIBUTOS, ATR, HUMANO, ONI, HIBRIDO_SUPERIOR, REI_ONI, RANKS_CACADOR, RANKS_ONI,
+  POR_PATENTE, OBJ_LIDER, OBJ_REI, ePatenteOni,
   PTS_POR_PONTO_DE_RANK, PONTOS_POR_ONI, LIMITE_SALDO, NIVEL_MAXIMO, custoMelhoria,
   SERIES_POR_MELHORIA, CREDITO_POR_SERIE, DOSES_POR_SERIE_VIDA, MAX_MOVIMENTO_SANGUE,
   vidaMax, movimentoMax, staminaMax, folegoMax,
 } from "./stats_config.js";
 import { OBJ_PTS, natural, tamanhoSerie, migrarLegado, lerRegistro, totalInvestido } from "./stats_migration.js";
+import { hibridoAtivo } from "./hybrid_records.js";
 
 const DADOS = "kny:stats_v70";
 const BONUS_VIDA = "kny:stats_bonus_vida";
@@ -42,6 +44,9 @@ export function titularDe(obj) {
 
 export function patenteDe(p) {
   const tags = new Set(p.getTags());
+  if (hibridoAtivo(p)) {
+    return tags.has(REI_ONI.tag) && titularDe(OBJ_REI) === p.name ? REI_ONI : HIBRIDO_SUPERIOR;
+  }
   const oni = tags.has("demon");
   const lista = oni ? RANKS_ONI : RANKS_CACADOR;
   for (let i = lista.length - 1; i >= 0; i--) {

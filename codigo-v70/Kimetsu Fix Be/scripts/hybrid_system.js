@@ -1,16 +1,15 @@
 import { system, world } from "@minecraft/server";
 import { H, ARTE_H_ID, ARTES_H, IDENTIDADES, RESP_H_ID, ROTULOS } from "./hybrid_config.js";
 import { avaliarDominio, dominioParaRecuperacao, ehCacadorHumano } from "./hybrid_mastery.js";
-import { guardarPersonagem, identificador, indexarHibrido, personagem, registrarAuditoria } from "./hybrid_records.js";
+import { guardarPersonagem, hibridoAtivo as racaHibrida, identificador, indexarHibrido, personagem, registrarAuditoria } from "./hybrid_records.js";
 import { agendarStats, getScore, patenteDe, pontuar, titularDe } from "./stats.js";
-import { OBJ_REI, OBJ_LIDER, RANKS_CACADOR, RANKS_ONI } from "./stats_config.js";
+import { HIBRIDO_SUPERIOR, OBJ_REI, OBJ_LIDER, RANKS_CACADOR, RANKS_ONI } from "./stats_config.js";
 import { modoDeJogo } from "./compat.js";
 
 const emTransformacao = new Set();
 const combate = new Map();
 const tagH = "kny_hybrid";
 const jogador = (p) => p?.isValid && p.typeId === "minecraft:player";
-const ligado = (d) => d?.estado === "ativo";
 const bloqueios = ["kny_caido", "animacao", "kny_finalizando", "kny_finalizado"];
 const REVISAO_TRANSFORMACAO = 73;
 const MAX_PLACAR = 2147483647;
@@ -24,10 +23,7 @@ export function ehStaff(p) {
 }
 
 export const ehReiAutor = (p) => jogador(p) && p.hasTag("demon") && p.hasTag("kny_muzan") && titularDe(OBJ_REI) === p.name;
-export const racaHibrida = (p) => {
-  const d = personagem(p);
-  return ligado(d) && d.raca === "hibrido" ? d : undefined;
-};
+export { racaHibrida };
 export const isHybrid = (p) => !!racaHibrida(p);
 export const isDemonLineage = (p) => !!racaHibrida(p) || p.hasTag("demon");
 export const getTrueRace = (p) => isHybrid(p) ? "hibrido" : p.hasTag("demon") ? "oni" : ehCacadorHumano(p) ? "cacador" : "humano";
@@ -210,7 +206,7 @@ function terminar(p, pendente) {
     console.warn("[Híbridos] Auditoria após transformação de " + d.id + ": " + e);
   }
   p.sendMessage(d.reparoV72 ? "§5A Staff recuperou sua linhagem Híbrida da v72."
-    : d.raca === "hibrido" ? "§5Você preservou a respiração dominada e despertou como Híbrido."
+    : d.raca === "hibrido" ? `§5Você preservou a respiração dominada e assumiu a posição de ${HIBRIDO_SUPERIOR.nome}.`
     : "§4Você se tornou Oni comum. O sol agora é seu inimigo.");
   try { p.playSound("biwa_sound"); } catch {}
 }

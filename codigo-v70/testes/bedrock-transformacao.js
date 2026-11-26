@@ -6,7 +6,7 @@ import { dominioHumano, registrarAula } from "./hybrid_mastery.js";
 import { guardarPersonagem, identificador } from "./hybrid_records.js";
 import { getTrueRace, racaHibrida } from "./hybrid_system.js";
 import { disponiveis, getScore, patenteDe, pontuar } from "./stats.js";
-import { OBJ_LIDER } from "./stats_config.js";
+import { HIBRIDO_SUPERIOR, OBJ_LIDER, ONI } from "./stats_config.js";
 
 const log = (text) => console.warn("[HIBRIDOS-TESTE] " + text);
 const espera = (ticks) => system.waitTicks(ticks);
@@ -101,6 +101,7 @@ async function testar() {
   planos.get(hashira.id).cliques.push("Beber e virar Oni comum");
   await usa(hashira, 22);
   eq(getTrueRace(hashira), "oni", "Confirmação permite Oni comum");
+  eq(patenteDe(hashira), ONI, "Oni comum recebe a patente original");
   eq(dosesNaMao(hashira), 2, "Consome uma unidade mesmo segurando");
   eq(getScore(hashira, "blood"), 1, "Pontua uma dose");
   item(hashira, "kny:cure");
@@ -161,15 +162,22 @@ async function testar() {
   eq(racaHibrida(legado)?.id, id, "Correção reaproveita a ficha v72");
   eq(racaHibrida(legado)?.resp, "water", "Reparo comprovado preserva escola");
   eq(racaHibrida(legado)?.arte, "enmu", "Arte compatível é vinculada");
-  eq(patenteDe(legado).tag, "lower5", "Recuperação preserva patente Oni existente");
+  eq(patenteDe(legado), HIBRIDO_SUPERIOR, "Recuperação aplica a patente Híbrida");
+  eq(legado.hasTag("lower5"), true, "Recuperação preserva histórico de progressão Oni");
   eq(getScore(legado, "updemon"), 250, "Recuperação preserva maldição acumulada");
   eq(getScore(legado, "blood"), 4, "Reparo sem dose adicional");
   eq(dosesNaMao(legado), 3, "Inventário preservado");
   eq(disponiveis(legado), saldo, "Saldo preservado");
-  log("comando real recuperou ficha v72 comprovada com patente, saldo e sangue intactos");
+  item(legado, "kny:menu_kimetsu");
+  await usa(legado);
+  const painel = planos.get(legado.id).abertos.at(-1);
+  eq(painel.title.includes("PAINEL DO HÍBRIDO"), true, "Painel do Híbrido via uso nativo do livro");
+  eq(painel.buttons[0].includes("Posição: Híbrido Superior"), true, "Posição do painel atualizada");
+  eq(painel.buttons.some((botao) => /Força\s+0\/68/.test(botao)), true, "Teto exibido no painel");
+  log("ficha v72 recuperada ganhou patente e painel novos com saldo e sangue preservados");
 
   for (const p of jogadores) p.disconnect();
-  log("FIM TRANSFORMAÇÃO V73");
+  log("FIM TRANSFORMAÇÃO V74");
 }
 
 system.runTimeout(() => testar().catch((e) => log("FALHA " + e + "\n" + (e.stack ?? ""))), 40);
