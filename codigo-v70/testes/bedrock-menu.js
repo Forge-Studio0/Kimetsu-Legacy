@@ -32,11 +32,12 @@ world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
   if (plans.has(source.id)) events.set(source.id, itemStack.typeId);
 });
 
-function simulate(choices, tag) {
+function simulate(choices, tag, entrouAntes = false) {
   const index = ++next;
   const p = spawnSimulatedPlayer({ x: 60 + index * 3, y: 114, z: 66, dimension: world.getDimension("overworld") }, "MenuTeste" + index, GameMode.Survival);
   p.runCommand("setblock ~ ~-1 ~ stone");
   if (tag) p.addTag(tag);
+  if (entrouAntes) p.addTag("start");
   const plan = { titles: [], choices };
   plans.set(p.id, plan);
   return { p, plan };
@@ -79,13 +80,13 @@ system.runTimeout(async () => {
     await use(oni.p, livro);
     assert(oni.plan.titles.length === 2 && oni.plan.titles[1].includes("MENU DO ONI"), "Menu clássico do Oni não abriu");
     oni.p.disconnect();
-    const novo = simulate([{ selection: 1 }]);
-    assert(await use(novo.p, menu), "Item não abriu para personagem novo");
-    assert(novo.plan.titles[0]?.startsWith("kny_ctr|"), "Contrato inicial não apareceu");
-    assert(novo.p.hasTag("kny_escolheu") && novo.p.hasTag("mizunoto"), "Contrato não promoveu ao cargo inicial");
-    await use(novo.p, menu);
-    assert(novo.plan.titles[1]?.startsWith("kny_painel|"), "Menu após contrato não abriu");
-    novo.p.disconnect();
+    const pendente = simulate([{ selection: 1 }], undefined, true);
+    assert(await use(pendente.p, menu), "Item não abriu para humano de mundo anterior");
+    assert(pendente.plan.titles[0]?.startsWith("kny_ctr|"), "Contrato pendente não apareceu");
+    assert(pendente.p.hasTag("kny_escolheu") && pendente.p.hasTag("mizunoto"), "Contrato não promoveu ao cargo inicial");
+    await use(pendente.p, menu);
+    assert(pendente.plan.titles[1]?.startsWith("kny_painel|"), "Menu após contrato não abriu");
+    pendente.p.disconnect();
     const alvo = simulate([], "slayer");
     const { x, y, z } = alvo.p.location;
     const block = { x: Math.floor(x), y: Math.floor(y) - 1, z: Math.floor(z) };

@@ -15,6 +15,7 @@ export const CORES = [
   cor("pinho", "Pinho", 8, "#3b6659"),
   cor("ameixa", "Ameixa", 9, "#734e73"),
 ];
+export const CORES_CABELO = [...CORES, cor("amarelo", "Amarelo sol", 10, "#f5d334")];
 export const IRIS = [
   cor("castanho", "Castanho", 0, "#5d362c"),
   cor("ambar", "Âmbar", 1, "#ba873b"),
@@ -26,6 +27,7 @@ export const IRIS = [
   cor("ametista", "Ametista", 7, "#75528a"),
   cor("rosa", "Rosa", 8, "#aa6178"),
   cor("turquesa", "Turquesa", 9, "#408f90"),
+  cor("ciano", "Ciano vivo", 10, "#39dcea"),
 ];
 export const TONS = [
   opcao("nenhum", "Rosto da skin", 0),
@@ -37,17 +39,28 @@ export const TONS = [
   cor("cacau", "Cacau", 6, "#614034"),
   cor("ebano", "Ébano", 7, "#4a302d"),
 ];
+const TONS_INICIAIS = [
+  ["e8b98f", "Claro"], ["c98f65", "Mel"], ["a66b45", "Cobre"], ["75452f", "Castanho"], ["4a2c20", "Escuro"],
+];
+export const PELES_INICIAIS = [
+  opcao("nenhum", "Pele da conta", 0),
+  ...["a", "b"].flatMap((base, grupo) => TONS_INICIAIS.map(([hex, nome], i) =>
+    cor("pele_" + base + "_" + hex, "Base " + base.toUpperCase() + " · " + nome, grupo * TONS_INICIAIS.length + i + 1, "#" + hex)
+  )),
+];
 const CAMPO = (nome, opcoes) => ({ nome, opcoes });
 export const CAMPOS = {
+  peleIntegral: CAMPO("Pele de corpo inteiro", PELES_INICIAIS),
   cabelo: CAMPO("Modelo de cabelo", [
     nenhuma, modelo("corte_curto", "Curto repartido", 1), modelo("franja", "Franja lateral", 2),
     modelo("ondas", "Ondas médias", 3), modelo("longo", "Longo aberto", 4),
     modelo("coque", "Coque alto", 5), modelo("rabo", "Rabo baixo", 6),
     modelo("espinhos", "Espetado", 7), modelo("trancas", "Duas tranças", 8),
   ]),
-  corCabelo: CAMPO("Cor principal", CORES),
-  mecha: CAMPO("Cor da mecha", [opcao("nenhum", "Sem mecha", 0), ...CORES.map((c) => ({ ...c, codigo: c.codigo + 1 }))]),
+  corCabelo: CAMPO("Cor principal", CORES_CABELO),
+  mecha: CAMPO("Cor da mecha", [opcao("nenhum", "Sem mecha", 0), ...CORES_CABELO.map((c) => ({ ...c, codigo: c.codigo + 1 }))]),
   pele: CAMPO("Tom do rosto", TONS),
+  // Campo reservado para manter o código das fichas v76. A camada foi retirada.
   rosto: CAMPO("Expressão", [
     nenhuma, modelo("calma", "Serena", 1), modelo("firme", "Firme", 2),
     modelo("sorriso", "Sorriso", 3), modelo("seria", "Concentrada", 4),
@@ -89,7 +102,7 @@ export const CAMPOS = {
 export const CANAIS = [
   ["cabelo", "corCabelo", "mecha", "pele", "rosto", "olhos"],
   ["olhoE", "olhoD", "cicatriz", "roupa", "corRoupa", "cabeca"],
-  ["mascara", "brincos", "demonio"],
+  ["mascara", "brincos", "demonio", "peleIntegral"],
 ];
 export const PROP_APARENCIA = ["kny:cc_a", "kny:cc_b", "kny:cc_c"];
 export const PROP_RASCUNHO = ["kny:cc_da", "kny:cc_db", "kny:cc_dc"];
@@ -98,26 +111,11 @@ export const VISUAL_PADRAO = Object.freeze(Object.fromEntries(
 ));
 
 export const CATEGORIAS = [
-  { id: "info", nome: "Informações", icone: "info" },
-  { id: "base", nome: "Aparência", icone: "pele", campos: ["pele", "rosto"] },
-  { id: "cabelo", nome: "Cabelo", icone: "cabelo", rosto: true, campos: ["cabelo", "corCabelo", "mecha"] },
-  { id: "rosto", nome: "Rosto", icone: "rosto", rosto: true, campos: ["olhos", "olhoE", "olhoD", "cicatriz"] },
-  { id: "roupa", nome: "Vestimentas", icone: "roupa", campos: ["roupa", "corRoupa"] },
-  { id: "adornos", nome: "Acessórios", icone: "acessorio", rosto: true, campos: ["cabeca", "mascara", "brincos"] },
-  { id: "demonio", nome: "Traços Oni", icone: "oni", rosto: true, campos: ["demonio"] },
-  { id: "identidades", nome: "Identidades", icone: "hibrido" },
-  { id: "conjuntos", nome: "Conjuntos", icone: "conjunto" },
+  { id: "pele", nome: "Pele", icone: "pele", campos: ["peleIntegral"], vista: "corpo" },
+  { id: "cabelo", nome: "Cabelo", icone: "cabelo", campos: ["cabelo", "corCabelo", "mecha"], vista: "rosto" },
+  { id: "olhos", nome: "Olhos", icone: "rosto", campos: ["olhos", "olhoE", "olhoD"], vista: "rosto" },
 ];
-export const PERFIS = { base: "Aparência base", cacador: "Caçador", oni: "Oni", revelado: "Forma verdadeira" };
-
-export const CONJUNTOS = [
-  { id: "viajante", nome: "Viajante de índigo", visual: { cabelo: "franja", corCabelo: "castanha", roupa: "haori_ondas", corRoupa: "indigo", olhos: "retos" } },
-  { id: "espadachim", nome: "Espadachim discreto", visual: { cabelo: "corte_curto", roupa: "kosode", corRoupa: "carvao", cabeca: "faixa", rosto: "firme" } },
-  { id: "nobre", nome: "Casa da Cerejeira", visual: { cabelo: "coque", roupa: "kimono", corRoupa: "ameixa", cabeca: "presilha", brincos: "gotas" } },
-  { id: "inverno", nome: "Viajante de inverno", visual: { cabelo: "ondas", corCabelo: "cinza", roupa: "manto", corRoupa: "pinho", mascara: "tecido" } },
-  { id: "cerimonia", nome: "Cerimônia do outono", visual: { cabelo: "trancas", roupa: "hakama", corRoupa: "vinho", brincos: "argolas", olhos: "suaves" } },
-  { id: "oni_sombra", nome: "Oni da penumbra", oni: true, visual: { cabelo: "longo", corCabelo: "neve", mecha: "vinho", roupa: "haori_folhas", corRoupa: "vinho", demonio: "chifres" } },
-];
+export const CAMPOS_INICIAIS = new Set(CATEGORIAS.flatMap(({ campos }) => campos));
 
 export function opcaoDe(campo, id) {
   return CAMPOS[campo]?.opcoes.find((o) => o.id === id);

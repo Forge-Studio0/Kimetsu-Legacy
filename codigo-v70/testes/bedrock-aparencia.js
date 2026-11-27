@@ -1,74 +1,68 @@
 import { GameMode, ItemStack, system, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
-import {
-  CHAVE_VISUAL, definirVisual, iniciarEdicao, lerAparencia, rascunho, salvarEdicao, sessaoAtual,
-  trocarPerfil, atualizarPersonagem,
-} from "./character_system.js";
-import { atualizarCamera } from "./character_camera.js";
+import { CHAVE_ENTRADA, CHAVE_VISUAL, iniciarEdicao, lerAparencia } from "./character_system.js";
 import { codificarVisual, PROP_APARENCIA, PROP_RASCUNHO } from "./character_config.js";
-import { espelharHibrido, getPublicIdentity, trocarDisfarce } from "./hybrid_system.js";
-import { guardarPersonagem, identificador } from "./hybrid_records.js";
-import { getScore } from "./stats.js";
-import { H } from "./hybrid_config.js";
 
-const CAM = "kny:aparencia_camera";
-const CHECKPOINT = "kny:teste_v76_ficha";
-const log = (s) => console.warn("KNY-TEST APARÊNCIA " + s);
+const CAMERA = "kny:aparencia_camera";
+const CHECKPOINT = "kny:teste_v77_ficha";
+const log = (s) => console.warn("KNY-TEST ENTRADA V77 " + s);
 const ok = (cond, msg) => { if (!cond) throw new Error(msg); };
 const eq = (a, b, msg) => ok(a === b, msg + " (" + a + " × " + b + ")");
-const lerCanais = (p, props) => props.map((k) => p.getProperty(k)).join(",");
+const canais = (p, props) => props.map((k) => p.getProperty(k)).join(",");
 const wait = (n = 1) => system.waitTicks(n);
 const planos = new Map();
 
-function formularios() {
+function interceptarFormularios() {
   const telas = new WeakMap();
   const title = ActionFormData.prototype.title;
   const button = ActionFormData.prototype.button;
   const show = ActionFormData.prototype.show;
-  ActionFormData.prototype.title = function (t) {
-    telas.set(this, { t, botoes: [] });
-    return title.call(this, t);
+  ActionFormData.prototype.title = function (texto) {
+    telas.set(this, { titulo: texto, botoes: [] });
+    return title.call(this, texto);
   };
-  ActionFormData.prototype.button = function (t, ...args) {
-    telas.get(this)?.botoes.push(t.replace(/§./g, ""));
-    return button.call(this, t, ...args);
+  ActionFormData.prototype.button = function (texto, ...args) {
+    telas.get(this)?.botoes.push(texto.replace(/§./g, ""));
+    return button.call(this, texto, ...args);
   };
   ActionFormData.prototype.show = function (p) {
     const plano = planos.get(p.id);
     if (!plano) return show.call(this, p);
-    const { t, botoes } = telas.get(this);
-    plano.telas.push(t);
-    const objetivo = plano.acoes.shift();
-    const selection = botoes.findIndex((b) => b.includes(objetivo ?? "###"));
-    if (objetivo) ok(selection >= 0, objetivo + " ausente em " + t);
-    if (selection >= 0) return Promise.resolve({ canceled: false, selection });
-    return Promise.resolve({ canceled: true, cancelationReason: "UserClosed" });
+    const tela = telas.get(this);
+    plano.telas.push(tela);
+    const acao = plano.acoes.shift();
+    if (!acao) return Promise.resolve({ canceled: true, cancelationReason: "UserClosed" });
+    const selection = tela.botoes.findIndex((b) => b.includes(acao));
+    ok(selection >= 0, acao + " ausente em " + tela.titulo + " [" + tela.botoes.join(" | ") + "]");
+    return Promise.resolve({ canceled: false, selection });
   };
 }
 
-async function spawn(nome, x) {
+async function spawn(nome, x, acoes = [], { salvo, antigo = false } = {}) {
   const dimension = world.getDimension("overworld");
-  const posicao = { x: x + 0.5, y: 210, z: 134.5 };
-  const p = spawnSimulatedPlayer({ ...posicao, dimension }, nome, GameMode.Survival);
-  p.teleport(posicao, { dimension, rotation: { x: 0, y: 0 } });
-  for (let i = 0; i < 30 && !p.hasTag("start"); i++) await wait(2);
-  ok(p.hasTag("start"), "jogador inicializado");
+  const pos = { x: x + 0.5, y: 210, z: 134.5 };
+  const p = spawnSimulatedPlayer({ ...pos, dimension }, nome, GameMode.Survival);
+  const plano = { acoes, telas: [] };
+  planos.set(p.id, plano);
+  if (antigo) p.addTag("start");
+  if (salvo) {
+    p.setDynamicProperty(CHAVE_VISUAL, salvo);
+    p.setDynamicProperty(CHAVE_ENTRADA, true);
+    p.setDynamicProperty(CAMERA, true);
+  }
+  p.teleport(pos, { dimension, rotation: { x: 0, y: 0 } });
   for (let i = 0; i < 20; i++) {
     await wait(3);
     if (dimension.getBlock({ x, y: 209, z: 134 })?.typeId === "minecraft:stone") break;
     p.runCommand("fill 128 209 128 143 209 143 minecraft:stone");
   }
   eq(dimension.getBlock({ x, y: 209, z: 134 })?.typeId, "minecraft:stone", "piso carregado");
-  p.teleport(posicao, { rotation: { x: 0, y: 0 } });
-  await wait(6);
-  ok(Math.abs(p.location.y - 210) < 0.2 && p.isOnGround, "jogador sobre o piso");
-  return p;
+  p.teleport(pos, { rotation: { x: 0, y: 0 } });
+  return { p, plano };
 }
 
-async function usarMenu(p, acoes) {
-  const plano = { acoes: [...acoes], telas: [] };
-  planos.set(p.id, plano);
+async function usarMenu(p) {
   const slot = p.selectedSlotIndex;
   p.getComponent("minecraft:inventory").container.setItem(slot, new ItemStack("kny:menu_kimetsu", 1));
   await wait(3);
@@ -76,143 +70,77 @@ async function usarMenu(p, acoes) {
   await wait(4);
   p.stopUsingItem();
   await wait(18);
-  eq(plano.acoes.length, 0, "ações de formulário concluídas");
-  eq(p.getComponent("minecraft:inventory").container.getItem(slot)?.typeId, "kny:menu_kimetsu", "item do menu foi preservado");
-  return plano.telas;
+  eq(p.getComponent("minecraft:inventory").container.getItem(slot)?.typeId, "kny:menu_kimetsu", "item preservado");
 }
 
 async function run() {
+  interceptarFormularios();
   const dim = world.getDimension("overworld");
-  dim.runCommand("time set midnight");
-  dim.runCommand("gamerule dodaylightcycle false");
   dim.runCommand("gamerule domobspawning false");
-  dim.runCommand("gamerule naturalregeneration false");
+  dim.runCommand("time set midnight");
   const checkpoint = world.getDynamicProperty(CHECKPOINT);
+
   if (checkpoint) {
-    const p = await spawn("AparenciaReinicio", 131);
-    p.setDynamicProperty(CHAVE_VISUAL, checkpoint);
-    p.setDynamicProperty(CAM, true);
-    atualizarPersonagem(p, true);
-    await wait(3);
-    eq(lerAparencia(p).perfis.base.cabelo, "corte_curto", "leitura de checkpoint após reiniciar");
-    eq(lerCanais(p, PROP_APARENCIA), codificarVisual(lerAparencia(p).perfis.base).join(","), "render confirmado reaplicado");
-    eq(p.getDynamicProperty(CAM), undefined, "restauração de câmera interrompida");
-    eq(lerCanais(p, PROP_RASCUNHO), "-1,-1,-1", "sem rascunho após reinício");
+    const { p, plano } = await spawn("V77Reinicio", 131, [], { antigo: true, salvo: checkpoint });
+    await wait(110);
+    eq(lerAparencia(p).perfis.base.peleIntegral, "pele_a_c98f65", "ficha relida após reinício de servidor");
+    eq(p.getDynamicProperty(CAMERA), undefined, "restauração de câmera após reinício");
+    eq(canais(p, PROP_APARENCIA), codificarVisual(lerAparencia(p).perfis.base).join(","), "canais recuperados");
+    eq(canais(p, PROP_RASCUNHO), "-1,-1,-1", "rascunho limpo");
+    ok(plano.telas.length === 1 && plano.telas[0].titulo.startsWith("kny_ctr|"), "ficha antiga abre somente o contrato pendente");
     p.disconnect();
-    log("REINÍCIO OK (checkpoint real do mundo e reaplicação da ficha)");
+    log("REINÍCIO OK");
     return;
   }
 
-  formularios();
-  const a = await spawn("AparenciaVisita", 131);
-  const b = await spawn("AparenciaHibrido", 138);
-  const telas = await usarMenu(a, ["Customizar personagem", "Cabelo", "Cor principal", "Próximo", "Girar ›", "Aproximar", "Corpo", "SALVAR"]);
-  ok(telas[0].startsWith("kny_ctr|") && telas[1].startsWith("kny_edit|"), "entrada pelo menu do humano");
-  const salvo = a.getDynamicProperty(CHAVE_VISUAL);
-  eq(lerAparencia(a).perfis.base.cabelo, "corte_curto", "modelo escolhido");
-  eq(lerAparencia(a).perfis.base.corCabelo, "castanha", "cor escolhida");
-  eq(a.hasTag("slayer"), false, "cosmético não muda a raça");
-  eq(a.getDynamicProperty(CAM), undefined, "câmera restaurada pelo salvamento");
-  eq(lerCanais(a, PROP_RASCUNHO), "-1,-1,-1", "rascunho removido pelo salvamento");
-  log("item nativo, entrada sem contrato, categoria, seletor, rotação, zoom e confirmação");
+  const { p: novo, plano: escolhas } = await spawn("V77Escolha", 131, [
+    "Próximo", "C:Cabelo", "Cor principal", "‹ Anterior", "C:Olhos", "Íris esquerda", "‹ Anterior",
+    "Girar ›", "Aproximar", "Ver corpo", "CONFIRMAR", "ASSINAR O CONTRATO",
+  ]);
+  const { p: visita, plano: cancelado } = await spawn("V77Visita", 138, ["Cancelar"]);
+  await wait(120);
 
-  a.addTag("kny_cfg_classico");
-  const classico = await usarMenu(a, ["Customizar personagem", "Vestimentas", "Próximo", "Cancelar"]);
-  eq(classico[1], "§6OFICINA DE PERSONAGEM", "entrada pelo formulário clássico");
-  eq(a.getDynamicProperty(CHAVE_VISUAL), salvo, "cancelar manteve a ficha");
-  a.removeTag("kny_cfg_classico");
-  const s1 = iniciarEdicao(a);
-  ok(atualizarCamera(s1, { modo: "rosto", angulo: 120, zoom: -3 }), "API de câmera no rosto");
-  ok(definirVisual(s1, { roupa: "kimono", pele: "ebano", rosto: "seria", olhos: "amplos" }), "rascunho na API");
-  const d = { v: 1, id: identificador(b), estado: "ativo", raca: "hibrido", resp: "water", formas: 10, arte: "enmu", publico: "cacador" };
-  guardarPersonagem(b, d);
-  espelharHibrido(b, d);
-  await wait(4);
-  const s2 = iniciarEdicao(b);
-  eq(definirVisual(s2, { demonio: "chifres" }), false, "disfarce Caçador sem chifres");
-  eq(definirVisual(s2, { cabeca: "adorno_festival" }), false, "concessão obrigatória");
-  ok(definirVisual(s2, { roupa: "hakama", brincos: "gotas" }), "cosméticos do disfarce Caçador");
-  ok(trocarPerfil(s2, "oni"), "troca temporária para editar perfil Oni");
-  ok(definirVisual(s2, { demonio: "chifres", cabeca: "faixa" }), "cosmético Oni");
-  eq(rascunho(s2).cabeca, "nenhum", "colisão de acessórios resolvida");
-  await wait(3);
-  eq(lerCanais(b, PROP_RASCUNHO), codificarVisual(rascunho(s2)).join(","), "propriedades nativas do rascunho");
-  ok(lerCanais(a, PROP_RASCUNHO) !== lerCanais(b, PROP_RASCUNHO), "rascunhos independentes");
-  ok(lerCanais(a, PROP_RASCUNHO) !== lerCanais(a, PROP_APARENCIA), "rascunho e ficha separados");
-  const hp = a.getComponent("minecraft:health");
-  const vida = hp.currentValue;
-  ok(a.applyDamage(1, { cause: "override" }), "dano no jogador em edição");
-  await wait(3);
-  eq(sessaoAtual(a), undefined, "dano fecha a sessão de quem recebeu");
-  eq(a.getDynamicProperty(CAM), undefined, "dano restaura a câmera");
-  eq(lerCanais(a, PROP_RASCUNHO), "-1,-1,-1", "dano descarta rascunho");
-  eq(a.getDynamicProperty(CHAVE_VISUAL), salvo, "dano preserva ficha");
-  ok(hp.currentValue < vida, "sem imunidade por editar");
-  eq(sessaoAtual(b), s2, "sessão do outro jogador continua");
-  eq(b.getDynamicProperty(CAM), true, "câmera do outro jogador continua");
-  const pontos = getScore(b, "kny_pts");
-  ok(salvarEdicao(s2), "confirmação híbrida");
-  await wait(3);
-  eq(getScore(b, "kny_pts"), pontos, "saldo dos Stats preservado");
-  eq(getPublicIdentity(b), "cacador", "salvar perfil Oni mantém o disfarce");
-  eq(lerCanais(b, PROP_APARENCIA), codificarVisual(lerAparencia(b).perfis.cacador).join(","), "perfil público restaurado depois de salvar");
-  trocarDisfarce(b, "oni");
-  await wait(4);
-  eq(getPublicIdentity(b), "oni", "disfarce legítimo");
-  eq(lerCanais(b, PROP_APARENCIA), codificarVisual(lerAparencia(b).perfis.oni).join(","), "perfil acompanha a troca legítima");
-  log("dois jogadores, isolamento da sessão, danos, Stats e perfis Híbridos");
+  for (const [p, plano] of [[novo, escolhas], [visita, cancelado]]) {
+    eq(p.getDynamicProperty(CHAVE_ENTRADA), true, "função nativa reservou a primeira entrada");
+    eq(plano.acoes.length, 0, "respostas concluídas");
+    ok(plano.telas[0]?.titulo.startsWith("kny_edit|"), "editor aberto automaticamente antes do contrato");
+    ok(plano.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "contrato aberto ao terminar");
+    eq(plano.telas[0].botoes.filter((t) => /^[CS]:/.test(t)).map((t) => t.slice(2)).join(","), "Pele,Cabelo,Olhos", "três categorias");
+    eq(plano.telas.at(-1).botoes.length, 2, "contrato sem atalho para a aparência");
+    eq(p.getDynamicProperty(CAMERA), undefined, "câmera voltando ao controle normal");
+    eq(canais(p, PROP_RASCUNHO), "-1,-1,-1", "rascunho limpo");
+  }
+  const salvo = novo.getDynamicProperty(CHAVE_VISUAL);
+  ok(novo.hasTag("slayer") && novo.hasTag("mizunoto") && novo.hasTag("kny_escolheu"), "contrato e patente inicial nativos");
+  const visual = lerAparencia(novo).perfis.base;
+  eq(visual.peleIntegral, "pele_a_c98f65", "pele selecionada");
+  eq(visual.corCabelo, "amarelo", "nova cor de cabelo");
+  eq(visual.olhoE, "ciano", "nova cor dos olhos");
+  eq(visual.roupa, undefined, "roupa fora da ficha");
+  eq(canais(novo, PROP_APARENCIA), codificarVisual(visual).join(","), "canais nativos da pele confirmada");
+  eq(visita.getDynamicProperty(CHAVE_VISUAL), undefined, "cancelar manteve a pele anterior");
+  eq(visita.hasTag("slayer"), false, "contrato só muda a raça se for assinado");
+  log("primeiro login automático, dez peles cadastradas, seleção de cor, câmera, cancelamento e contrato");
 
-  a.addTag("kny_finalizando");
-  let bloqueado = false;
-  try { iniciarEdicao(a); }
-  catch { bloqueado = true; }
-  eq(bloqueado, true, "finalização bloqueia abertura");
-  a.removeTag("kny_finalizando");
-  a.runCommand('scriptevent kny:aparencia autorizar_nome "AparenciaVisita" sim');
-  await wait(3);
-  eq(lerAparencia(a).autorizarNome, false, "sem permissão de Staff");
-  a.addTag("kny_op");
-  a.runCommand('scriptevent kny:aparencia autorizar_nome "AparenciaVisita" sim');
-  await wait(3);
-  eq(lerAparencia(a).autorizarNome, true, "comando autorizado");
+  await usarMenu(novo);
+  await usarMenu(visita);
+  ok(escolhas.telas.at(-1)?.titulo.startsWith("kny_painel|"), "item abre painel normal depois do contrato");
+  ok(cancelado.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "item reabre apenas o contrato");
+  ok(!escolhas.telas.at(-1).botoes.some((t) => /Aparência|Customizar personagem/.test(t)), "sem atalho no painel");
+  let bloqueou = false;
+  try { iniciarEdicao(novo); } catch { bloqueou = true; }
+  eq(bloqueou, true, "sessão não pode ser aberta novamente");
 
-  const s3 = iniciarEdicao(b);
-  definirVisual(s3, { cabelo: "coque" });
-  b.teleport({ x: 141.5, y: 210, z: 134.5 });
-  await wait(5);
-  eq(sessaoAtual(b), undefined, "teletransporte fecha edição");
-  eq(b.getDynamicProperty(CAM), undefined, "teletransporte restaura câmera");
-  eq(lerAparencia(b).perfis.oni.cabelo, "nenhum", "teletransporte descarta cabelo de teste");
-
-  const s4 = iniciarEdicao(b);
-  definirVisual(s4, { cabelo: "ondas" });
-  const nether = world.getDimension("nether");
-  b.teleport({ x: 8, y: 115, z: 8 }, { dimension: nether });
-  await wait(4);
-  eq(b.dimension.id, "minecraft:nether", "teletransporte entre dimensões");
-  eq(sessaoAtual(b), undefined, "troca de dimensão fecha edição");
-  eq(lerCanais(b, PROP_RASCUNHO), "-1,-1,-1", "troca de dimensão descarta rascunho");
-  eq(b.getDynamicProperty(CAM), undefined, "troca de dimensão restaura câmera");
-  b.disconnect();
-  log("permissões de Staff, teletransporte e troca de dimensão");
-
-  await wait(Math.ceil(H.combateMs / 50) + 5);
-  const nova = iniciarEdicao(a);
-  definirVisual(nova, { cabelo: "longo" });
-  a.disconnect();
-  await wait(4);
-  eq(sessaoAtual(a), undefined, "desconexão libera sessão");
-  const voltou = await spawn("AparenciaVisita", 131);
-  eq(lerCanais(voltou, PROP_RASCUNHO), "-1,-1,-1", "reconexão limpa rascunho");
-  if (voltou.getDynamicProperty(CHAVE_VISUAL)) {
-    eq(lerAparencia(voltou).perfis.base.cabelo, "corte_curto", "reconexão mantém visual confirmado");
-    log("reconexão nativa com dados do mesmo jogador");
-  } else log("jogador simulado recriado na reconexão");
-  voltou.disconnect();
+  const { p: antigo, plano: migracao } = await spawn("V77Legado", 134, [], { antigo: true });
+  await wait(110);
+  eq(antigo.getDynamicProperty(CHAVE_ENTRADA), undefined, "jogador de mundo antigo não é marcado como novo");
+  ok(migracao.telas.length === 1 && migracao.telas[0].titulo.startsWith("kny_ctr|"), "jogador antigo segue o fluxo original");
+  antigo.disconnect();
+  novo.disconnect();
+  visita.disconnect();
   world.setDynamicProperty(CHECKPOINT, salvo);
+  log("bloqueio de segunda edição e compatibilidade com mundo anterior");
   log("FIM");
 }
 
-system.runTimeout(() => {
-  run().catch((e) => console.error("KNY-TEST FALHA APARÊNCIA " + e + "\n" + (e.stack ?? "")));
-}, 35);
+system.runTimeout(() => run().catch((e) => console.error("KNY-TEST FALHA V77 " + e + "\n" + (e.stack ?? ""))), 35);

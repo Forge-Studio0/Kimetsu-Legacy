@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { deflateSync } from "node:zlib";
-import { CANAIS, CATEGORIAS, CORES, IRIS, TONS, PROP_APARENCIA, PROP_RASCUNHO } from "./codigo-v70/Kimetsu Fix Be/scripts/character_config.js";
+import { CANAIS, CATEGORIAS, CORES, CORES_CABELO, IRIS, PELES_INICIAIS, TONS, PROP_APARENCIA, PROP_RASCUNHO } from "./codigo-v70/Kimetsu Fix Be/scripts/character_config.js";
 
 const rp = resolve(dirname(fileURLToPath(import.meta.url)), "codigo-v70/Kimetsu Fix Re");
 function gravar(caminho, valor) {
@@ -144,20 +144,8 @@ const pele = TONS.filter((c) => c.codigo > 0).map((c) => textura("pele_" + c.id,
   t.rect(x + 3, y + 6, 2, 1, tom(rgb(c.hex), 0.64));
 })));
 const geomPele = geometria("pele", { head: [cubo(-4, 24, -4, 8, 8, 8, 0, { inflate: 0.53 })] });
-controlador("pele", fixo(geomPele), tArray(padrao(pele), "pele"), "variable.cc_pele > 0 && " + cabecaLivre + " && (" + semMarca + ")");
-
-const expressoes = [
-  [[1, 3, 2, 3], [5, 3, 6, 3], [3, 6, 4, 6]],
-  [[1, 2, 2, 3], [5, 3, 6, 2], [3, 6, 4, 6]],
-  [[1, 3, 2, 3], [5, 3, 6, 3], [2, 6, 5, 6], [2, 5, 2, 5], [5, 5, 5, 5]],
-  [[1, 2, 2, 3], [5, 3, 6, 2], [3, 6, 4, 6], [4, 7, 5, 7]],
-].map((riscos, i) => {
-  const t = quadro(64, 64);
-  for (const risco of riscos) t.linha(...risco, tinta);
-  return textura("expressao_" + (i + 1), t);
-});
-const rosto = geometria("rosto", { head: [placa(-4, 24, -4.59, 8, 8)] });
-controlador("rosto", fixo(rosto), tArray(padrao(expressoes), "rosto"), "variable.cc_rosto > 0 && variable.cc_mascara == 0 && " + cabecaLivre);
+controlador("pele", fixo(geomPele), tArray(padrao(pele), "pele"),
+  "variable.cc_peleIntegral == 0 && variable.cc_pele > 0 && " + cabecaLivre + " && (" + semMarca + ")");
 
 const olhos = IRIS.map((c) => {
   const t = quadro(64, 64);
@@ -201,7 +189,7 @@ const cabelos = cortes.map((c, i) => geometria("cabelo_" + (i + 1), { head: [top
 const mechas = cortes.map((_, i) => geometria("mecha_" + (i + 1), { head: [
   cubo(-2.8 + i % 3 * 0.75, 32.65, -3.75, i % 2 ? 1.25 : 1.7, 0.14, 4.8, 1),
 ] }));
-const tintas = CORES.map((c) => textura("cabelo_" + c.id, atlas(rgb(c.hex), (t, x, y, bloco) => {
+const tintas = CORES_CABELO.map((c) => textura("cabelo_" + c.id, atlas(rgb(c.hex), (t, x, y, bloco) => {
   t.rect(x + 1, y, 1, 8, tom(rgb(c.hex), bloco ? 1.25 : 1.12));
   t.rect(x + 5, y, 1, 8, tom(rgb(c.hex), 0.8));
 })));
@@ -297,6 +285,48 @@ controlador("demonio", gArray(padrao(tracos), "demonio"), fixo(osso),
   "variable.cc_demonio > 0 && (variable.cc_demonio != 1 || variable.cc_mascara == 0) && " + cabecaLivre);
 
 gravarJson("models/entity/customizacao/oficina.geo.json", { format_version: "1.12.0", "minecraft:geometry": modelos });
+
+// Reutiliza a geometria do jogador e as visibilidades dos slots de equipamento.
+const pelesIntegrais = PELES_INICIAIS.map(({ id, codigo }) => {
+  if (codigo === 0) return "Texture.default";
+  const alias = "cc_" + id;
+  texturas[alias] = TEX + "peles/" + id;
+  return "Texture." + alias;
+});
+const maoDireita = "query.get_equipped_item_name(0, 1)";
+const maoEsquerda = "query.get_equipped_item_name('off_hand')";
+const mostrarBracoDireito = `${maoDireita} == '' || ${maoDireita} == 'filled_map'`;
+const mostrarBracoEsquerdo = `(${maoDireita} == 'filled_map' && ${maoEsquerda} != 'shield') ||
+  (${maoEsquerda} == 'filled_map' && !query.item_is_charged) ||
+  (!query.item_is_charged && variable.item_use_normalized > 0 && variable.item_use_normalized < 1.0)`.replace(/\s+/g, " ");
+const equipamentos = {
+  helmet: "variable.helmet_layer_visible",
+  leftLegging: "variable.leg_layer_visible", rightLegging: "variable.leg_layer_visible",
+  leftBoot: "variable.boot_layer_visible", rightBoot: "variable.boot_layer_visible",
+  leftSock: "variable.boot_layer_visible && variable.leg_layer_visible",
+  rightSock: "variable.boot_layer_visible && variable.leg_layer_visible",
+  bodyArmor: "variable.chest_layer_visible", leftArmArmor: "variable.chest_layer_visible", rightArmArmor: "variable.chest_layer_visible",
+  belt: "variable.chest_layer_visible && variable.leg_layer_visible",
+};
+const vistasPele = [
+  ["first_person", "variable.is_first_person", {
+    "*": false, rightArm: mostrarBracoDireito, rightSleeve: mostrarBracoDireito,
+    leftArm: mostrarBracoEsquerdo, leftSleeve: mostrarBracoEsquerdo,
+  }],
+  ["third_person", "!variable.is_first_person && !variable.map_face_icon", { "*": true, ...equipamentos }],
+  ["map", "variable.map_face_icon", { "*": false, head: true, hat: true, helmet: true }],
+];
+for (const [vista, condicao, ossos] of vistasPele) {
+  const id = "controller.render.kny.pele_" + vista;
+  controladores[id] = {
+    arrays: { textures: { "Array.peles_kny": pelesIntegrais } },
+    geometry: "Geometry.default",
+    materials: [{ "*": "Material.default" }],
+    textures: ["Array.peles_kny[variable.cc_peleIntegral]"],
+    part_visibility: Object.entries(ossos).map(([osso, visivel]) => ({ [osso]: visivel })),
+  };
+  ativacoes[id] = condicao + " && query.property('kny:forms') == 0 && variable.cc_peleIntegral > 0";
+}
 gravarJson("render_controllers/customizacao.render_controllers.json", { format_version: "1.8.0", render_controllers: controladores });
 
 const glyphs = {
@@ -323,7 +353,7 @@ for (const { icone } of CATEGORIAS) {
   t.rect(29, 51, 6, 2, rosa);
   gravar(UI + icone + ".png", t.png());
 }
-for (const hex of new Set([...CORES, ...IRIS, ...TONS].map((c) => c.hex).filter(Boolean))) {
+for (const hex of new Set([...CORES_CABELO, ...IRIS, ...TONS, ...PELES_INICIAIS].map((c) => c.hex).filter(Boolean))) {
   const t = quadro(24, 24);
   t.rect(1, 1, 22, 22, ouro);
   t.rect(3, 3, 18, 18, rgb(hex));

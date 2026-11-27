@@ -1,6 +1,6 @@
 import { system, world } from "@minecraft/server";
 import * as UI from "@minecraft/server-ui";
-import { CAMPOS, PROP_APARENCIA, PROP_RASCUNHO, VISUAL_PADRAO, codificarVisual, opcaoDe } from "./character_config.js";
+import { CAMPOS, CAMPOS_INICIAIS, PROP_APARENCIA, PROP_RASCUNHO, VISUAL_PADRAO, codificarVisual, opcaoDe } from "./character_config.js";
 import { cameraInicial, posicionarCamera } from "./character_camera.js";
 import { emCombate, estadoBloqueado, getTrueRace, racaHibrida } from "./hybrid_system.js";
 import { lerJson, gravarJson, personagem } from "./hybrid_records.js";
@@ -9,9 +9,12 @@ import { resgateEmCurso } from "./revive.js";
 
 export const CHAVE_VISUAL = "kny:aparencia";
 export const CHAVE_CATALOGO = "kny:aparencia_catalogo";
+export const CHAVE_ENTRADA = "kny:aparencia_primeiro_login";
 const CHAVE_CAMERA = "kny:aparencia_camera";
+const TAG_NOVO = "kny_aparencia_novo";
 const PERFIS_H = ["cacador", "oni", "revelado"];
 const sessoes = new Map();
+const entradas = new Set();
 const jogadorValido = (p) => p?.isValid && p.typeId === "minecraft:player";
 const objeto = (d) => !!d && typeof d === "object" && !Array.isArray(d);
 
@@ -26,12 +29,12 @@ export function lerCatalogo() {
   return Array.isArray(dado?.bloqueados) ? dado : { v: 1, bloqueados: [] };
 }
 
-export const perfisDisponiveis = (raca) => raca === "hibrido" ? PERFIS_H : raca === "oni" ? ["oni"] : ["base"];
+const perfisDisponiveis = (raca) => raca === "hibrido" ? PERFIS_H : raca === "oni" ? ["oni"] : ["base"];
 export function perfilAtivo(p, raca = getTrueRace(p)) {
   return raca === "hibrido" ? racaHibrida(p).publico : perfisDisponiveis(raca)[0];
 }
 
-export const permiteTracos = (raca, perfil) => (raca === "oni" && perfil === "oni") ||
+const permiteTracos = (raca, perfil) => (raca === "oni" && perfil === "oni") ||
   (raca === "hibrido" && (perfil === "oni" || perfil === "revelado"));
 
 export function opcaoPermitida(campo, opcao, registro, raca, perfil, catalogo) {
@@ -93,6 +96,18 @@ export function encerrarEdicao(sessao, mensagem) {
 
 export const sessaoAtual = (p) => sessoes.get(p.id);
 
+export function prepararAparenciaInicial(p) {
+  if (!jogadorValido(p) || !p.hasTag(TAG_NOVO)) return false;
+  p.removeTag(TAG_NOVO);
+  if (p.getDynamicProperty(CHAVE_ENTRADA) !== undefined || p.getDynamicProperty(CHAVE_VISUAL) !== undefined) return false;
+  // O registro dura no mundo. A oportunidade de edição dura apenas nesta conexão.
+  p.setDynamicProperty(CHAVE_ENTRADA, true);
+  entradas.add(p.id);
+  return true;
+}
+
+export const edicaoInicialDisponivel = (p) => entradas.has(p.id);
+
 export function indisponivel(p) {
   return !jogadorValido(p) || estadoBloqueado(p) || emCombate(p) || viagemEmCurso(p) || resgateEmCurso(p) ||
     p.getProperty("kny:h_ocupado") === true || (p.getProperty("kny:treino") ?? 0) > 0 ||
@@ -109,21 +124,35 @@ export function sessaoSegura(sessao) {
 }
 
 export function iniciarEdicao(p) {
-  if (indisponivel(p) || sessoes.has(p.id)) throw new Error("Aguarde em um local seguro para personalizar.");
+  if (!entradas.delete(p.id)) throw new Error("A aparência pode ser escolhida somente na primeira entrada.");
+  if (indisponivel(p) || sessoes.has(p.id)) throw new Error("A edição foi encerrada porque o personagem está em uma ação.");
   const registro = lerAparencia(p);
-  if (!registro) throw new Error("A ficha de aparência precisa ser revisada pela Staff.");
   const raca = getTrueRace(p);
-  const perfil = perfilAtivo(p, raca);
+  if (!registro || raca !== "humano" || p.getDynamicProperty(CHAVE_VISUAL) !== undefined) {
+    throw new Error("O personagem já foi iniciado.");
+  }
+  const catalogo = lerCatalogo();
+  const inicial = {
+    ...VISUAL_PADRAO,
+    peleIntegral: CAMPOS.peleIntegral.opcoes.find((o) => o.codigo > 0 && opcaoPermitida("peleIntegral", o, registro, raca, "base", catalogo))?.id,
+    cabelo: "corte_curto",
+    olhos: "amplos",
+  };
   const sessao = {
-    p, raca, perfil, identidade: perfil, dim: p.dimension.id, registro, editados: new Set(),
-    rascunhos: new Map(), camera: cameraInicial(p), categoria: "base", campo: "pele", tela: "editor",
-    nome: registro.nome ?? "", sobrenome: registro.sobrenome ?? "", editouNome: false,
+    p, raca, identidade: "base", dim: p.dimension.id, registro,
+    visual: limparVisual(inicial, registro, raca, "base", catalogo),
+    camera: cameraInicial(p), temCamera: false, categoria: "pele", campo: "peleIntegral", tela: "editor",
   };
   sessoes.set(p.id, sessao);
   try {
-    if (!posicionarCamera(p, sessao.camera)) throw new Error("Deixe espaço à frente do personagem para abrir o editor.");
-    try { p.setDynamicProperty(CHAVE_CAMERA, true); }
-    catch (e) { p.camera.clear(); throw e; }
+    try { sessao.temCamera = posicionarCamera(p, sessao.camera); } catch {}
+    if (sessao.temCamera) {
+      try { p.setDynamicProperty(CHAVE_CAMERA, true); }
+      catch (e) { p.camera.clear(); throw e; }
+    } else {
+      sessao.tela = "simples";
+      p.sendMessage("§eO espaço neste local está fechado. Escolha sua aparência pelo formulário simples.");
+    }
     previsualizar(sessao);
     return sessao;
   } catch (e) {
@@ -132,62 +161,36 @@ export function iniciarEdicao(p) {
   }
 }
 
-export function rascunho(sessao) {
-  if (!sessao.rascunhos.has(sessao.perfil)) {
-    sessao.rascunhos.set(sessao.perfil, visualDoPerfil(sessao.registro, sessao.raca, sessao.perfil));
-  }
-  return sessao.rascunhos.get(sessao.perfil);
-}
-
 function previsualizar(sessao) {
   if (!sessaoSegura(sessao)) throw new Error("A sessão de edição foi interrompida.");
-  escreverCanais(sessao.p, PROP_RASCUNHO, codificarVisual(rascunho(sessao)));
-}
-
-export function trocarPerfil(sessao, perfil) {
-  if (!perfisDisponiveis(sessao.raca).includes(perfil) || !sessaoSegura(sessao)) return false;
-  sessao.perfil = perfil;
-  previsualizar(sessao);
-  return true;
+  escreverCanais(sessao.p, PROP_RASCUNHO, codificarVisual(sessao.visual));
 }
 
 export function definirVisual(sessao, alteracoes) {
   if (!sessaoSegura(sessao)) return false;
   const catalogo = lerCatalogo();
   for (const [campo, id] of Object.entries(alteracoes)) {
-    if (!opcaoPermitida(campo, opcaoDe(campo, id), sessao.registro, sessao.raca, sessao.perfil, catalogo)) return false;
+    if (!CAMPOS_INICIAIS.has(campo) ||
+        !opcaoPermitida(campo, opcaoDe(campo, id), sessao.registro, sessao.raca, "base", catalogo)) return false;
   }
-  const novo = limparVisual({ ...rascunho(sessao), ...alteracoes }, sessao.registro, sessao.raca, sessao.perfil, catalogo);
-  sessao.rascunhos.set(sessao.perfil, novo);
-  sessao.editados.add(sessao.perfil);
+  sessao.visual = limparVisual({ ...sessao.visual, ...alteracoes }, sessao.registro, sessao.raca, "base", catalogo);
   previsualizar(sessao);
   return true;
 }
 
-export function validarNome(valor) {
-  if (typeof valor !== "string") return undefined;
-  const nome = valor.trim().replace(/ +/g, " ");
-  return nome.length <= 24 && /^[\p{L}\p{M} '\-]*$/u.test(nome) ? nome : undefined;
-}
-
 export function salvarEdicao(sessao) {
   if (!sessaoSegura(sessao)) return false;
-  const registro = lerAparencia(sessao.p);
-  if (!registro) return false;
+  const p = sessao.p;
+  if (p.getDynamicProperty(CHAVE_VISUAL) !== undefined) return false;
   const catalogo = lerCatalogo();
-  const perfis = { ...registro.perfis };
-  for (const perfil of sessao.editados) {
-    const visual = sessao.rascunhos.get(perfil);
-    for (const [campo, id] of Object.entries(visual)) {
-      if (!opcaoPermitida(campo, opcaoDe(campo, id), registro, sessao.raca, perfil, catalogo)) return false;
-    }
-    perfis[perfil] = limparVisual(visual, registro, sessao.raca, perfil, catalogo);
+  const base = {};
+  for (const campo of CAMPOS_INICIAIS) {
+    const id = sessao.visual[campo];
+    if (!opcaoPermitida(campo, opcaoDe(campo, id), sessao.registro, sessao.raca, "base", catalogo)) return false;
+    base[campo] = id;
   }
-  const nome = sessao.editouNome ? validarNome(sessao.nome) : registro.nome;
-  const sobrenome = sessao.editouNome ? validarNome(sessao.sobrenome) : registro.sobrenome;
-  if (sessao.editouNome && (!registro.autorizarNome || nome === undefined || sobrenome === undefined)) return false;
-  if (sessao.editados.size || sessao.editouNome) gravarJson(sessao.p, CHAVE_VISUAL, { ...registro, perfis, nome, sobrenome });
-  aplicarVisualSalvo(sessao.p);
+  gravarJson(p, CHAVE_VISUAL, { ...sessao.registro, perfis: { base } });
+  aplicarVisualSalvo(p);
   encerrarEdicao(sessao, "§aSua aparência foi salva com sucesso.");
   return true;
 }
@@ -220,7 +223,10 @@ world.afterEvents.playerDimensionChange.subscribe(({ player }) => {
   interromper(player);
   agendarVisual(player, true);
 });
-world.afterEvents.playerLeave.subscribe(({ playerId }) => sessoes.delete(playerId));
+world.afterEvents.playerLeave.subscribe(({ playerId }) => {
+  entradas.delete(playerId);
+  sessoes.delete(playerId);
+});
 world.afterEvents.entityDie.subscribe(({ deadEntity }) => interromper(deadEntity));
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damageSource, damage }) => {
   if (damage <= 0) return;

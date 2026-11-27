@@ -80,7 +80,7 @@
     ]
   },
   "categoria@kny_oficina.botao": {
-    "size": ["100%", "11.1%"],
+    "size": ["100%", "33.33%"],
     "$vis": "((('%.2s' * #form_button_text) = 'C:') or (('%.2s' * #form_button_text) = 'S:'))",
     "$txt": "((#form_button_text - 'C:') - 'S:')",
     "$lbl_anchor": "left_middle",
@@ -132,17 +132,6 @@
     "$txt": "((#form_button_text - 'K:') - 'V:')",
     "$lbl_scale": 0.74
   },
-  "entrada@kny_oficina.botao": {
-    "size": ["100%", "100%"],
-    "$vis": "(('%.2s' * #form_button_text) = 'E:')",
-    "$txt": "(#form_button_text - 'E:')",
-    "$lbl_scale": 0.85,
-    "$lbl_anchor": "left_middle",
-    "$lbl_offset": ["22%", 0],
-    "$lbl_size": ["74%", "default"],
-    "$lbl_align": "left",
-    "$icone_tamanho": ["16%", "77%"]
-  },
   "botoes": {
     "type": "collection_panel",
     "size": ["100%", "100%"],
@@ -150,13 +139,6 @@
     "collection_name": "form_buttons",
     "bindings": [
       { "binding_name": "#form_button_length", "binding_name_override": "#collection_length" }
-    ]
-  },
-  "acesso": {
-    "type": "panel",
-    "layer": 7,
-    "controls": [
-      { "entrada@kny_oficina.botoes": { "$item": "kny_oficina.entrada" } }
     ]
   },
   "editor": {
@@ -177,7 +159,7 @@
                 "type": "label",
                 "size": ["95%", "default"],
                 "layer": 5,
-                "text": "OFICINA DE PERSONAGEM",
+                "text": "APARÊNCIA DO PERSONAGEM",
                 "color": [0.95, 0.8, 0.47],
                 "shadow": true,
                 "font_scale_factor": 0.88,
@@ -195,7 +177,7 @@
           "anchor_from": "top_left",
           "anchor_to": "top_left",
           "offset": ["1.5%", "13%"],
-          "size": ["16%", "74%"],
+          "size": ["16%", "34%"],
           "controls": [
             { "moldura@kny_oficina.moldura": {} },
             {

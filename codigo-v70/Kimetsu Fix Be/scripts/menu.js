@@ -8,7 +8,8 @@ import {
   registrarTreinoRespiracao, requisitosProximaForma, selecionarOriginal,
 } from "./hybrid_mastery.js";
 import { limparTreinosDaForma, textoTreinoDaForma } from "./treino_respiracao.js";
-import { abrirEditor, ICONE_EDITOR } from "./character_editor.js";
+import { abrirEditor } from "./character_editor.js";
+import { edicaoInicialDisponivel, prepararAparenciaInicial } from "./character_system.js";
 import "./character_admin.js";
 import { canUseBreathing, canUseKekkijutsu, doseEmMaos, ehStaff, estadoBloqueado, isHybrid, preverTransformacao, racaHibrida, transformar, trocarDisfarce } from "./hybrid_system.js";
 import { ativarHabilidade, danoEspecialEmCurso, habilidadeDe } from "./hybrid_abilities.js";
@@ -269,13 +270,14 @@ world.afterEvents.playerSpawn.subscribe(({ player: p, initialSpawn }) => {
       if (jaEscolheu(p)) {
         if (!p.hasTag(TAG_ESCOLHEU)) p.addTag(TAG_ESCOLHEU); // personagens antigos não precisam escolher
       } else if (initialSpawn) {
-        pedirAbertura(p);
+        pedirAbertura(p, false, true);
       }
     } catch {}
   }, 100);
 });
 
 const sessoesMenu = new Map();
+const menuAbertoNestaEntrada = new Set();
 
 function reportar(p, e) {
   try {
@@ -303,11 +305,15 @@ function abrirSessaoMenu(p, acao) {
   return true;
 }
 
-function pedirAbertura(p, classico = false) {
-  abrirSessaoMenu(p, () => {
+function pedirAbertura(p, classico = false, automatico = false) {
+  if (!p?.isValid || (automatico && menuAbertoNestaEntrada.has(p.id))) return;
+  const abriu = abrirSessaoMenu(p, async () => {
     if (classico) p.addTag(TAG_CLASSICO);
-    return jaEscolheu(p) ? menuPrincipal(p) : escolha(p);
+    if (jaEscolheu(p)) return menuPrincipal(p);
+    if (edicaoInicialDisponivel(p)) await abrirEditor(p, p.hasTag(TAG_CLASSICO));
+    if (p.isValid && !jaEscolheu(p)) return escolha(p);
   });
+  if (abriu) menuAbertoNestaEntrada.add(p.id);
 }
 
 // Os dois itens vinculam a própria ação de uso, inclusive no modo de toque.
@@ -324,6 +330,10 @@ system.beforeEvents.startup.subscribe(({ itemComponentRegistry }) => {
 // Diagnóstico de operador e alternativa para voltar à interface clássica.
 try {
   system.afterEvents?.scriptEventReceive?.subscribe((ev) => {
+    if (ev.id === "kny:aparencia_inicial" && ev.message === "primeiro") {
+      const p = ev.sourceEntity;
+      if (p?.isValid && p.typeId === "minecraft:player" && !jaEscolheu(p)) prepararAparenciaInicial(p);
+    }
     if (ev.id === "kny:menu") pedirAbertura(ev.sourceEntity, ev.message?.trim() === "classico");
     if (ev.id === "kny:h_sangue" && ev.message === "beber") {
       const p = ev.sourceEntity;
@@ -470,13 +480,11 @@ async function escolha(p) {
           .title("§l§cKIMETSU NO YAIBA")
           .body(textoContrato(p.name))
           .button("§l§cAssinar o contrato\n§r§7Tornar-se Caçador", "textures/icons/menu_char")
-          .button("Customizar personagem", ICONE_EDITOR)
       : new ActionFormData()
           .title(`${MARCA_CTR}§lKIMETSU NO YAIBA`)
           .body(" ")
           .button("T:" + textoContrato(p.name))
-          .button("S:§l§aASSINAR O CONTRATO")
-          .button("E:Customizar personagem", ICONE_EDITOR);
+          .button("S:§l§aASSINAR O CONTRATO");
     const r = await mostrar(f, p);
     if (!p.isValid || jaEscolheu(p)) return;
     if (r.canceled && !classico && r.cancelationReason === undefined) {
@@ -484,7 +492,6 @@ async function escolha(p) {
       continue;
     }
     if (!r.canceled && r.selection === (classico ? 0 : 1)) await aplicarEscolha(p);
-    if (!r.canceled && r.selection === (classico ? 1 : 2)) await abrirEditor(p, classico);
     return;
   }
 }
@@ -623,7 +630,6 @@ async function painelPrincipal(p) {
     return painelPrincipal(p);
   });
   add("X:", "§6§lX", null, "fechar"); // botão X no canto superior direito
-  add("E:", "§6Aparência", ICONE_EDITOR, () => abrirEditor(p));
 
   const res = await mostrar(f, p);
   if (res.canceled) {
@@ -709,8 +715,6 @@ async function menuClassico(p) {
     }
   }
 
-  f.button("§6Customizar personagem", ICONE_EDITOR);
-  extras.push("editor");
   const res = await mostrar(f, p);
   if (res.canceled) return;
   switch (res.selection) {
@@ -730,7 +734,6 @@ async function menuClassico(p) {
   if (acao === "ensinar") return ensinar(p);
   if (acao === "transformar") return transformarMenu(p);
   if (acao === "cargo") return alterarCargo(p);
-  if (acao === "editor") return abrirEditor(p, true);
 }
 
 async function guiaEAcessos(p) {
@@ -1576,6 +1579,7 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => {
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   limparTreino(playerId);
   sessoesMenu.delete(playerId);
+  menuAbertoNestaEntrada.delete(playerId);
 });
 world.afterEvents.playerDimensionChange.subscribe(({ player }) => {
   movimentoTreino.delete(player.id);

@@ -1,17 +1,17 @@
-KIMETSU LEGACY v76
+KIMETSU LEGACY v77
 Código-fonte e testes
 
-Kimetsu_Fix_v76_Completo.mcaddon inclui o Behavior Pack e o Resource Pack,
-ambos na versão interna 1.0.58. Importe o arquivo no Minecraft Bedrock,
+Kimetsu_Fix_v77_Completo.mcaddon inclui o Behavior Pack e o Resource Pack,
+ambos na versão interna 1.0.59. Importe o arquivo no Minecraft Bedrock,
 ative os dois pacotes e habilite APIs Beta no mundo.
 
 Selecione Menu Kimetsu ou o livro e use o item. No toque, use o botão
 Abrir menu. Agache ao usar para selecionar a interface clássica. Para
 voltar ao painel, escolha Menu em painel.
 
-No painel, escolha Aparência. No menu clássico e no contrato inicial,
-procure Customizar personagem. A oficina usa a câmera do jogador em
-uma área livre. Confirme em SALVAR para aplicar e fechar.
+Personagens novos escolhem Pele, Cabelo e Olhos no primeiro login.
+Confirme a aparência para abrir o contrato do Caçador. Depois, use
+o Menu Kimetsu normalmente.
 
 As pastas Kimetsu Fix Be e Kimetsu Fix Re contêm os arquivos alterados em
 relação à v69. Os pacotes inteiros podem ser extraídos do .mcaddon completo.
@@ -39,9 +39,9 @@ use bedrock-treino-respiracao.js. O relatório atual está em
 docs/RELATORIO-TREINO-RESPIRACOES-V75.md.
 
 Para testar a oficina no servidor, use bedrock-aparencia.js. A teoria,
-o fluxo de uso, os comandos Staff, o catálogo e a matriz de testes estão
-em docs/RELATORIO-CUSTOMIZACAO-V76.md e nos documentos associados.
+o fluxo de uso, o catálogo e os resultados de testes estão
+em docs/RELATORIO-APARENCIA-INICIAL-V77.md.
 
-Use o Resource Pack 1.0.58 do .mcaddon completo para testar a interface no
-cliente. No servidor dedicado, configure os dois pacotes na versão 1.0.58 na
+Use o Resource Pack 1.0.59 do .mcaddon completo para testar a interface no
+cliente. No servidor dedicado, configure os dois pacotes na versão 1.0.59 na
 lista de pacotes do mundo.

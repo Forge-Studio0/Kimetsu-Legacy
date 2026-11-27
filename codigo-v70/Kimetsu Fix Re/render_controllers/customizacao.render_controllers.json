@@ -26,28 +26,6 @@
         }
       }
     },
-    "controller.render.kny.cc_rosto": {
-      "geometry": "Geometry.cc_rosto",
-      "materials": [
-        {
-          "*": "Material.default"
-        }
-      ],
-      "textures": [
-        "Array.cc_cores[variable.cc_rosto]"
-      ],
-      "arrays": {
-        "textures": {
-          "Array.cc_cores": [
-            "Texture.cc_expressao_1",
-            "Texture.cc_expressao_1",
-            "Texture.cc_expressao_2",
-            "Texture.cc_expressao_3",
-            "Texture.cc_expressao_4"
-          ]
-        }
-      }
-    },
     "controller.render.kny.cc_olho_e": {
       "geometry": "Array.cc_modelos[variable.cc_olhos]",
       "materials": [
@@ -79,7 +57,8 @@
             "Texture.cc_iris_vinho",
             "Texture.cc_iris_ametista",
             "Texture.cc_iris_rosa",
-            "Texture.cc_iris_turquesa"
+            "Texture.cc_iris_turquesa",
+            "Texture.cc_iris_ciano"
           ]
         }
       }
@@ -115,7 +94,8 @@
             "Texture.cc_iris_vinho",
             "Texture.cc_iris_ametista",
             "Texture.cc_iris_rosa",
-            "Texture.cc_iris_turquesa"
+            "Texture.cc_iris_turquesa",
+            "Texture.cc_iris_ciano"
           ]
         }
       }
@@ -178,7 +158,8 @@
             "Texture.cc_cabelo_cinza",
             "Texture.cc_cabelo_indigo",
             "Texture.cc_cabelo_pinho",
-            "Texture.cc_cabelo_ameixa"
+            "Texture.cc_cabelo_ameixa",
+            "Texture.cc_cabelo_amarelo"
           ]
         }
       }
@@ -219,7 +200,8 @@
             "Texture.cc_cabelo_cinza",
             "Texture.cc_cabelo_indigo",
             "Texture.cc_cabelo_pinho",
-            "Texture.cc_cabelo_ameixa"
+            "Texture.cc_cabelo_ameixa",
+            "Texture.cc_cabelo_amarelo"
           ]
         }
       }
@@ -364,6 +346,159 @@
           ]
         }
       }
+    },
+    "controller.render.kny.pele_first_person": {
+      "arrays": {
+        "textures": {
+          "Array.peles_kny": [
+            "Texture.default",
+            "Texture.cc_pele_a_e8b98f",
+            "Texture.cc_pele_a_c98f65",
+            "Texture.cc_pele_a_a66b45",
+            "Texture.cc_pele_a_75452f",
+            "Texture.cc_pele_a_4a2c20",
+            "Texture.cc_pele_b_e8b98f",
+            "Texture.cc_pele_b_c98f65",
+            "Texture.cc_pele_b_a66b45",
+            "Texture.cc_pele_b_75452f",
+            "Texture.cc_pele_b_4a2c20"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.peles_kny[variable.cc_peleIntegral]"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "rightArm": "query.get_equipped_item_name(0, 1) == '' || query.get_equipped_item_name(0, 1) == 'filled_map'"
+        },
+        {
+          "rightSleeve": "query.get_equipped_item_name(0, 1) == '' || query.get_equipped_item_name(0, 1) == 'filled_map'"
+        },
+        {
+          "leftArm": "(query.get_equipped_item_name(0, 1) == 'filled_map' && query.get_equipped_item_name('off_hand') != 'shield') || (query.get_equipped_item_name('off_hand') == 'filled_map' && !query.item_is_charged) || (!query.item_is_charged && variable.item_use_normalized > 0 && variable.item_use_normalized < 1.0)"
+        },
+        {
+          "leftSleeve": "(query.get_equipped_item_name(0, 1) == 'filled_map' && query.get_equipped_item_name('off_hand') != 'shield') || (query.get_equipped_item_name('off_hand') == 'filled_map' && !query.item_is_charged) || (!query.item_is_charged && variable.item_use_normalized > 0 && variable.item_use_normalized < 1.0)"
+        }
+      ]
+    },
+    "controller.render.kny.pele_third_person": {
+      "arrays": {
+        "textures": {
+          "Array.peles_kny": [
+            "Texture.default",
+            "Texture.cc_pele_a_e8b98f",
+            "Texture.cc_pele_a_c98f65",
+            "Texture.cc_pele_a_a66b45",
+            "Texture.cc_pele_a_75452f",
+            "Texture.cc_pele_a_4a2c20",
+            "Texture.cc_pele_b_e8b98f",
+            "Texture.cc_pele_b_c98f65",
+            "Texture.cc_pele_b_a66b45",
+            "Texture.cc_pele_b_75452f",
+            "Texture.cc_pele_b_4a2c20"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.peles_kny[variable.cc_peleIntegral]"
+      ],
+      "part_visibility": [
+        {
+          "*": true
+        },
+        {
+          "helmet": "variable.helmet_layer_visible"
+        },
+        {
+          "leftLegging": "variable.leg_layer_visible"
+        },
+        {
+          "rightLegging": "variable.leg_layer_visible"
+        },
+        {
+          "leftBoot": "variable.boot_layer_visible"
+        },
+        {
+          "rightBoot": "variable.boot_layer_visible"
+        },
+        {
+          "leftSock": "variable.boot_layer_visible && variable.leg_layer_visible"
+        },
+        {
+          "rightSock": "variable.boot_layer_visible && variable.leg_layer_visible"
+        },
+        {
+          "bodyArmor": "variable.chest_layer_visible"
+        },
+        {
+          "leftArmArmor": "variable.chest_layer_visible"
+        },
+        {
+          "rightArmArmor": "variable.chest_layer_visible"
+        },
+        {
+          "belt": "variable.chest_layer_visible && variable.leg_layer_visible"
+        }
+      ]
+    },
+    "controller.render.kny.pele_map": {
+      "arrays": {
+        "textures": {
+          "Array.peles_kny": [
+            "Texture.default",
+            "Texture.cc_pele_a_e8b98f",
+            "Texture.cc_pele_a_c98f65",
+            "Texture.cc_pele_a_a66b45",
+            "Texture.cc_pele_a_75452f",
+            "Texture.cc_pele_a_4a2c20",
+            "Texture.cc_pele_b_e8b98f",
+            "Texture.cc_pele_b_c98f65",
+            "Texture.cc_pele_b_a66b45",
+            "Texture.cc_pele_b_75452f",
+            "Texture.cc_pele_b_4a2c20"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.peles_kny[variable.cc_peleIntegral]"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        },
+        {
+          "head": true
+        },
+        {
+          "hat": true
+        },
+        {
+          "helmet": true
+        }
+      ]
     }
   }
 }
