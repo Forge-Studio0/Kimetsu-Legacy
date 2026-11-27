@@ -399,6 +399,7 @@ test("a troca entre painel e clássico vale também nos submenus e na próxima a
 
 test("fechar o contrato libera o item e apenas o botão de assinar cria o Caçador", async () => {
   const p = jogador();
+  p.addTag("start"); // personagem já inicializado, com contrato pendente
   const comandos = [];
   p.runCommand = (cmd) => { comandos.push(cmd); };
   p.escolhas.push(

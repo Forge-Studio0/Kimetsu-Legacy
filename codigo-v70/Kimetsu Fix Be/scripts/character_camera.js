@@ -2,6 +2,7 @@ const VISTAS = {
   corpo: { altura: 1.02, distancia: 3.65, minimo: 2.65, maximo: 5.1 },
   rosto: { altura: 1.72, distancia: 1.55, minimo: 1.18, maximo: 2.65 },
 };
+const ANGULOS_INICIAIS = [0, 30, 330, 60, 300, 90, 270, 120, 240, 150, 210, 180];
 
 export function cameraInicial(p) {
   return { origem: { ...p.location }, frente: p.getRotation().y, modo: "corpo", angulo: 0, zoom: 0 };
@@ -32,9 +33,21 @@ export function posicionarCamera(p, c, animar = false) {
   return true;
 }
 
+export function buscarCameraInicial(p, camera) {
+  if (!p.isOnGround) return undefined;
+  for (const angulo of ANGULOS_INICIAIS) {
+    const tentativa = { ...camera, angulo };
+    try {
+      if (posicionarCamera(p, tentativa)) return tentativa;
+    } catch {}
+  }
+}
+
 export function atualizarCamera(sessao, alteracoes) {
   const nova = { ...sessao.camera, ...alteracoes };
-  if (!posicionarCamera(sessao.p, nova, true)) return false;
+  try {
+    if (!posicionarCamera(sessao.p, nova, true)) return false;
+  } catch { return false; }
   sessao.camera = nova;
   return true;
 }

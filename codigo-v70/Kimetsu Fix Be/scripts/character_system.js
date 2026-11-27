@@ -1,7 +1,7 @@
 import { system, world } from "@minecraft/server";
 import * as UI from "@minecraft/server-ui";
 import { CAMPOS, CAMPOS_INICIAIS, PROP_APARENCIA, PROP_RASCUNHO, VISUAL_PADRAO, codificarVisual, opcaoDe } from "./character_config.js";
-import { cameraInicial, posicionarCamera } from "./character_camera.js";
+import { buscarCameraInicial, cameraInicial } from "./character_camera.js";
 import { emCombate, estadoBloqueado, getTrueRace, racaHibrida } from "./hybrid_system.js";
 import { lerJson, gravarJson, personagem } from "./hybrid_records.js";
 import { viagemEmCurso } from "./hybrid_locations.js";
@@ -12,11 +12,13 @@ export const CHAVE_CATALOGO = "kny:aparencia_catalogo";
 export const CHAVE_ENTRADA = "kny:aparencia_primeiro_login";
 const CHAVE_CAMERA = "kny:aparencia_camera";
 const TAG_NOVO = "kny_aparencia_novo";
+const MARCA_ENTRADA = "v78";
 const PERFIS_H = ["cacador", "oni", "revelado"];
 const sessoes = new Map();
 const entradas = new Set();
 const jogadorValido = (p) => p?.isValid && p.typeId === "minecraft:player";
 const objeto = (d) => !!d && typeof d === "object" && !Array.isArray(d);
+const racaEditavel = (raca) => raca === "humano" || raca === "cacador";
 
 export function lerAparencia(p) {
   const d = lerJson(p, CHAVE_VISUAL);
@@ -77,6 +79,11 @@ function limparCamera(p) {
   p.setDynamicProperty(CHAVE_CAMERA, undefined);
 }
 
+export function usarRetrato(sessao) {
+  limparCamera(sessao.p);
+  sessao.temCamera = false;
+}
+
 export function encerrarEdicao(sessao, mensagem) {
   if (sessoes.get(sessao.p.id) !== sessao) return false;
   sessoes.delete(sessao.p.id);
@@ -96,14 +103,25 @@ export function encerrarEdicao(sessao, mensagem) {
 
 export const sessaoAtual = (p) => sessoes.get(p.id);
 
-export function prepararAparenciaInicial(p) {
-  if (!jogadorValido(p) || !p.hasTag(TAG_NOVO)) return false;
-  p.removeTag(TAG_NOVO);
-  if (p.getDynamicProperty(CHAVE_ENTRADA) !== undefined || p.getDynamicProperty(CHAVE_VISUAL) !== undefined) return false;
-  // O registro dura no mundo. A oportunidade de edição dura apenas nesta conexão.
-  p.setDynamicProperty(CHAVE_ENTRADA, true);
+function reservarEntrada(p) {
+  // A marca dura no mundo. A oportunidade dura nesta conexão.
+  p.setDynamicProperty(CHAVE_ENTRADA, MARCA_ENTRADA);
   entradas.add(p.id);
   return true;
+}
+
+export function prepararAparenciaInicial(p) {
+  if (!jogadorValido(p) || !p.hasTag(TAG_NOVO)) return false;
+  const reservada = p.getDynamicProperty(CHAVE_ENTRADA) === undefined &&
+    p.getDynamicProperty(CHAVE_VISUAL) === undefined && reservarEntrada(p);
+  p.removeTag(TAG_NOVO);
+  return reservada;
+}
+
+export function recuperarEntradaV77(p) {
+  if (!jogadorValido(p) || p.getDynamicProperty(CHAVE_ENTRADA) !== true ||
+      p.getDynamicProperty(CHAVE_VISUAL) !== undefined || !racaEditavel(getTrueRace(p))) return false;
+  return reservarEntrada(p);
 }
 
 export const edicaoInicialDisponivel = (p) => entradas.has(p.id);
@@ -118,17 +136,19 @@ export function sessaoSegura(sessao) {
   const p = sessao.p;
   if (sessoes.get(p.id) !== sessao || indisponivel(p) || p.dimension.id !== sessao.dim ||
       getTrueRace(p) !== sessao.raca || perfilAtivo(p, sessao.raca) !== sessao.identidade) return false;
+  if (sessao.aguardandoTela) return true;
   const { x, y, z } = p.location;
   const origem = sessao.camera.origem;
-  return Math.hypot(x - origem.x, y - origem.y, z - origem.z) <= 0.8;
+  return Math.hypot(x - origem.x, y - origem.y, z - origem.z) <= (sessao.temCamera ? 0.8 : 3);
 }
 
 export function iniciarEdicao(p) {
-  if (!entradas.delete(p.id)) throw new Error("A aparência pode ser escolhida somente na primeira entrada.");
+  if (!entradas.has(p.id)) throw new Error("A aparência pode ser escolhida somente na primeira entrada.");
   if (indisponivel(p) || sessoes.has(p.id)) throw new Error("A edição foi encerrada porque o personagem está em uma ação.");
   const registro = lerAparencia(p);
   const raca = getTrueRace(p);
-  if (!registro || raca !== "humano" || p.getDynamicProperty(CHAVE_VISUAL) !== undefined) {
+  if (!registro || !racaEditavel(raca) || p.getDynamicProperty(CHAVE_VISUAL) !== undefined) {
+    entradas.delete(p.id);
     throw new Error("O personagem já foi iniciado.");
   }
   const catalogo = lerCatalogo();
@@ -143,15 +163,17 @@ export function iniciarEdicao(p) {
     visual: limparVisual(inicial, registro, raca, "base", catalogo),
     camera: cameraInicial(p), temCamera: false, categoria: "pele", campo: "peleIntegral", tela: "editor",
   };
+  entradas.delete(p.id);
   sessoes.set(p.id, sessao);
   try {
-    try { sessao.temCamera = posicionarCamera(p, sessao.camera); } catch {}
-    if (sessao.temCamera) {
+    let camera;
+    try { camera = buscarCameraInicial(p, sessao.camera); } catch {}
+    if (camera) {
+      sessao.camera = camera;
+      sessao.anguloInicial = camera.angulo;
+      sessao.temCamera = true;
       try { p.setDynamicProperty(CHAVE_CAMERA, true); }
       catch (e) { p.camera.clear(); throw e; }
-    } else {
-      sessao.tela = "simples";
-      p.sendMessage("§eO espaço neste local está fechado. Escolha sua aparência pelo formulário simples.");
     }
     previsualizar(sessao);
     return sessao;

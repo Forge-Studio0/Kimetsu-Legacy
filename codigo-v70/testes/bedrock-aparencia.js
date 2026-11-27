@@ -5,13 +5,23 @@ import { CHAVE_ENTRADA, CHAVE_VISUAL, iniciarEdicao, lerAparencia } from "./char
 import { codificarVisual, PROP_APARENCIA, PROP_RASCUNHO } from "./character_config.js";
 
 const CAMERA = "kny:aparencia_camera";
-const CHECKPOINT = "kny:teste_v77_ficha";
-const log = (s) => console.warn("KNY-TEST ENTRADA V77 " + s);
+const CHECKPOINT = "kny:teste_v78_ficha";
+const MENU = "kny:menu_kimetsu";
+const LIVRO = "kny:book_archievement";
+const log = (s) => console.warn("KNY-TEST ENTRADA V78 " + s);
 const ok = (cond, msg) => { if (!cond) throw new Error(msg); };
 const eq = (a, b, msg) => ok(a === b, msg + " (" + a + " × " + b + ")");
 const canais = (p, props) => props.map((k) => p.getProperty(k)).join(",");
 const wait = (n = 1) => system.waitTicks(n);
 const planos = new Map();
+const inv = (p) => p.getComponent("minecraft:inventory").container;
+
+function slotsMenu(p) {
+  const c = inv(p);
+  const slots = [];
+  for (let i = 0; i < c.size; i++) if (c.getItem(i)?.typeId === MENU) slots.push(i);
+  return slots;
+}
 
 function interceptarFormularios() {
   const telas = new WeakMap();
@@ -31,6 +41,10 @@ function interceptarFormularios() {
     if (!plano) return show.call(this, p);
     const tela = telas.get(this);
     plano.telas.push(tela);
+    if (tela.titulo.startsWith("kny_edit|") && plano.ocupado > 0) {
+      plano.ocupado--;
+      return Promise.resolve({ canceled: true, cancelationReason: "UserBusy" });
+    }
     const acao = plano.acoes.shift();
     if (!acao) return Promise.resolve({ canceled: true, cancelationReason: "UserClosed" });
     const selection = tela.botoes.findIndex((b) => b.includes(acao));
@@ -39,38 +53,44 @@ function interceptarFormularios() {
   };
 }
 
-async function spawn(nome, x, acoes = [], { salvo, antigo = false } = {}) {
+async function spawn(nome, x, acoes = [], { antigo = false, salvo, caixa = false, ocupado = 0, preparar } = {}) {
   const dimension = world.getDimension("overworld");
   const pos = { x: x + 0.5, y: 210, z: 134.5 };
   const p = spawnSimulatedPlayer({ ...pos, dimension }, nome, GameMode.Survival);
-  const plano = { acoes, telas: [] };
+  const plano = { acoes, ocupado, telas: [] };
   planos.set(p.id, plano);
   if (antigo) p.addTag("start");
   if (salvo) {
     p.setDynamicProperty(CHAVE_VISUAL, salvo);
-    p.setDynamicProperty(CHAVE_ENTRADA, true);
+    p.setDynamicProperty(CHAVE_ENTRADA, "v78");
     p.setDynamicProperty(CAMERA, true);
   }
+  preparar?.(p);
   p.teleport(pos, { dimension, rotation: { x: 0, y: 0 } });
   for (let i = 0; i < 20; i++) {
     await wait(3);
     if (dimension.getBlock({ x, y: 209, z: 134 })?.typeId === "minecraft:stone") break;
-    p.runCommand("fill 128 209 128 143 209 143 minecraft:stone");
+    p.runCommand("fill 128 209 128 143 209 143 stone");
   }
   eq(dimension.getBlock({ x, y: 209, z: 134 })?.typeId, "minecraft:stone", "piso carregado");
+  if (caixa) {
+    p.runCommand(`fill ${x - 1} 210 133 ${x + 1} 212 135 stone`);
+    p.runCommand(`fill ${x} 210 134 ${x} 212 134 air`);
+  }
   p.teleport(pos, { rotation: { x: 0, y: 0 } });
   return { p, plano };
 }
 
 async function usarMenu(p) {
-  const slot = p.selectedSlotIndex;
-  p.getComponent("minecraft:inventory").container.setItem(slot, new ItemStack("kny:menu_kimetsu", 1));
-  await wait(3);
+  const slot = slotsMenu(p)[0];
+  ok(slot >= 0 && slot < 9, "Menu na barra");
+  p.selectedSlotIndex = slot;
+  await wait(2);
   ok(p.useItemInSlot(slot), "uso nativo do Menu Kimetsu");
   await wait(4);
   p.stopUsingItem();
   await wait(18);
-  eq(p.getComponent("minecraft:inventory").container.getItem(slot)?.typeId, "kny:menu_kimetsu", "item preservado");
+  eq(slotsMenu(p).length, 1, "item único preservado após usar");
 }
 
 async function run() {
@@ -81,66 +101,107 @@ async function run() {
   const checkpoint = world.getDynamicProperty(CHECKPOINT);
 
   if (checkpoint) {
-    const { p, plano } = await spawn("V77Reinicio", 131, [], { antigo: true, salvo: checkpoint });
+    const { p, plano } = await spawn("V78Reinicio", 131, [], { antigo: true, salvo: checkpoint });
     await wait(110);
     eq(lerAparencia(p).perfis.base.peleIntegral, "pele_a_c98f65", "ficha relida após reinício de servidor");
     eq(p.getDynamicProperty(CAMERA), undefined, "restauração de câmera após reinício");
     eq(canais(p, PROP_APARENCIA), codificarVisual(lerAparencia(p).perfis.base).join(","), "canais recuperados");
     eq(canais(p, PROP_RASCUNHO), "-1,-1,-1", "rascunho limpo");
+    eq(slotsMenu(p).length, 1, "jogador antigo recebe um menu");
     ok(plano.telas.length === 1 && plano.telas[0].titulo.startsWith("kny_ctr|"), "ficha antiga abre somente o contrato pendente");
     p.disconnect();
     log("REINÍCIO OK");
     return;
   }
 
-  const { p: novo, plano: escolhas } = await spawn("V77Escolha", 131, [
+  const { p: novo, plano: escolhas } = await spawn("V78Escolha", 131, [
     "Próximo", "C:Cabelo", "Cor principal", "‹ Anterior", "C:Olhos", "Íris esquerda", "‹ Anterior",
     "Girar ›", "Aproximar", "Ver corpo", "CONFIRMAR", "ASSINAR O CONTRATO",
-  ]);
-  const { p: visita, plano: cancelado } = await spawn("V77Visita", 138, ["Cancelar"]);
-  await wait(120);
+  ], { preparar: (p) => {
+    inv(p).setItem(1, new ItemStack(MENU)); // Este cenário dava duas cópias na v77.
+    inv(p).setItem(9, new ItemStack(LIVRO));
+  } });
+  const { p: visita, plano: fechado } = await spawn("V78Caixa", 138, ["Cancelar"], { caixa: true, ocupado: 10,
+    preparar: (p) => {
+      inv(p).setItem(0, new ItemStack(MENU));
+      inv(p).setItem(3, new ItemStack(MENU));
+    },
+  });
+  const { p: cheio } = await spawn("V78Cheio", 134, [], { antigo: true, preparar: (p) => {
+    p.addTag("slayer");
+    const c = inv(p);
+    for (let i = 0; i < c.size; i++) c.setItem(i, new ItemStack("minecraft:stone", 64));
+  } });
+  const { p: legado, plano: recuperacao } = await spawn("V78Legado", 135, [], {
+    antigo: true, preparar: (p) => {
+      p.addTag("slayer");
+      p.addTag("kny_escolheu");
+      p.setDynamicProperty(CHAVE_ENTRADA, true);
+    },
+  });
+  await wait(125);
 
-  for (const [p, plano] of [[novo, escolhas], [visita, cancelado]]) {
-    eq(p.getDynamicProperty(CHAVE_ENTRADA), true, "função nativa reservou a primeira entrada");
-    eq(plano.acoes.length, 0, "respostas concluídas");
-    ok(plano.telas[0]?.titulo.startsWith("kny_edit|"), "editor aberto automaticamente antes do contrato");
-    ok(plano.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "contrato aberto ao terminar");
-    eq(plano.telas[0].botoes.filter((t) => /^[CS]:/.test(t)).map((t) => t.slice(2)).join(","), "Pele,Cabelo,Olhos", "três categorias");
-    eq(plano.telas.at(-1).botoes.length, 2, "contrato sem atalho para a aparência");
-    eq(p.getDynamicProperty(CAMERA), undefined, "câmera voltando ao controle normal");
-    eq(canais(p, PROP_RASCUNHO), "-1,-1,-1", "rascunho limpo");
-  }
+  eq(novo.getDynamicProperty(CHAVE_ENTRADA), "v78", "função nativa reservou a primeira entrada");
+  eq(escolhas.acoes.length, 0, "ações de edição e contrato executadas");
+  ok(escolhas.telas[0]?.titulo.startsWith("kny_edit|§"), "editor com câmera abre antes do contrato");
+  ok(escolhas.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "confirmação abre o contrato");
+  eq(escolhas.telas[0].botoes.filter((t) => /^[CS]:/.test(t)).map((t) => t.slice(2)).join(","), "Pele,Cabelo,Olhos", "três categorias");
+  eq(slotsMenu(novo).join(","), "1", "login com item já presente mantém uma cópia no mesmo slot");
+  eq(inv(novo).getItem(9)?.typeId, LIVRO, "livro preservado");
   const salvo = novo.getDynamicProperty(CHAVE_VISUAL);
   ok(novo.hasTag("slayer") && novo.hasTag("mizunoto") && novo.hasTag("kny_escolheu"), "contrato e patente inicial nativos");
   const visual = lerAparencia(novo).perfis.base;
-  eq(visual.peleIntegral, "pele_a_c98f65", "pele selecionada");
-  eq(visual.corCabelo, "amarelo", "nova cor de cabelo");
-  eq(visual.olhoE, "ciano", "nova cor dos olhos");
-  eq(visual.roupa, undefined, "roupa fora da ficha");
-  eq(canais(novo, PROP_APARENCIA), codificarVisual(visual).join(","), "canais nativos da pele confirmada");
-  eq(visita.getDynamicProperty(CHAVE_VISUAL), undefined, "cancelar manteve a pele anterior");
-  eq(visita.hasTag("slayer"), false, "contrato só muda a raça se for assinado");
-  log("primeiro login automático, dez peles cadastradas, seleção de cor, câmera, cancelamento e contrato");
+  eq(visual.peleIntegral, "pele_a_c98f65", "pele escolhida");
+  eq(visual.corCabelo, "amarelo", "cor de cabelo");
+  eq(visual.olhoE, "ciano", "cor dos olhos");
+  eq(canais(novo, PROP_APARENCIA), codificarVisual(visual).join(","), "canais nativos do visual confirmado");
+  eq(novo.getDynamicProperty(CAMERA), undefined, "câmera restaurada ao confirmar");
+  eq(slotsMenu(visita).length, 1, "duas cópias preexistentes viraram uma");
+  ok(fechado.telas[0]?.titulo.startsWith("kny_edit|R"), "sala fechada recebe o painel com retrato");
+  ok(!fechado.telas.some((tela) => tela.titulo.startsWith("kny_ctr|")), "contrato aguardando durante a tela ocupada");
+  log("câmera em área aberta, painel com retrato em espaço fechado e item único no login");
+
+  eq(slotsMenu(cheio).length, 0, "inventário cheio sem item");
+  eq(cheio.dimension.getEntities({ type: "minecraft:item", location: cheio.location, maxDistance: 2 }).length, 0, "sem item largado no chão");
+  inv(cheio).setItem(4, undefined);
+  await wait(7);
+  eq(slotsMenu(cheio).join(","), "4", "liberar espaço entrega o item");
+  eq(inv(cheio).getItem(4)?.keepOnDeath, true, "menu entregue permanece ao morrer");
+  inv(novo).setItem(16, new ItemStack(MENU));
+  await wait(7);
+  eq(slotsMenu(novo).length, 1, "cópia recebida depois do login removida");
+  log("inventário cheio, entrega após liberar espaço e deduplicação depois do login");
+
+  eq(recuperacao.telas.length, 0, "personagem da v77 em andamento não recebe editor automático");
+  novo.runCommand("scriptevent kny:aparencia recuperar_entrada V78Legado");
+  await wait(5);
+  eq(recuperacao.telas.length, 0, "jogador comum não recupera uma entrada");
+  novo.addTag("kny_op");
+  recuperacao.acoes.push("CONFIRMAR");
+  novo.runCommand("scriptevent kny:aparencia recuperar_entrada V78Legado");
+  await wait(8);
+  ok(recuperacao.telas[0]?.titulo.startsWith("kny_edit|"), "Staff abriu a recuperação da v77");
+  eq(recuperacao.telas.length, 1, "Caçador de recuperação não reassina o contrato");
+  eq(legado.getDynamicProperty(CHAVE_ENTRADA), "v78", "recuperação registrada uma vez");
+  ok(lerAparencia(legado).perfis.base.peleIntegral, "ficha recuperada salva");
+
+  for (let i = 0; i < 16 && !fechado.telas.at(-1)?.titulo.startsWith("kny_ctr|"); i++) await wait(12);
+  eq(fechado.telas.filter((t) => t.titulo.startsWith("kny_edit|R")).length, 11, "dez bloqueios e exibição do editor");
+  ok(fechado.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "só abriu contrato quando a escolha terminou");
+  eq(visita.getDynamicProperty(CHAVE_VISUAL), undefined, "cancelamento preservou a ficha");
+  eq(canais(visita, PROP_RASCUNHO), "-1,-1,-1", "rascunho descartado");
+  log("dez tentativas com tela ocupada e recuperação controlada da v77");
 
   await usarMenu(novo);
   await usarMenu(visita);
   ok(escolhas.telas.at(-1)?.titulo.startsWith("kny_painel|"), "item abre painel normal depois do contrato");
-  ok(cancelado.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "item reabre apenas o contrato");
-  ok(!escolhas.telas.at(-1).botoes.some((t) => /Aparência|Customizar personagem/.test(t)), "sem atalho no painel");
+  ok(fechado.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "item reabre apenas o contrato");
   let bloqueou = false;
   try { iniciarEdicao(novo); } catch { bloqueou = true; }
-  eq(bloqueou, true, "sessão não pode ser aberta novamente");
-
-  const { p: antigo, plano: migracao } = await spawn("V77Legado", 134, [], { antigo: true });
-  await wait(110);
-  eq(antigo.getDynamicProperty(CHAVE_ENTRADA), undefined, "jogador de mundo antigo não é marcado como novo");
-  ok(migracao.telas.length === 1 && migracao.telas[0].titulo.startsWith("kny_ctr|"), "jogador antigo segue o fluxo original");
-  antigo.disconnect();
-  novo.disconnect();
-  visita.disconnect();
+  eq(bloqueou, true, "sessão confirmada não reabre");
+  for (const p of [cheio, legado, visita, novo]) p.disconnect();
   world.setDynamicProperty(CHECKPOINT, salvo);
-  log("bloqueio de segunda edição e compatibilidade com mundo anterior");
   log("FIM");
 }
 
-system.runTimeout(() => run().catch((e) => console.error("KNY-TEST FALHA V77 " + e + "\n" + (e.stack ?? ""))), 35);
+system.runTimeout(() => run().catch((e) => console.error("KNY-TEST FALHA V78 " + e + "\n" + (e.stack ?? ""))), 35);

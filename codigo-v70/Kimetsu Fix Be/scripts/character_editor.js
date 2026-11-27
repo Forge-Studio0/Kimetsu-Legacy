@@ -3,8 +3,8 @@ import { ActionFormData } from "@minecraft/server-ui";
 import { CAMPOS, CATEGORIAS, VISUAL_PADRAO, opcaoDe } from "./character_config.js";
 import { atualizarCamera } from "./character_camera.js";
 import {
-  definirVisual, encerrarEdicao, iniciarEdicao, lerCatalogo, opcaoPermitida,
-  salvarEdicao, sessaoAtual, sessaoSegura,
+  definirVisual, edicaoInicialDisponivel, encerrarEdicao, indisponivel, iniciarEdicao, lerCatalogo,
+  opcaoPermitida, salvarEdicao, sessaoAtual, sessaoSegura, usarRetrato,
 } from "./character_system.js";
 
 const ICONE = "textures/ui/customizacao/";
@@ -15,15 +15,9 @@ const MODELO_DA_COR = {
 };
 
 async function mostrar(form, sessao) {
-  for (let i = 0; i < 8 && sessaoSegura(sessao); i++) {
-    sessao.formAberto = true;
-    try {
-      const resposta = await form.show(sessao.p);
-      if (resposta.cancelationReason !== "UserBusy") return resposta;
-    } finally { sessao.formAberto = false; }
-    await espera(5);
-  }
-  return { canceled: true, cancelationReason: "UserBusy" };
+  sessao.formAberto = true;
+  try { return await form.show(sessao.p); }
+  finally { sessao.formAberto = false; }
 }
 
 function ajustarCamera(sessao, ajuste) {
@@ -33,7 +27,7 @@ function ajustarCamera(sessao, ajuste) {
 function descricao(sessao) {
   const grupo = CATEGORIAS.find((c) => c.id === sessao.categoria);
   const vista = sessao.camera.modo === "rosto" ? "Rosto" : "Corpo inteiro";
-  return `§6§l${grupo.nome}§r\n§fEscolha única\n§7${sessao.temCamera ? vista : "Confirme para abrir o contrato."}`;
+  return `§6§l${grupo.nome}§r\n§fEscolha única\n§7${sessao.temCamera ? vista : "Prévia no painel"}`;
 }
 
 function disponiveis(sessao, campo, catalogo) {
@@ -61,7 +55,9 @@ function editarCampo(sessao, campo, delta) {
 function painel(sessao) {
   const p = sessao.p;
   const estilizado = sessao.tela === "editor";
-  const f = new ActionFormData().title(estilizado ? MARCA + "§6§lAPARÊNCIA DO PERSONAGEM" : "§6APARÊNCIA DO PERSONAGEM")
+  const titulo = "APARÊNCIA DO PERSONAGEM";
+  const marca = sessao.temCamera ? MARCA : MARCA + "R";
+  const f = new ActionFormData().title(estilizado ? marca + "§6§l" + titulo : "§6" + titulo)
     .body(estilizado ? " " : descricao(sessao));
   const acoes = [];
   const add = (prefixo, texto, acao, icone) => {
@@ -107,7 +103,7 @@ function painel(sessao) {
     add("K", sessao.camera.modo === "corpo" ? "Ver rosto" : "Ver corpo", () => ajustarCamera(sessao, {
       modo: sessao.camera.modo === "corpo" ? "rosto" : "corpo", zoom: 0,
     }));
-    add("K", "Restaurar", () => ajustarCamera(sessao, { modo: "corpo", angulo: 0, zoom: 0 }));
+    add("K", "Restaurar", () => ajustarCamera(sessao, { modo: "corpo", angulo: sessao.anguloInicial, zoom: 0 }));
   }
   add("V", "§6§lCONFIRMAR", () => {
     if (!salvarEdicao(sessao)) p.sendMessage("§eConfira os cosméticos liberados antes de salvar.");
@@ -116,17 +112,29 @@ function painel(sessao) {
   return { f, acoes };
 }
 
-export async function abrirEditor(p, modoSimples = false) {
+export async function abrirEditor(p) {
   let sessao;
   try {
+    while (p.isValid && edicaoInicialDisponivel(p) && indisponivel(p)) await espera(20);
+    if (!p.isValid || !edicaoInicialDisponivel(p)) return;
     sessao = iniciarEdicao(p);
-    if (modoSimples) sessao.tela = "simples";
     while (sessaoSegura(sessao)) {
       const { f, acoes } = painel(sessao);
       const resposta = await mostrar(f, sessao);
+      if (resposta.cancelationReason === "UserBusy" && sessaoAtual(p) === sessao) {
+        sessao.aguardandoTela = true;
+        if (!sessaoSegura(sessao)) return;
+        usarRetrato(sessao);
+        await espera(20);
+        if (!sessaoSegura(sessao)) return;
+        sessao.camera.origem = { ...p.location };
+        sessao.aguardandoTela = false;
+        continue;
+      }
       if (!sessaoSegura(sessao)) return;
       if (resposta.canceled) {
         if (resposta.cancelationReason === undefined && sessao.tela === "editor") {
+          usarRetrato(sessao);
           sessao.tela = "simples";
           continue;
         }

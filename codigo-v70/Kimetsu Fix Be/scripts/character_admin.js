@@ -1,7 +1,7 @@
 import { system, world } from "@minecraft/server";
 import { CAMPOS, VISUAL_PADRAO } from "./character_config.js";
 import {
-  CHAVE_CATALOGO, CHAVE_VISUAL, atualizarPersonagem, encerrarEdicao, lerAparencia, lerCatalogo, sessaoAtual,
+  CHAVE_CATALOGO, CHAVE_VISUAL, atualizarPersonagem, encerrarEdicao, lerAparencia, lerCatalogo, recuperarEntradaV77, sessaoAtual,
 } from "./character_system.js";
 import { gravarJson } from "./hybrid_records.js";
 import { ehStaff } from "./hybrid_system.js";
@@ -14,9 +14,15 @@ function executar(mensagem) {
   const partes = Array.from(mensagem.matchAll(/"([^"]+)"|([^\s"]+)/g), (m) => m[1] ?? m[2]);
   const [acao, alvo, opcao] = partes;
   if (acao === "fechar" || acao === "consultar" || acao === "resetar" ||
-      acao === "autorizar_nome" || acao === "conceder" || acao === "revogar") {
+      acao === "recuperar_entrada" || acao === "autorizar_nome" || acao === "conceder" || acao === "revogar") {
     const p = world.getPlayers().find((j) => j.name === alvo);
     if (!p) return "Informe o nome de um jogador online.";
+    if (acao === "recuperar_entrada") {
+      if (!recuperarEntradaV77(p)) return "A recuperação é para Humanos ou Caçadores com entrada da v77 e sem ficha de aparência.";
+      p.sendMessage("§aA escolha de aparência foi recuperada para esta conexão. Use o Menu Kimetsu se já estiver em outra tela.");
+      p.runCommand("scriptevent kny:menu");
+      return "Entrada de aparência recuperada para " + p.name + ".";
+    }
     const sessao = sessaoAtual(p);
     if (acao === "fechar") {
       if (sessao) encerrarEdicao(sessao, "§eEdição encerrada pela Staff.");
@@ -53,7 +59,7 @@ function executar(mensagem) {
     for (const p of world.getPlayers()) atualizarPersonagem(p, true);
     return "Catálogo atualizado para " + alvo + ".";
   }
-  return "Use consultar, resetar, fechar, autorizar_nome, conceder, revogar, desativar ou ativar.";
+  return "Use consultar, resetar, fechar, recuperar_entrada, autorizar_nome, conceder, revogar, desativar ou ativar.";
 }
 
 system.afterEvents.scriptEventReceive.subscribe(({ id, sourceEntity, message }) => {

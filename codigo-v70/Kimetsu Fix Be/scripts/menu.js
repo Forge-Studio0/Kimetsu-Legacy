@@ -1,5 +1,5 @@
 import { kcmd, knockback } from "./compat.js";
-import { world, system, ItemStack } from "@minecraft/server";
+import { world, system } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { RESPIRACOES, KEKKIJUTSUS, ITEM_OBJ } from "./menu_data.js";
 import { H, ARTE_H_ID, DOMINAVEL, RESP_H_ID, ROTULOS } from "./hybrid_config.js";
@@ -10,6 +10,7 @@ import {
 import { limparTreinosDaForma, textoTreinoDaForma } from "./treino_respiracao.js";
 import { abrirEditor } from "./character_editor.js";
 import { edicaoInicialDisponivel, prepararAparenciaInicial } from "./character_system.js";
+import { garantirItemMenu } from "./menu_item.js";
 import "./character_admin.js";
 import { canUseBreathing, canUseKekkijutsu, doseEmMaos, ehStaff, estadoBloqueado, isHybrid, preverTransformacao, racaHibrida, transformar, trocarDisfarce } from "./hybrid_system.js";
 import { ativarHabilidade, danoEspecialEmCurso, habilidadeDe } from "./hybrid_abilities.js";
@@ -32,7 +33,6 @@ import {
    Abra com o item "Menu Kimetsu" (clique direito).
 ===================================================================== */
 
-const MENU_ITEM = "kny:menu_kimetsu";
 const TAG_DICA_OFF = "kny_cfg_dica_off"; // barra de ação desligada
 const TAG_SOM_OFF = "kny_cfg_som_off";   // sons do menu desligados
 const TAG_CLASSICO = "kny_cfg_classico";
@@ -234,28 +234,14 @@ const MARCAS = {
    Item do menu
 --------------------------------------------------------------------- */
 
-function temItemMenu(player) {
+function pedirItemMenu(p, avisar = false) {
   try {
-    const c = player.getComponent("minecraft:inventory").container;
-    for (let i = 0; i < c.size; i++) {
-      if (c.getItem(i)?.typeId === MENU_ITEM) return true;
-    }
-  } catch {}
-  return false;
-}
-
-function darItemMenu(player) {
-  try {
-    const item = new ItemStack(MENU_ITEM, 1);
-    try {
-      item.lockMode = "inventory";
-      item.keepOnDeath = true;
-    } catch {}
-    const sobra = player.getComponent("minecraft:inventory").container.addItem(item);
-    if (sobra) player.dimension.spawnItem(sobra, player.location);
-    return true;
-  } catch {
-    return false;
+    const resultado = garantirItemMenu(p);
+    if (resultado === "cheio") p.sendMessage("§cLibere um espaço no inventário para receber o Menu Kimetsu.");
+    if (avisar && resultado === "existente") p.sendMessage("§cVocê já possui o item do menu.");
+    if (avisar && resultado === "entregue") p.sendMessage("§cItem do menu entregue.");
+  } catch (e) {
+    console.warn("[Menu Kimetsu] Inventário: " + e);
   }
 }
 
@@ -263,7 +249,7 @@ world.afterEvents.playerSpawn.subscribe(({ player: p, initialSpawn }) => {
   system.runTimeout(() => {
     if (!p.isValid) return;
     try {
-      if (!temItemMenu(p)) darItemMenu(p);
+      pedirItemMenu(p);
       if (initialSpawn) {
         p.sendMessage("§8[Kimetsu] §cUse o item §lMenu Kimetsu§r§c ou o livro. Agache ao usar para abrir o menu clássico.");
       }
@@ -287,14 +273,14 @@ function reportar(p, e) {
 }
 
 // Uma sessão por jogador, do primeiro formulário até fechar o último submenu.
-function abrirSessaoMenu(p, acao) {
+function abrirSessaoMenu(p, acao, podeAguardar = false) {
   if (!p?.isValid || p.typeId !== "minecraft:player" || sessoesMenu.has(p.id)) return false;
   const id = p.id;
   const sessao = {};
   sessoesMenu.set(id, sessao);
   system.run(async () => {
     try {
-      if (!p.isValid || p.hasTag("kny_caido")) return;
+      if (!p.isValid || (!podeAguardar && p.hasTag("kny_caido"))) return;
       await acao();
     } catch (e) {
       if (p.isValid) reportar(p, e);
@@ -309,10 +295,19 @@ function pedirAbertura(p, classico = false, automatico = false) {
   if (!p?.isValid || (automatico && menuAbertoNestaEntrada.has(p.id))) return;
   const abriu = abrirSessaoMenu(p, async () => {
     if (classico) p.addTag(TAG_CLASSICO);
-    if (jaEscolheu(p)) return menuPrincipal(p);
-    if (edicaoInicialDisponivel(p)) await abrirEditor(p, p.hasTag(TAG_CLASSICO));
-    if (p.isValid && !jaEscolheu(p)) return escolha(p);
-  });
+    // A inicialização nativa pode terminar depois de chegar o evento de login
+    // ou o primeiro uso do item. Dê tempo para ela registrar a oportunidade.
+    for (let i = 0; i < 10 && p.isValid && !jaEscolheu(p) && !p.hasTag("start") && !edicaoInicialDisponivel(p); i++) {
+      await wait(10);
+    }
+    if (!p.isValid) return;
+    if (!jaEscolheu(p)) prepararAparenciaInicial(p);
+    const editar = edicaoInicialDisponivel(p);
+    if (editar) await abrirEditor(p);
+    if (!p.isValid || p.hasTag("kny_caido")) return;
+    if (!jaEscolheu(p)) return escolha(p);
+    if (!editar && !automatico) return menuPrincipal(p);
+  }, true);
   if (abriu) menuAbertoNestaEntrada.add(p.id);
 }
 
@@ -1105,8 +1100,7 @@ async function painelConfig(p) {
     return painelConfig(p);
   });
   add("L:", "§f§lReceber item do menu\n§r§7Se você perdeu o item", () => {
-    if (temItemMenu(p)) p.sendMessage("§cVocê já possui o item do menu.");
-    else if (darItemMenu(p)) p.sendMessage("§cItem do menu entregue.");
+    pedirItemMenu(p, true);
     return painelConfig(p);
   });
   add("L:", `§f§lMenu em painel\n§r${!p.hasTag(TAG_CLASSICO) ? on : off}`, () => {
@@ -1160,8 +1154,7 @@ async function configuracoesClassica(p) {
       else p.removeTag(TAG_SOM_OFF);
       return configuracoes(p);
     case 3:
-      if (temItemMenu(p)) p.sendMessage("§cVocê já possui o item do menu.");
-      else if (darItemMenu(p)) p.sendMessage("§cItem do menu entregue.");
+      pedirItemMenu(p, true);
       return configuracoes(p);
     case 4:
       if (p.hasTag(TAG_CLASSICO)) p.removeTag(TAG_CLASSICO);

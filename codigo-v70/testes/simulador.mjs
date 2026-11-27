@@ -68,8 +68,8 @@ export const system = {
   runInterval(fn, ticks) { intervalos.push([fn, ticks]); },
 };
 
-export async function executarAgendados() {
-  for (let i = 0; i < 8; i++) {
+export async function executarAgendados(rodadas = 8) {
+  for (let i = 0; i < rodadas; i++) {
     for (const { fn } of depois.splice(0).sort((a, b) => a.ticks - b.ticks)) fn();
     await new Promise((resolve) => setImmediate(resolve));
   }
@@ -81,7 +81,7 @@ export function executarIntervalos(periodo) {
 }
 
 export class ItemStack {
-  constructor(typeId) { this.typeId = typeId; }
+  constructor(typeId, amount = 1) { this.typeId = typeId; this.amount = amount; }
 }
 
 export class ActionFormData {
@@ -160,7 +160,15 @@ export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
         size: 36,
         getItem(i) { return estoque.get(i); },
         setItem(i, item) { estoque.set(i, item); },
-        addItem(item) { estoque.set(10, item); },
+        addItem(item) {
+          for (let i = 0; i < 36; i++) {
+            if (!estoque.get(i)) {
+              estoque.set(i, item);
+              return undefined;
+            }
+          }
+          return item;
+        },
       } };
     },
     getDynamicProperty(nome) { return dinamicos.get(nome); },

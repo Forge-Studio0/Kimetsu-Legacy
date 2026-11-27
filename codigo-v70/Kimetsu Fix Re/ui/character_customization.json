@@ -132,6 +132,9 @@
     "$txt": "((#form_button_text - 'K:') - 'V:')",
     "$lbl_scale": 0.74
   },
+  "comando_retrato@kny_oficina.comando": {
+    "size": ["50%", "100%"]
+  },
   "botoes": {
     "type": "collection_panel",
     "size": ["100%", "100%"],
@@ -251,6 +254,37 @@
         }
       },
       {
+        "retrato": {
+          "type": "panel",
+          "size": ["50%", "72%"],
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "offset": ["20%", "14%"],
+          "bindings": [
+            { "binding_name": "#title_text" },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.10s' * #title_text) = 'kny_edit|R')",
+              "target_property_name": "#visible"
+            }
+          ],
+          "controls": [
+            { "moldura@kny_oficina.moldura": {} },
+            {
+              "jogador": {
+                "type": "custom",
+                "renderer": "live_player_renderer",
+                "size": ["94%", "93%"],
+                "layer": 3,
+                "anchor_from": "center",
+                "anchor_to": "center",
+                "property_bag": { "#look_at_cursor": false }
+              }
+            }
+          ]
+        }
+      },
+      {
         "rodape@kny_oficina.botoes": {
           "type": "stack_panel",
           "orientation": "horizontal",
@@ -258,7 +292,36 @@
           "anchor_from": "bottom_middle",
           "anchor_to": "bottom_middle",
           "offset": [0, "-1.6%"],
-          "$item": "kny_oficina.comando"
+          "$item": "kny_oficina.comando",
+          "bindings": [
+            { "binding_name": "#form_button_length", "binding_name_override": "#collection_length" },
+            { "binding_name": "#title_text" },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not (('%.10s' * #title_text) = 'kny_edit|R'))",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "rodape_retrato@kny_oficina.botoes": {
+          "type": "stack_panel",
+          "orientation": "horizontal",
+          "size": ["50%", "10%"],
+          "anchor_from": "bottom_middle",
+          "anchor_to": "bottom_middle",
+          "offset": ["-5%", "-1.6%"],
+          "$item": "kny_oficina.comando_retrato",
+          "bindings": [
+            { "binding_name": "#form_button_length", "binding_name_override": "#collection_length" },
+            { "binding_name": "#title_text" },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.10s' * #title_text) = 'kny_edit|R')",
+              "target_property_name": "#visible"
+            }
+          ]
         }
       }
     ]

@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { registerHooks } from "node:module";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { system, world, jogador, executarAgendados, executarIntervalos } from "./simulador.mjs";
+import { ItemStack, system, world, jogador, executarAgendados, executarIntervalos } from "./simulador.mjs";
 
 registerHooks({
   resolve(specifier, context, next) {
@@ -22,6 +22,7 @@ const [oficina, config, camera, registros, hibrido, { abrirEditor }] = await Pro
   carregar("hybrid_records"), carregar("hybrid_system"), carregar("character_editor"),
 ]);
 await carregar("menu");
+const { garantirItemMenu } = await carregar("menu_item");
 
 const { CHAVE_VISUAL, CHAVE_ENTRADA, prepararAparenciaInicial, iniciarEdicao, encerrarEdicao,
   definirVisual, salvarEdicao, lerAparencia } = oficina;
@@ -38,7 +39,7 @@ const primeiraEntrada = (p) => {
 const novo = () => {
   const p = jogador();
   primeiraEntrada(p);
-  assert.equal(p.getDynamicProperty(CHAVE_ENTRADA), true);
+  assert.equal(p.getDynamicProperty(CHAVE_ENTRADA), "v78");
   return p;
 };
 const entrar = (p, initialSpawn = true) => world.afterEvents.playerSpawn.emit({ player: p, initialSpawn });
@@ -211,11 +212,11 @@ test("a pele inicial continua disponível na transformação e na troca legítim
   assert.throws(() => iniciarEdicao(p), /somente na primeira entrada/);
 });
 
-test("sala apertada usa o formulário simples e ainda salva a primeira aparência", async () => {
+test("sala fechada usa o retrato dentro do painel e ainda salva a primeira aparência", async () => {
   const p = novo();
   p.dimension.getBlockFromRay = () => ({ block: { location: { x: 0, y: 71, z: 1 } }, faceLocation: { x: 0, y: 0, z: 0 } });
   p.escolhas.push((f) => {
-    assert.match(f.titulo, /^§6APARÊNCIA DO PERSONAGEM$/);
+    assert.match(f.titulo, /^kny_edit\|R/);
     assert.ok(!f.buttons.some((b) => b.texto.includes("Girar")));
     return confirmar("CONFIRMAR")(f);
   });
@@ -223,6 +224,151 @@ test("sala apertada usa o formulário simples e ainda salva a primeira aparênci
   assert.equal(p.camera.atual, undefined);
   assert.equal(p.getDynamicProperty(CHAVE_CAMERA), undefined);
   assert.equal(lerAparencia(p).perfis.base.peleIntegral, "pele_a_e8b98f");
+});
+
+test("falha na abertura da interface personalizada mantém o formulário simples como alternativa", async () => {
+  const p = novo();
+  p.escolhas.push(() => ({ canceled: true }), (f) => {
+    assert.equal(f.titulo, "§6APARÊNCIA DO PERSONAGEM");
+    assert.equal(p.camera.atual, undefined);
+    return confirmar("CONFIRMAR")(f);
+  });
+  await abrirEditor(p);
+  assert.ok(isEditor(p.telas[0]));
+  assert.ok(lerAparencia(p).perfis.base.peleIntegral);
+});
+
+test("câmera começa em um ângulo livre quando o jogador nasce virado para uma parede", () => {
+  const p = novo();
+  p.dimension.getBlockFromRay = (_foco, direcao) => direcao.z > 0.95
+    ? { block: { location: { x: 0, y: 71, z: 1 } }, faceLocation: { x: 0, y: 0, z: 0 } }
+    : undefined;
+  const sessao = iniciarEdicao(p);
+  assert.ok(sessao.temCamera);
+  assert.equal(sessao.anguloInicial, 30);
+  assert.ok(p.camera.atual.location.x < -1);
+  encerrarEdicao(sessao);
+});
+
+test("a tela ocupada por mais de oito tentativas mantém a escolha pendente antes do contrato", async () => {
+  const p = novo();
+  const ocupado = () => ({ canceled: true, cancelationReason: "UserBusy" });
+  p.escolhas.push(...Array(12).fill(ocupado), (f) => {
+    assert.match(f.titulo, /^kny_edit\|R/);
+    assert.equal(p.camera.atual, undefined);
+    return confirmar("CONFIRMAR")(f);
+  }, fechar);
+  entrar(p);
+  digitar(p, "kny:menu", "classico");
+  await executarAgendados(36);
+  assert.equal(p.telas.filter(isEditor).length, 13);
+  assert.equal(semCor(p.telas.at(-1).titulo), "KIMETSU NO YAIBA");
+  assert.ok(p.hasTag("kny_cfg_classico"));
+  assert.ok(lerAparencia(p).perfis.base.peleIntegral);
+});
+
+test("a entrada espera a inicialização nativa e reage ao sinal persistido mesmo que o evento atrase", async () => {
+  const p = jogador();
+  p.escolhas.push(confirmar("CONFIRMAR"), fechar);
+  entrar(p);
+  digitar(p, "kny:menu");
+  system.runTimeout(() => {
+    p.addTag("start");
+    p.addTag("kny_aparencia_novo");
+  }, 110);
+  await executarAgendados(16);
+  assert.ok(isEditor(p.telas[0]));
+  assert.ok(isContrato(p.telas.at(-1)));
+  assert.equal(p.getDynamicProperty(CHAVE_ENTRADA), "v78");
+});
+
+test("a escolha continua reservada até o jogador sair do estado de caído", async () => {
+  const p = novo();
+  p.addTag("kny_caido");
+  p.escolhas.push(confirmar("CONFIRMAR"));
+  const abrir = abrirEditor(p);
+  await executarAgendados(1);
+  assert.equal(p.telas.length, 0);
+  assert.ok(oficina.edicaoInicialDisponivel(p));
+  p.removeTag("kny_caido");
+  await executarAgendados();
+  await abrir;
+  assert.equal(p.telas.length, 1);
+  assert.ok(lerAparencia(p).perfis.base.peleIntegral);
+});
+
+test("Staff recupera somente uma oportunidade da v77 sem ficha salva e sem reassinar o contrato", async () => {
+  const staff = jogador("Staff de reparo");
+  staff.addTag("kny_op");
+  const p = jogador("Caçador V77");
+  p.addTag("slayer");
+  p.addTag("start");
+  p.setDynamicProperty(CHAVE_ENTRADA, true);
+  p.runCommand = (comando) => {
+    assert.equal(comando, "scriptevent kny:menu");
+    digitar(p, "kny:menu");
+  };
+  const recuperar = 'recuperar_entrada "' + p.name + '"';
+  digitar(p, "kny:aparencia", recuperar);
+  assert.equal(p.getDynamicProperty(CHAVE_ENTRADA), true);
+  p.escolhas.push(confirmar("CONFIRMAR"));
+  digitar(staff, "kny:aparencia", recuperar);
+  await executarAgendados();
+  assert.equal(p.telas.length, 1);
+  assert.ok(isEditor(p.telas[0]));
+  assert.ok(p.hasTag("slayer"));
+  assert.equal(p.getDynamicProperty(CHAVE_ENTRADA), "v78");
+  digitar(staff, "kny:aparencia", recuperar);
+  await executarAgendados();
+  assert.equal(p.telas.length, 1);
+
+  const salvo = jogador("Ficha anterior");
+  salvo.setDynamicProperty(CHAVE_ENTRADA, true);
+  salvo.setDynamicProperty(CHAVE_VISUAL, p.getDynamicProperty(CHAVE_VISUAL));
+  digitar(staff, "kny:aparencia", 'recuperar_entrada "' + salvo.name + '"');
+  assert.equal(salvo.getDynamicProperty(CHAVE_ENTRADA), true);
+  assert.equal(oficina.edicaoInicialDisponivel(salvo), false);
+});
+
+test("login e reposição conservam um menu, a cópia em uso e o livro de conquistas", async () => {
+  const p = jogador();
+  p.addTag("start");
+  p.addTag("slayer");
+  p.selectedSlotIndex = 3;
+  const inventario = p.getComponent("minecraft:inventory").container;
+  const menu = new ItemStack("kny:menu_kimetsu");
+  const livro = new ItemStack("kny:book_archievement");
+  inventario.setItem(1, new ItemStack("kny:menu_kimetsu"));
+  inventario.setItem(3, menu);
+  inventario.setItem(9, livro);
+  entrar(p);
+  await executarAgendados();
+  assert.equal(inventario.getItem(1), undefined);
+  assert.equal(inventario.getItem(3), menu);
+  assert.equal(inventario.getItem(9), livro);
+  inventario.setItem(3, undefined);
+  assert.equal(garantirItemMenu(p), "entregue");
+  assert.equal(garantirItemMenu(p), "existente");
+  assert.equal(inventario.getItem(0).lockMode, "inventory");
+  assert.equal(inventario.getItem(0).keepOnDeath, true);
+  const copia = new ItemStack("kny:menu_kimetsu");
+  inventario.setItem(14, copia);
+  world.afterEvents.playerInventoryItemChange.emit({ player: p, itemStack: copia });
+  await executarAgendados();
+  assert.equal(inventario.getItem(14), undefined);
+});
+
+test("inventário cheio recebe um menu assim que libera um espaço", async () => {
+  const p = jogador();
+  const inv = p.getComponent("minecraft:inventory").container;
+  for (let i = 0; i < inv.size; i++) inv.setItem(i, new ItemStack("minecraft:dirt", 64));
+  assert.equal(garantirItemMenu(p), "cheio");
+  assert.equal(inv.getItem(9).typeId, "minecraft:dirt");
+  inv.setItem(9, undefined);
+  world.afterEvents.playerInventoryItemChange.emit({ player: p, itemStack: undefined });
+  await executarAgendados();
+  assert.equal(inv.getItem(9).typeId, "kny:menu_kimetsu");
+  assert.equal(garantirItemMenu(p), "existente");
 });
 
 test("dois jogadores editam independentemente e dano e mudança de dimensão descartam os rascunhos", async () => {
@@ -298,6 +444,7 @@ test("canais, controladores, armaduras e as dez texturas de corpo inteiro corres
     });
   }
   assert.match(ler(bp, "functions/inicio.mcfunction"), /tag=!start.*scriptevent kny:aparencia_inicial primeiro/);
+  assert.doesNotMatch(ler(bp, "functions/inicio.mcfunction"), /give.*kny:menu_kimetsu/);
   const player = json(rp, "entity/player.entity.json")["minecraft:client_entity"].description;
   const controllers = json(rp, "render_controllers/customizacao.render_controllers.json").render_controllers;
   assert.equal(controllers["controller.render.kny.cc_rosto"], undefined);
@@ -332,5 +479,9 @@ test("canais, controladores, armaduras e as dez texturas de corpo inteiro corres
   assert.ok(player.scripts.pre_animation.some((l) => l.includes("cc_peleIntegral") && l.includes("4096")));
   assert.ok(!ler(rp, "ui/server_form.json").includes("kny_oficina.acesso"));
   assert.ok(json(rp, "ui/_ui_defs.json").ui_defs.includes("ui/character_customization.json"));
+  const interfaceEditor = json(rp, "ui/character_customization.json").editor;
+  const retrato = interfaceEditor.controls.find((control) => control.retrato).retrato;
+  assert.ok(retrato.bindings.some((b) => b.source_property_name?.includes("kny_edit|R")));
+  assert.ok(retrato.controls.some((control) => control.jogador?.renderer === "live_player_renderer"));
   assert.deepEqual(codificarVisual(VISUAL_PADRAO), [0, 0, 0]);
 });
