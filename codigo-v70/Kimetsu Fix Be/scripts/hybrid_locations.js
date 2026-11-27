@@ -5,6 +5,7 @@ import { ehStaff, emCombate, estadoBloqueado, getPublicFaction, getPublicIdentit
 
 const CHAVE = "kny:h_locais";
 const viagens = new Map();
+export const viagemEmCurso = (p) => viagens.has(p.id);
 const IDS = /^[a-z][a-z0-9_-]{0,23}$/;
 const idValido = (id) => IDS.test(id) && id !== "castelo" && id !== "constructor";
 const POLITICAS = ["cacador", "oni", "revelado", "hibrido"];

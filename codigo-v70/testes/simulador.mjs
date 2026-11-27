@@ -96,6 +96,16 @@ export class ActionFormData {
   }
 }
 
+export class ModalFormData extends ActionFormData {
+  campos = [];
+  textField(nome, dica, opcoes) { this.campos.push({ nome, dica, opcoes }); return this; }
+  submitButton(rotulo) { this.confirmar = rotulo; return this; }
+}
+
+export const uiManager = {
+  closeAllForms(p) { p.formulariosFechados++; },
+};
+
 let conta = 0;
 export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
   const id = "mock:" + nome;
@@ -115,8 +125,15 @@ export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
     },
   };
   const movimento = { currentValue: 0.1, setCurrentValue(v) { this.currentValue = v; } };
+  const camera = {
+    atual: undefined,
+    limpezas: 0,
+    setCamera(preset, opcoes) { this.atual = { preset, ...opcoes }; },
+    clear() { this.atual = undefined; this.limpezas++; },
+  };
   const p = {
     id, name: nome, typeId: "minecraft:player", isValid: true, tags, mensagens, titulos, dinamicos, telas: [], escolhas: [],
+    camera, formulariosFechados: 0, nameTag: nome,
     scoreboardIdentity: { id, name: nome },
     dimension: { id: "minecraft:overworld" }, location: { x: 0, y: 70, z: 0 }, selectedSlotIndex: 0,
     isSprinting: false, isSneaking: false, isOnGround: true,

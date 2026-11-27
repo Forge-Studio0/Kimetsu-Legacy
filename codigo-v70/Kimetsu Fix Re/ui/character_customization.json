@@ -1,0 +1,284 @@
+{
+  "namespace": "kny_oficina",
+  "moldura": {
+    "type": "image",
+    "texture": "textures/ui/customizacao/painel",
+    "size": ["100%", "100%"],
+    "nineslice_size": 12,
+    "layer": 2
+  },
+  "linha": {
+    "type": "image",
+    "texture": "textures/ui/customizacao/botao",
+    "size": ["100% - 2px", "100% - 2px"],
+    "nineslice_size": 6,
+    "layer": 3
+  },
+  "linha_dourada@kny_oficina.linha": {
+    "texture": "textures/ui/customizacao/salvar"
+  },
+  "icone": {
+    "$icone_tamanho|default": ["25%", "78%"],
+    "$icone_ancora|default": "left_middle",
+    "$icone_offset|default": ["3%", 0],
+    "type": "image",
+    "size": "$icone_tamanho",
+    "keep_ratio": true,
+    "anchor_from": "$icone_ancora",
+    "anchor_to": "$icone_ancora",
+    "offset": "$icone_offset",
+    "layer": 5,
+    "bindings": [
+      { "binding_name": "#form_button_texture", "binding_name_override": "#texture", "binding_type": "collection", "binding_collection_name": "form_buttons" },
+      { "binding_name": "#form_button_texture_file_system", "binding_name_override": "#texture_file_system", "binding_type": "collection", "binding_collection_name": "form_buttons" },
+      { "binding_type": "view", "source_property_name": "(not (#texture = ''))", "target_property_name": "#visible" }
+    ]
+  },
+  "botao@server_form.kny_btn_base": {
+    "$lbl_anchor": "center",
+    "$lbl_offset": [0, 0],
+    "$lbl_size": ["97%", "default"],
+    "$lbl_align": "center",
+    "$lbl_scale": 0.75,
+    "controls": [
+      { "fundo@kny_oficina.linha": {} },
+      {
+        "realce@kny_oficina.linha_dourada": {
+          "bindings": [
+            { "binding_name": "#form_button_text", "binding_type": "collection", "binding_collection_name": "form_buttons" },
+            { "binding_type": "view", "source_property_name": "((('%.2s' * #form_button_text) = 'S:') or (('%.2s' * #form_button_text) = 'V:'))", "target_property_name": "#visible" }
+          ]
+        }
+      },
+      {
+        "default": {
+          "type": "panel"
+        }
+      },
+      {
+        "hover": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [1, 0.79, 0.42],
+          "alpha": 0.18,
+          "size": ["100% - 2px", "100% - 2px"],
+          "layer": 4
+        }
+      },
+      {
+        "pressed": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [1, 0.79, 0.42],
+          "alpha": 0.37,
+          "size": ["100% - 2px", "100% - 2px"],
+          "layer": 4
+        }
+      },
+      { "icone@kny_oficina.icone": {} },
+      { "texto@server_form.kny_label": {} }
+    ]
+  },
+  "categoria@kny_oficina.botao": {
+    "size": ["100%", "11.1%"],
+    "$vis": "((('%.2s' * #form_button_text) = 'C:') or (('%.2s' * #form_button_text) = 'S:'))",
+    "$txt": "((#form_button_text - 'C:') - 'S:')",
+    "$lbl_anchor": "left_middle",
+    "$lbl_offset": ["31%", 0],
+    "$lbl_size": ["67%", "default"],
+    "$lbl_align": "left",
+    "$lbl_scale": 0.70
+  },
+  "opcao@kny_oficina.botao": {
+    "size": ["100%", "25%"],
+    "$vis": "(('%.2s' * #form_button_text) = 'O:')",
+    "$txt": "(#form_button_text - 'O:')",
+    "$lbl_anchor": "left_middle",
+    "$lbl_offset": ["8%", 0],
+    "$lbl_size": ["73%", "default"],
+    "$lbl_align": "left",
+    "$lbl_scale": 0.8,
+    "$icone_tamanho": ["17%", "55%"],
+    "$icone_ancora": "right_middle",
+    "$icone_offset": ["-4%", 0]
+  },
+  "titulo@server_form.kny_txt_base": {
+    "size": ["100%", "100%"],
+    "$vis": "(('%.2s' * #form_button_text) = 'T:')",
+    "$txt": "(#form_button_text - 'T:')",
+    "$lbl_anchor": "left_middle",
+    "$lbl_offset": ["6%", 0],
+    "$lbl_size": ["91%", "default"],
+    "$lbl_align": "left",
+    "$lbl_scale": 0.84
+  },
+  "nota@kny_oficina.titulo": {
+    "$vis": "(('%.2s' * #form_button_text) = 'H:')",
+    "$txt": "(#form_button_text - 'H:')",
+    "$lbl_scale": 0.72
+  },
+  "anterior@kny_oficina.botao": {
+    "size": ["100%", "100%"],
+    "$vis": "(('%.2s' * #form_button_text) = 'P:')",
+    "$txt": "(#form_button_text - 'P:')"
+  },
+  "proximo@kny_oficina.anterior": {
+    "$vis": "(('%.2s' * #form_button_text) = 'N:')",
+    "$txt": "(#form_button_text - 'N:')"
+  },
+  "comando@kny_oficina.botao": {
+    "size": ["12.5%", "100%"],
+    "$vis": "((('%.2s' * #form_button_text) = 'K:') or (('%.2s' * #form_button_text) = 'V:'))",
+    "$txt": "((#form_button_text - 'K:') - 'V:')",
+    "$lbl_scale": 0.74
+  },
+  "entrada@kny_oficina.botao": {
+    "size": ["100%", "100%"],
+    "$vis": "(('%.2s' * #form_button_text) = 'E:')",
+    "$txt": "(#form_button_text - 'E:')",
+    "$lbl_scale": 0.85,
+    "$lbl_anchor": "left_middle",
+    "$lbl_offset": ["22%", 0],
+    "$lbl_size": ["74%", "default"],
+    "$lbl_align": "left",
+    "$icone_tamanho": ["16%", "77%"]
+  },
+  "botoes": {
+    "type": "collection_panel",
+    "size": ["100%", "100%"],
+    "factory": { "name": "buttons", "control_name": "$item" },
+    "collection_name": "form_buttons",
+    "bindings": [
+      { "binding_name": "#form_button_length", "binding_name_override": "#collection_length" }
+    ]
+  },
+  "acesso": {
+    "type": "panel",
+    "layer": 7,
+    "controls": [
+      { "entrada@kny_oficina.botoes": { "$item": "kny_oficina.entrada" } }
+    ]
+  },
+  "editor": {
+    "type": "panel",
+    "size": ["100%", "100%"],
+    "controls": [
+      {
+        "faixa": {
+          "type": "panel",
+          "anchor_from": "top_middle",
+          "anchor_to": "top_middle",
+          "offset": [0, "2%"],
+          "size": ["42%", "9%"],
+          "controls": [
+            { "moldura@kny_oficina.moldura": {} },
+            {
+              "nome": {
+                "type": "label",
+                "size": ["95%", "default"],
+                "layer": 5,
+                "text": "OFICINA DE PERSONAGEM",
+                "color": [0.95, 0.8, 0.47],
+                "shadow": true,
+                "font_scale_factor": 0.88,
+                "text_alignment": "center",
+                "anchor_from": "center",
+                "anchor_to": "center"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "categorias": {
+          "type": "panel",
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "offset": ["1.5%", "13%"],
+          "size": ["16%", "74%"],
+          "controls": [
+            { "moldura@kny_oficina.moldura": {} },
+            {
+              "lista@kny_oficina.botoes": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": ["93%", "96%"],
+                "$item": "kny_oficina.categoria"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "configuracoes": {
+          "type": "panel",
+          "anchor_from": "top_right",
+          "anchor_to": "top_right",
+          "offset": ["-1.5%", "13%"],
+          "size": ["26%", "74%"],
+          "controls": [
+            { "moldura@kny_oficina.moldura": {} },
+            {
+              "categoria@kny_oficina.botoes": {
+                "size": ["94%", "22%"],
+                "anchor_from": "top_middle",
+                "anchor_to": "top_middle",
+                "offset": [0, "2%"],
+                "$item": "kny_oficina.titulo"
+              }
+            },
+            {
+              "config@kny_oficina.botoes": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": ["91%", "50%"],
+                "anchor_from": "top_middle",
+                "anchor_to": "top_middle",
+                "offset": [0, "24%"],
+                "$item": "kny_oficina.opcao"
+              }
+            },
+            {
+              "nota@kny_oficina.botoes": {
+                "size": ["93%", "9%"],
+                "anchor_from": "top_middle",
+                "anchor_to": "top_middle",
+                "offset": [0, "74%"],
+                "$item": "kny_oficina.nota"
+              }
+            },
+            {
+              "voltar@kny_oficina.botoes": {
+                "size": ["44%", "12%"],
+                "anchor_from": "bottom_left",
+                "anchor_to": "bottom_left",
+                "offset": ["4%", "-4%"],
+                "$item": "kny_oficina.anterior"
+              }
+            },
+            {
+              "avancar@kny_oficina.botoes": {
+                "size": ["44%", "12%"],
+                "anchor_from": "bottom_right",
+                "anchor_to": "bottom_right",
+                "offset": ["-4%", "-4%"],
+                "$item": "kny_oficina.proximo"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rodape@kny_oficina.botoes": {
+          "type": "stack_panel",
+          "orientation": "horizontal",
+          "size": ["97%", "10%"],
+          "anchor_from": "bottom_middle",
+          "anchor_to": "bottom_middle",
+          "offset": [0, "-1.6%"],
+          "$item": "kny_oficina.comando"
+        }
+      }
+    ]
+  }
+}

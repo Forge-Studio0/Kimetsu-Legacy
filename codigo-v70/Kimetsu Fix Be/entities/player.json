@@ -357,6 +357,42 @@
         "kny:h_revelar": {
           "type": "bool",
           "default": true
+        },
+        "kny:cc_a": {
+          "type": "int",
+          "range": [0, 16777215],
+          "default": 0,
+          "client_sync": true
+        },
+        "kny:cc_b": {
+          "type": "int",
+          "range": [0, 16777215],
+          "default": 0,
+          "client_sync": true
+        },
+        "kny:cc_c": {
+          "type": "int",
+          "range": [0, 16777215],
+          "default": 0,
+          "client_sync": true
+        },
+        "kny:cc_da": {
+          "type": "int",
+          "range": [-1, 16777215],
+          "default": -1,
+          "client_sync": true
+        },
+        "kny:cc_db": {
+          "type": "int",
+          "range": [-1, 16777215],
+          "default": -1,
+          "client_sync": true
+        },
+        "kny:cc_dc": {
+          "type": "int",
+          "range": [-1, 16777215],
+          "default": -1,
+          "client_sync": true
         }
       }
     },

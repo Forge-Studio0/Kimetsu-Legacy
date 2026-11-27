@@ -8,6 +8,8 @@ import {
   registrarTreinoRespiracao, requisitosProximaForma, selecionarOriginal,
 } from "./hybrid_mastery.js";
 import { limparTreinosDaForma, textoTreinoDaForma } from "./treino_respiracao.js";
+import { abrirEditor, ICONE_EDITOR } from "./character_editor.js";
+import "./character_admin.js";
 import { canUseBreathing, canUseKekkijutsu, doseEmMaos, ehStaff, estadoBloqueado, isHybrid, preverTransformacao, racaHibrida, transformar, trocarDisfarce } from "./hybrid_system.js";
 import { ativarHabilidade, danoEspecialEmCurso, habilidadeDe } from "./hybrid_abilities.js";
 import { canAccessLocation, configurarLocal, locais, viajar } from "./hybrid_locations.js";
@@ -468,11 +470,13 @@ async function escolha(p) {
           .title("§l§cKIMETSU NO YAIBA")
           .body(textoContrato(p.name))
           .button("§l§cAssinar o contrato\n§r§7Tornar-se Caçador", "textures/icons/menu_char")
+          .button("Customizar personagem", ICONE_EDITOR)
       : new ActionFormData()
           .title(`${MARCA_CTR}§lKIMETSU NO YAIBA`)
           .body(" ")
           .button("T:" + textoContrato(p.name))
-          .button("S:§l§aASSINAR O CONTRATO");
+          .button("S:§l§aASSINAR O CONTRATO")
+          .button("E:Customizar personagem", ICONE_EDITOR);
     const r = await mostrar(f, p);
     if (!p.isValid || jaEscolheu(p)) return;
     if (r.canceled && !classico && r.cancelationReason === undefined) {
@@ -480,6 +484,7 @@ async function escolha(p) {
       continue;
     }
     if (!r.canceled && r.selection === (classico ? 0 : 1)) await aplicarEscolha(p);
+    if (!r.canceled && r.selection === (classico ? 1 : 2)) await abrirEditor(p, classico);
     return;
   }
 }
@@ -618,6 +623,7 @@ async function painelPrincipal(p) {
     return painelPrincipal(p);
   });
   add("X:", "§6§lX", null, "fechar"); // botão X no canto superior direito
+  add("E:", "§6Aparência", ICONE_EDITOR, () => abrirEditor(p));
 
   const res = await mostrar(f, p);
   if (res.canceled) {
@@ -703,6 +709,8 @@ async function menuClassico(p) {
     }
   }
 
+  f.button("§6Customizar personagem", ICONE_EDITOR);
+  extras.push("editor");
   const res = await mostrar(f, p);
   if (res.canceled) return;
   switch (res.selection) {
@@ -722,6 +730,7 @@ async function menuClassico(p) {
   if (acao === "ensinar") return ensinar(p);
   if (acao === "transformar") return transformarMenu(p);
   if (acao === "cargo") return alterarCargo(p);
+  if (acao === "editor") return abrirEditor(p, true);
 }
 
 async function guiaEAcessos(p) {

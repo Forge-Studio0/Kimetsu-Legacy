@@ -1,0 +1,2668 @@
+{
+  "namespace": "server_form",
+  "main_screen_content": {
+    "type": "panel",
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "controls": [
+      {
+        "server_form_factory": {
+          "type": "factory",
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "control_ids": {
+            "long_form": "@server_form.kny_long_form",
+            "custom_form": "@server_form.custom_form"
+          }
+        }
+      }
+    ]
+  },
+  "kny_long_form": {
+    "type": "panel",
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "controls": [
+      {
+        "kny_vanilla": {
+          "type": "panel",
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "bindings": [
+            {
+              "binding_name": "#title_text"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not (('%.4s' * #title_text) = 'kny_'))",
+              "target_property_name": "#visible"
+            }
+          ],
+          "controls": [
+            {
+              "vanilla_form@server_form.long_form": {}
+            }
+          ]
+        }
+      },
+      {
+        "kny_menu@server_form.kny_menu": {
+          "bindings": [
+            {
+              "binding_name": "#title_text"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.11s' * #title_text) = 'kny_painel|')",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "kny_menu_arte@server_form.kny_menu_arte": {
+          "bindings": [
+            {
+              "binding_name": "#title_text"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.9s' * #title_text) = 'kny_arte|')",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "kny_menu_conf@server_form.kny_menu_conf": {
+          "bindings": [
+            {
+              "binding_name": "#title_text"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.9s' * #title_text) = 'kny_conf|')",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "kny_menu_missao@server_form.kny_menu_missao": {
+          "bindings": [
+            {
+              "binding_name": "#title_text"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.9s' * #title_text) = 'kny_miss|')",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "kny_menu_guia@server_form.kny_menu_guia": {
+          "bindings": [
+            {
+              "binding_name": "#title_text"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.8s' * #title_text) = 'kny_txt|')",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "kny_menu_contrato@server_form.kny_menu_contrato": {
+          "bindings": [
+            {
+              "binding_name": "#title_text"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.8s' * #title_text) = 'kny_ctr|')",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "oficina@kny_oficina.editor": {
+          "bindings": [
+            { "binding_name": "#title_text" },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.9s' * #title_text) = 'kny_edit|')",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "kny_menu": {
+    "type": "panel",
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "controls": [
+      {
+        "escurecer": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.5,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 1
+        }
+      },
+      {
+        "moldura_raiz": {
+          "type": "panel",
+          "size": [
+            "177.78%y",
+            "100% - 4px"
+          ],
+          "anchor_from": "center",
+          "anchor_to": "center",
+          "controls": [
+            {
+              "fundo_centro": {
+                "type": "image",
+                "texture": "textures/ui/kny_fundo_redondo",
+                "color": [
+                  0.05,
+                  0,
+                  0
+                ],
+                "alpha": 0.62,
+                "size": [
+                  "39.6%",
+                  "76.5%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "50.8%",
+                  "17%"
+                ],
+                "layer": 2,
+                "nineslice_size": 30
+              }
+            },
+            {
+              "area_retrato": {
+                "type": "panel",
+                "size": [
+                  "38.2%",
+                  "73.8%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "51.6%",
+                  "18.3%"
+                ],
+                "clips_children": false,
+                "layer": 2,
+                "controls": [
+                  {
+                    "jogador": {
+                      "type": "custom",
+                      "renderer": "live_player_renderer",
+                      "layer": 2,
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "anchor_from": "center",
+                      "anchor_to": "center",
+                      "offset": [
+                        0,
+                        0
+                      ],
+                      "property_bag": {
+                        "#look_at_cursor": false
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "moldura": {
+                "type": "image",
+                "texture": "textures/ui/kny_painel_moldura",
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 3
+              }
+            },
+            {
+              "titulo": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "#text",
+                "font_scale_factor": 1.3,
+                "color": [
+                  1,
+                  0.85,
+                  0.45
+                ],
+                "text_alignment": "center",
+                "size": [
+                  "80%",
+                  "default"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "left_middle",
+                "offset": [
+                  "10%",
+                  "8.9%"
+                ],
+                "bindings": [
+                  {
+                    "binding_name": "#title_text"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(#title_text - 'kny_painel|')",
+                    "target_property_name": "#text"
+                  }
+                ]
+              }
+            },
+            {
+              "area_info": {
+                "type": "panel",
+                "size": [
+                  "44.4%",
+                  "13%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "3.5%",
+                  "17.9%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_I"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "area_barras": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": [
+                  "38.6%",
+                  "58.2%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "8.1%",
+                  "33.6%"
+                ],
+                "factory": {
+                  "name": "buttons",
+                  "control_name": "server_form.kny_btn_L"
+                },
+                "collection_name": "form_buttons",
+                "bindings": [
+                  {
+                    "binding_name": "#form_button_length",
+                    "binding_name_override": "#collection_length"
+                  }
+                ]
+              }
+            },
+            {
+              "area_quadrados": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": [
+                  "6%",
+                  "75.7%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "92.1%",
+                  "17.1%"
+                ],
+                "factory": {
+                  "name": "buttons",
+                  "control_name": "server_form.kny_btn_R"
+                },
+                "collection_name": "form_buttons",
+                "bindings": [
+                  {
+                    "binding_name": "#form_button_length",
+                    "binding_name_override": "#collection_length"
+                  }
+                ]
+              }
+            },
+            {
+              "aparencia@kny_oficina.acesso": {
+                "size": ["25%", "7%"],
+                "anchor_from": "bottom_middle",
+                "anchor_to": "bottom_middle",
+                "offset": ["20.4%", "-7.8%"]
+              }
+            },
+            {
+              "area_fechar": {
+                "type": "panel",
+                "size": [
+                  "4.7%",
+                  "8.3%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "92.8%",
+                  "5.4%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_X"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "kny_label": {
+    "type": "label",
+    "layer": 6,
+    "shadow": true,
+    "text": "#text",
+    "font_scale_factor": "$lbl_scale",
+    "text_alignment": "$lbl_align",
+    "anchor_from": "$lbl_anchor",
+    "anchor_to": "$lbl_anchor",
+    "offset": "$lbl_offset",
+    "size": "$lbl_size",
+    "bindings": [
+      {
+        "binding_name": "#form_button_text",
+        "binding_type": "collection",
+        "binding_collection_name": "form_buttons"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "$txt",
+        "target_property_name": "#text"
+      }
+    ]
+  },
+  "kny_btn_base": {
+    "type": "button",
+    "default_control": "default",
+    "hover_control": "hover",
+    "pressed_control": "pressed",
+    "sound_name": "random.click",
+    "button_mappings": [
+      {
+        "from_button_id": "button.menu_select",
+        "to_button_id": "button.form_button_click",
+        "mapping_type": "pressed"
+      },
+      {
+        "from_button_id": "button.menu_ok",
+        "to_button_id": "button.form_button_click",
+        "mapping_type": "focused"
+      }
+    ],
+    "bindings": [
+      {
+        "binding_type": "collection_details",
+        "binding_collection_name": "form_buttons"
+      },
+      {
+        "binding_name": "#form_button_text",
+        "binding_type": "collection",
+        "binding_collection_name": "form_buttons"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "$vis",
+        "target_property_name": "#visible"
+      }
+    ],
+    "controls": [
+      {
+        "default": {
+          "type": "panel"
+        }
+      },
+      {
+        "hover": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.18,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "pressed": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.34,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "texto@server_form.kny_label": {}
+      }
+    ]
+  },
+  "kny_txt_base": {
+    "type": "panel",
+    "bindings": [
+      {
+        "binding_type": "collection_details",
+        "binding_collection_name": "form_buttons"
+      },
+      {
+        "binding_name": "#form_button_text",
+        "binding_type": "collection",
+        "binding_collection_name": "form_buttons"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "$vis",
+        "target_property_name": "#visible"
+      }
+    ],
+    "controls": [
+      {
+        "texto@server_form.kny_label": {}
+      }
+    ]
+  },
+  "kny_btn_I@server_form.kny_txt_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'I:')",
+    "$txt": "(#form_button_text - 'I:')",
+    "$lbl_anchor": "left_middle",
+    "$lbl_offset": [
+      "3%",
+      0
+    ],
+    "$lbl_size": [
+      "94%",
+      "default"
+    ],
+    "$lbl_align": "left",
+    "$lbl_scale": 0.9,
+    "size": [
+      "100%",
+      "100%"
+    ]
+  },
+  "kny_btn_L@server_form.kny_btn_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'L:')",
+    "$txt": "(#form_button_text - 'L:')",
+    "$lbl_anchor": "left_middle",
+    "$lbl_offset": [
+      "2%",
+      0
+    ],
+    "$lbl_size": [
+      "92%",
+      "default"
+    ],
+    "$lbl_align": "left",
+    "$lbl_scale": 0.85,
+    "size": [
+      "100%",
+      "14.2857%"
+    ]
+  },
+  "kny_btn_R@server_form.kny_btn_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'R:')",
+    "$txt": "(#form_button_text - 'R:')",
+    "$lbl_anchor": "bottom_middle",
+    "$lbl_offset": [
+      0,
+      "-6%"
+    ],
+    "$lbl_size": [
+      "96%",
+      "default"
+    ],
+    "$lbl_align": "center",
+    "$lbl_scale": 0.6,
+    "size": [
+      "100%",
+      "14.2857%"
+    ],
+    "controls": [
+      {
+        "default": {
+          "type": "panel"
+        }
+      },
+      {
+        "hover": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.18,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "pressed": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.34,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "icone": {
+          "type": "image",
+          "layer": 6,
+          "keep_ratio": true,
+          "size": [
+            "55%",
+            "50%"
+          ],
+          "anchor_from": "top_middle",
+          "anchor_to": "top_middle",
+          "offset": [
+            0,
+            "12%"
+          ],
+          "bindings": [
+            {
+              "binding_name": "#form_button_texture",
+              "binding_name_override": "#texture",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_name": "#form_button_texture_file_system",
+              "binding_name_override": "#texture_file_system",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not (#texture = ''))",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "texto@server_form.kny_label": {}
+      }
+    ]
+  },
+  "kny_btn_X@server_form.kny_btn_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'X:')",
+    "$txt": "(#form_button_text - 'X:')",
+    "$lbl_anchor": "center",
+    "$lbl_offset": [
+      0,
+      0
+    ],
+    "$lbl_size": [
+      "100%",
+      "default"
+    ],
+    "$lbl_align": "center",
+    "$lbl_scale": 1.6,
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "controls": [
+      {
+        "default": {
+          "type": "panel"
+        }
+      },
+      {
+        "hover": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.16,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "pressed": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.3,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "texto@server_form.kny_label": {}
+      }
+    ]
+  },
+  "kny_btn_L6@server_form.kny_btn_L": {
+    "size": [
+      "100%",
+      "16.6667%"
+    ]
+  },
+  "kny_btn_B@server_form.kny_btn_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'B:')",
+    "$txt": "(#form_button_text - 'B:')",
+    "$lbl_anchor": "center",
+    "$lbl_offset": [
+      0,
+      0
+    ],
+    "$lbl_size": [
+      "100%",
+      "default"
+    ],
+    "$lbl_align": "center",
+    "$lbl_scale": 1.0,
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "controls": [
+      {
+        "default": {
+          "type": "panel"
+        }
+      },
+      {
+        "hover": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0.5,
+            0.9,
+            1
+          ],
+          "alpha": 0.18,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "pressed": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0.5,
+            0.9,
+            1
+          ],
+          "alpha": 0.34,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "texto@server_form.kny_label": {}
+      }
+    ]
+  },
+  "kny_btn_G@server_form.kny_txt_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'G:')",
+    "$txt": "(#form_button_text - 'G:')",
+    "$lbl_anchor": "bottom_middle",
+    "$lbl_offset": [
+      0,
+      "-3%"
+    ],
+    "$lbl_size": [
+      "94%",
+      "default"
+    ],
+    "$lbl_align": "center",
+    "$lbl_scale": 0.8,
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "controls": [
+      {
+        "imagem": {
+          "type": "image",
+          "layer": 6,
+          "keep_ratio": true,
+          "size": [
+            "80%",
+            "56%"
+          ],
+          "anchor_from": "top_middle",
+          "anchor_to": "top_middle",
+          "offset": [
+            0,
+            "3%"
+          ],
+          "bindings": [
+            {
+              "binding_name": "#form_button_texture",
+              "binding_name_override": "#texture",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_name": "#form_button_texture_file_system",
+              "binding_name_override": "#texture_file_system",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not (#texture = ''))",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "texto@server_form.kny_label": {}
+      }
+    ]
+  },
+  "kny_menu_arte": {
+    "type": "panel",
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "controls": [
+      {
+        "escurecer": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.5,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 1
+        }
+      },
+      {
+        "moldura_raiz": {
+          "type": "panel",
+          "size": [
+            "177.78%y",
+            "100% - 4px"
+          ],
+          "anchor_from": "center",
+          "anchor_to": "center",
+          "controls": [
+            {
+              "fundo": {
+                "type": "image",
+                "texture": "textures/ui/kny_fundo_redondo",
+                "color": [
+                  0.05,
+                  0,
+                  0
+                ],
+                "alpha": 0.62,
+                "size": [
+                  "83%",
+                  "78%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "9%",
+                  "12.5%"
+                ],
+                "layer": 2,
+                "nineslice_size": 30
+              }
+            },
+            {
+              "moldura": {
+                "type": "image",
+                "texture": "textures/ui/kny_moldura_arte",
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 3
+              }
+            },
+            {
+              "titulo": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "#text",
+                "font_scale_factor": 1.2,
+                "color": [
+                  1,
+                  0.85,
+                  0.45
+                ],
+                "text_alignment": "center",
+                "size": [
+                  "40%",
+                  "default"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "left_middle",
+                "offset": [
+                  "30%",
+                  "20.2%"
+                ],
+                "bindings": [
+                  {
+                    "binding_name": "#title_text"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(#title_text - 'kny_arte|')",
+                    "target_property_name": "#text"
+                  }
+                ]
+              }
+            },
+            {
+              "area_voltar": {
+                "type": "panel",
+                "size": [
+                  "10.8%",
+                  "7.4%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "69.7%",
+                  "16.5%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_B"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "area_barras": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": [
+                  "36.2%",
+                  "56.1%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "12.9%",
+                  "28.7%"
+                ],
+                "factory": {
+                  "name": "buttons",
+                  "control_name": "server_form.kny_btn_L6"
+                },
+                "collection_name": "form_buttons",
+                "bindings": [
+                  {
+                    "binding_name": "#form_button_length",
+                    "binding_name_override": "#collection_length"
+                  }
+                ]
+              }
+            },
+            {
+              "area_grande": {
+                "type": "panel",
+                "size": [
+                  "34.4%",
+                  "52.6%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "51.4%",
+                  "29.8%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_G"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "kny_btn_L5@server_form.kny_btn_L": {
+    "size": [
+      "100%",
+      "20%"
+    ],
+    "$lbl_anchor": "center",
+    "$lbl_offset": [
+      0,
+      0
+    ],
+    "$lbl_size": [
+      "84%",
+      "default"
+    ],
+    "$lbl_align": "center",
+    "$lbl_scale": 1.0
+  },
+  "kny_btn_M@server_form.kny_txt_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'M:')",
+    "$txt": "(#form_button_text - 'M:')",
+    "$lbl_anchor": "top_left",
+    "$lbl_offset": [
+      "1%",
+      "1%"
+    ],
+    "$lbl_size": [
+      "98%",
+      "default"
+    ],
+    "$lbl_align": "left",
+    "$lbl_scale": 0.85,
+    "size": [
+      "100%",
+      "100%"
+    ]
+  },
+  "kny_menu_conf": {
+    "type": "panel",
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "controls": [
+      {
+        "escurecer": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.5,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 1
+        }
+      },
+      {
+        "moldura_raiz": {
+          "type": "panel",
+          "size": [
+            "150%y",
+            "100% - 4px"
+          ],
+          "anchor_from": "center",
+          "anchor_to": "center",
+          "controls": [
+            {
+              "fundo": {
+                "type": "image",
+                "texture": "textures/ui/kny_fundo_redondo",
+                "color": [
+                  0.05,
+                  0,
+                  0
+                ],
+                "alpha": 0.7,
+                "size": [
+                  "91%",
+                  "87%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "4.5%",
+                  "6%"
+                ],
+                "layer": 2,
+                "nineslice_size": 30
+              }
+            },
+            {
+              "moldura": {
+                "type": "image",
+                "texture": "textures/ui/kny_moldura_conf",
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 3
+              }
+            },
+            {
+              "titulo": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "#text",
+                "font_scale_factor": 1.2,
+                "color": [
+                  1,
+                  0.85,
+                  0.45
+                ],
+                "text_alignment": "center",
+                "size": [
+                  "40%",
+                  "default"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "left_middle",
+                "offset": [
+                  "30%",
+                  "11%"
+                ],
+                "bindings": [
+                  {
+                    "binding_name": "#title_text"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(#title_text - 'kny_conf|')",
+                    "target_property_name": "#text"
+                  }
+                ]
+              }
+            },
+            {
+              "area_voltar": {
+                "type": "panel",
+                "size": [
+                  "14%",
+                  "7.3%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "71.6%",
+                  "7.8%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_B"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "area_barras": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": [
+                  "51.6%",
+                  "64.1%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "24.2%",
+                  "22.7%"
+                ],
+                "factory": {
+                  "name": "buttons",
+                  "control_name": "server_form.kny_btn_L5"
+                },
+                "collection_name": "form_buttons",
+                "bindings": [
+                  {
+                    "binding_name": "#form_button_length",
+                    "binding_name_override": "#collection_length"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "kny_menu_missao": {
+    "type": "panel",
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "controls": [
+      {
+        "escurecer": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.5,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 1
+        }
+      },
+      {
+        "moldura_raiz": {
+          "type": "panel",
+          "size": [
+            "150%y",
+            "100% - 4px"
+          ],
+          "anchor_from": "center",
+          "anchor_to": "center",
+          "controls": [
+            {
+              "fundo": {
+                "type": "image",
+                "texture": "textures/ui/kny_fundo_redondo",
+                "color": [
+                  0.05,
+                  0,
+                  0
+                ],
+                "alpha": 0.7,
+                "size": [
+                  "91%",
+                  "87%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "4.5%",
+                  "6%"
+                ],
+                "layer": 2,
+                "nineslice_size": 30
+              }
+            },
+            {
+              "moldura": {
+                "type": "image",
+                "texture": "textures/ui/kny_moldura_missao",
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 3
+              }
+            },
+            {
+              "titulo": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "#text",
+                "font_scale_factor": 1.2,
+                "color": [
+                  1,
+                  0.85,
+                  0.45
+                ],
+                "text_alignment": "center",
+                "size": [
+                  "40%",
+                  "default"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "left_middle",
+                "offset": [
+                  "30%",
+                  "11.9%"
+                ],
+                "bindings": [
+                  {
+                    "binding_name": "#title_text"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(#title_text - 'kny_miss|')",
+                    "target_property_name": "#text"
+                  }
+                ]
+              }
+            },
+            {
+              "area_voltar": {
+                "type": "panel",
+                "size": [
+                  "13.4%",
+                  "7.8%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "73.6%",
+                  "8.3%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_B"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "area_cab": {
+                "type": "panel",
+                "size": [
+                  "82%",
+                  "5.2%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "9%",
+                  "19.6%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_H"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "area_linhas": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": [
+                  "82%",
+                  "52%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "9%",
+                  "25.4%"
+                ],
+                "factory": {
+                  "name": "buttons",
+                  "control_name": "server_form.kny_btn_Q"
+                },
+                "collection_name": "form_buttons",
+                "bindings": [
+                  {
+                    "binding_name": "#form_button_length",
+                    "binding_name_override": "#collection_length"
+                  }
+                ]
+              }
+            },
+            {
+              "area_prev": {
+                "type": "panel",
+                "size": [
+                  "22%",
+                  "7%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "9%",
+                  "80%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_NP"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "area_next": {
+                "type": "panel",
+                "size": [
+                  "22%",
+                  "7%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "69%",
+                  "80%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_NN"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "kny_btn_Q@server_form.kny_btn_base": {
+    "$vis": "(('%.1s' * #form_button_text) = 'Q')",
+    "$txt": "(((((#form_button_text - 'Q0:') - 'Q1:') - 'QA:') - 'QB:') - 'QW:')",
+    "$lbl_anchor": "left_middle",
+    "$lbl_offset": [
+      "2%",
+      0
+    ],
+    "$lbl_size": [
+      "70%",
+      "default"
+    ],
+    "$lbl_align": "left",
+    "$lbl_scale": 0.85,
+    "size": [
+      "100%",
+      "16.6667%"
+    ],
+    "controls": [
+      {
+        "default": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0.1,
+            0,
+            0
+          ],
+          "alpha": 0.32,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "hover": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.16,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "pressed": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.32,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "texto@server_form.kny_label": {}
+      },
+      {
+        "v_Q0": {
+          "type": "panel",
+          "size": [
+            "21%",
+            "78%"
+          ],
+          "anchor_from": "right_middle",
+          "anchor_to": "right_middle",
+          "offset": [
+            "-1.2%",
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#form_button_text",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.3s' * #form_button_text) = 'Q0:')",
+              "target_property_name": "#visible"
+            }
+          ],
+          "controls": [
+            {
+              "cx": {
+                "type": "image",
+                "texture": "textures/ui/White",
+                "color": [
+                  0.1,
+                  0.55,
+                  0.15
+                ],
+                "alpha": 0.55,
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 5
+              }
+            },
+            {
+              "tx": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "§a§lMARCAR",
+                "font_scale_factor": 0.8,
+                "text_alignment": "center",
+                "anchor_from": "center",
+                "anchor_to": "center",
+                "size": [
+                  "96%",
+                  "default"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "v_Q1": {
+          "type": "panel",
+          "size": [
+            "21%",
+            "78%"
+          ],
+          "anchor_from": "right_middle",
+          "anchor_to": "right_middle",
+          "offset": [
+            "-1.2%",
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#form_button_text",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.3s' * #form_button_text) = 'Q1:')",
+              "target_property_name": "#visible"
+            }
+          ],
+          "controls": [
+            {
+              "cx": {
+                "type": "image",
+                "texture": "textures/ui/White",
+                "color": [
+                  0.55,
+                  0.4,
+                  0.05
+                ],
+                "alpha": 0.55,
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 5
+              }
+            },
+            {
+              "tx": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "§e§lDESMARCAR",
+                "font_scale_factor": 0.8,
+                "text_alignment": "center",
+                "anchor_from": "center",
+                "anchor_to": "center",
+                "size": [
+                  "96%",
+                  "default"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "v_QA": {
+          "type": "panel",
+          "size": [
+            "21%",
+            "78%"
+          ],
+          "anchor_from": "right_middle",
+          "anchor_to": "right_middle",
+          "offset": [
+            "-1.2%",
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#form_button_text",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.3s' * #form_button_text) = 'QA:')",
+              "target_property_name": "#visible"
+            }
+          ],
+          "controls": [
+            {
+              "cx": {
+                "type": "image",
+                "texture": "textures/ui/White",
+                "color": [
+                  0.3,
+                  0.3,
+                  0.3
+                ],
+                "alpha": 0.45,
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 5
+              }
+            },
+            {
+              "tx": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "§7AUTOMÁTICA",
+                "font_scale_factor": 0.8,
+                "text_alignment": "center",
+                "anchor_from": "center",
+                "anchor_to": "center",
+                "size": [
+                  "96%",
+                  "default"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "v_QB": {
+          "type": "panel",
+          "size": [
+            "21%",
+            "78%"
+          ],
+          "anchor_from": "right_middle",
+          "anchor_to": "right_middle",
+          "offset": [
+            "-1.2%",
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#form_button_text",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.3s' * #form_button_text) = 'QB:')",
+              "target_property_name": "#visible"
+            }
+          ],
+          "controls": [
+            {
+              "cx": {
+                "type": "image",
+                "texture": "textures/ui/White",
+                "color": [
+                  0.1,
+                  0.55,
+                  0.15
+                ],
+                "alpha": 0.45,
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 5
+              }
+            },
+            {
+              "tx": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "§a§lCONCLUÍDA",
+                "font_scale_factor": 0.8,
+                "text_alignment": "center",
+                "anchor_from": "center",
+                "anchor_to": "center",
+                "size": [
+                  "96%",
+                  "default"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "v_QW": {
+          "type": "panel",
+          "size": [
+            "21%",
+            "78%"
+          ],
+          "anchor_from": "right_middle",
+          "anchor_to": "right_middle",
+          "offset": [
+            "-1.2%",
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#form_button_text",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.3s' * #form_button_text) = 'QW:')",
+              "target_property_name": "#visible"
+            }
+          ],
+          "controls": [
+            {
+              "cx": {
+                "type": "image",
+                "texture": "textures/ui/White",
+                "color": [
+                  0.2,
+                  0.2,
+                  0.2
+                ],
+                "alpha": 0.45,
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 5
+              }
+            },
+            {
+              "tx": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "§8EM BREVE",
+                "font_scale_factor": 0.8,
+                "text_alignment": "center",
+                "anchor_from": "center",
+                "anchor_to": "center",
+                "size": [
+                  "96%",
+                  "default"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "kny_btn_H@server_form.kny_txt_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'H:')",
+    "$txt": "(#form_button_text - 'H:')",
+    "$lbl_anchor": "left_middle",
+    "$lbl_offset": [
+      0,
+      0
+    ],
+    "$lbl_size": [
+      "100%",
+      "default"
+    ],
+    "$lbl_align": "left",
+    "$lbl_scale": 0.85,
+    "size": [
+      "100%",
+      "100%"
+    ]
+  },
+  "kny_btn_NP@server_form.kny_btn_base": {
+    "$vis": "(('%.3s' * #form_button_text) = 'NP:')",
+    "$txt": "(#form_button_text - 'NP:')",
+    "$lbl_anchor": "center",
+    "$lbl_offset": [
+      0,
+      0
+    ],
+    "$lbl_size": [
+      "100%",
+      "default"
+    ],
+    "$lbl_align": "center",
+    "$lbl_scale": 1.0,
+    "size": [
+      "100%",
+      "100%"
+    ]
+  },
+  "kny_btn_NN@server_form.kny_btn_base": {
+    "$vis": "(('%.3s' * #form_button_text) = 'NN:')",
+    "$txt": "(#form_button_text - 'NN:')",
+    "$lbl_anchor": "center",
+    "$lbl_offset": [
+      0,
+      0
+    ],
+    "$lbl_size": [
+      "100%",
+      "default"
+    ],
+    "$lbl_align": "center",
+    "$lbl_scale": 1.0,
+    "size": [
+      "100%",
+      "100%"
+    ]
+  },
+  "kny_btn_T@server_form.kny_txt_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'T:')",
+    "$txt": "(#form_button_text - 'T:')",
+    "$lbl_anchor": "top_left",
+    "$lbl_offset": [
+      0,
+      0
+    ],
+    "$lbl_size": [
+      "100%",
+      "default"
+    ],
+    "$lbl_align": "left",
+    "$lbl_scale": 0.9,
+    "size": [
+      "100%",
+      "100%c"
+    ]
+  },
+  "kny_btn_K@server_form.kny_btn_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'K:')",
+    "$txt": "(#form_button_text - 'K:')",
+    "$lbl_anchor": "left_middle",
+    "$lbl_offset": [
+      "3%",
+      0
+    ],
+    "$lbl_size": [
+      "94%",
+      "default"
+    ],
+    "$lbl_align": "left",
+    "$lbl_scale": 1.0,
+    "size": [
+      "100%",
+      26
+    ],
+    "controls": [
+      {
+        "default": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0.1,
+            0,
+            0
+          ],
+          "alpha": 0.4,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "hover": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.18,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "pressed": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            1,
+            0.8,
+            0.5
+          ],
+          "alpha": 0.34,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "texto@server_form.kny_label": {}
+      }
+    ]
+  },
+  "kny_btn_S@server_form.kny_btn_base": {
+    "$vis": "(('%.2s' * #form_button_text) = 'S:')",
+    "$txt": "(#form_button_text - 'S:')",
+    "$lbl_anchor": "center",
+    "$lbl_offset": [
+      0,
+      0
+    ],
+    "$lbl_size": [
+      "96%",
+      "default"
+    ],
+    "$lbl_align": "center",
+    "$lbl_scale": 1.1,
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "controls": [
+      {
+        "default": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0.05,
+            0.3,
+            0.08
+          ],
+          "alpha": 0.8,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "hover": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0.4,
+            1,
+            0.5
+          ],
+          "alpha": 0.22,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "pressed": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0.4,
+            1,
+            0.5
+          ],
+          "alpha": 0.4,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 4
+        }
+      },
+      {
+        "texto@server_form.kny_label": {}
+      }
+    ]
+  },
+  "kny_scroll_conteudo": {
+    "type": "stack_panel",
+    "orientation": "vertical",
+    "size": [
+      "100%",
+      "100%c"
+    ],
+    "controls": [
+      {
+        "textos": {
+          "type": "stack_panel",
+          "orientation": "vertical",
+          "size": [
+            "100%",
+            "100%c"
+          ],
+          "factory": {
+            "name": "buttons",
+            "control_name": "server_form.kny_btn_T"
+          },
+          "collection_name": "form_buttons",
+          "bindings": [
+            {
+              "binding_name": "#form_button_length",
+              "binding_name_override": "#collection_length"
+            }
+          ]
+        }
+      },
+      {
+        "botoes": {
+          "type": "stack_panel",
+          "orientation": "vertical",
+          "size": [
+            "100%",
+            "100%c"
+          ],
+          "factory": {
+            "name": "buttons",
+            "control_name": "server_form.kny_btn_K"
+          },
+          "collection_name": "form_buttons",
+          "bindings": [
+            {
+              "binding_name": "#form_button_length",
+              "binding_name_override": "#collection_length"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "kny_rolagem@common.scrolling_panel": {
+    "$show_background": false,
+    "$scrolling_content": "server_form.kny_scroll_conteudo",
+    "$scroll_size": [
+      5,
+      "100% - 4px"
+    ],
+    "$scrolling_pane_size": [
+      "100% - 4px",
+      "100% - 2px"
+    ],
+    "$scrolling_pane_offset": [
+      2,
+      0
+    ],
+    "$scroll_bar_right_padding_size": [
+      0,
+      0
+    ],
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "layer": 4
+  },
+  "kny_menu_guia": {
+    "type": "panel",
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "controls": [
+      {
+        "escurecer": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.5,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 1
+        }
+      },
+      {
+        "moldura_raiz": {
+          "type": "panel",
+          "size": [
+            "177.78%y",
+            "100% - 4px"
+          ],
+          "anchor_from": "center",
+          "anchor_to": "center",
+          "controls": [
+            {
+              "fundo": {
+                "type": "image",
+                "texture": "textures/ui/kny_fundo_redondo",
+                "color": [
+                  0.05,
+                  0,
+                  0
+                ],
+                "alpha": 0.62,
+                "size": [
+                  "83%",
+                  "78%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "9%",
+                  "12.5%"
+                ],
+                "layer": 2,
+                "nineslice_size": 30
+              }
+            },
+            {
+              "moldura": {
+                "type": "image",
+                "texture": "textures/ui/kny_moldura_arte",
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 3
+              }
+            },
+            {
+              "titulo": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "#text",
+                "font_scale_factor": 1.2,
+                "color": [
+                  1,
+                  0.85,
+                  0.45
+                ],
+                "text_alignment": "center",
+                "size": [
+                  "40%",
+                  "default"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "left_middle",
+                "offset": [
+                  "30%",
+                  "20.2%"
+                ],
+                "bindings": [
+                  {
+                    "binding_name": "#title_text"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(#title_text - 'kny_txt|')",
+                    "target_property_name": "#text"
+                  }
+                ]
+              }
+            },
+            {
+              "area_voltar": {
+                "type": "panel",
+                "size": [
+                  "10.8%",
+                  "7.4%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "69.7%",
+                  "16.5%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_B"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "area_barras": {
+                "type": "stack_panel",
+                "orientation": "vertical",
+                "size": [
+                  "36.2%",
+                  "56.1%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "12.9%",
+                  "28.7%"
+                ],
+                "factory": {
+                  "name": "buttons",
+                  "control_name": "server_form.kny_btn_L6"
+                },
+                "collection_name": "form_buttons",
+                "bindings": [
+                  {
+                    "binding_name": "#form_button_length",
+                    "binding_name_override": "#collection_length"
+                  }
+                ]
+              }
+            },
+            {
+              "area_rolagem": {
+                "type": "panel",
+                "size": [
+                  "34.4%",
+                  "52.6%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "51.4%",
+                  "29.8%"
+                ],
+                "layer": 4,
+                "controls": [
+                  {
+                    "rolagem@server_form.kny_rolagem": {}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "kny_menu_contrato": {
+    "type": "panel",
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "controls": [
+      {
+        "escurecer": {
+          "type": "image",
+          "texture": "textures/ui/White",
+          "color": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.5,
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 1
+        }
+      },
+      {
+        "moldura_raiz": {
+          "type": "panel",
+          "size": [
+            "150%y",
+            "100% - 4px"
+          ],
+          "anchor_from": "center",
+          "anchor_to": "center",
+          "controls": [
+            {
+              "fundo": {
+                "type": "image",
+                "texture": "textures/ui/kny_fundo_redondo",
+                "color": [
+                  0.05,
+                  0,
+                  0
+                ],
+                "alpha": 0.7,
+                "size": [
+                  "91%",
+                  "87%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "4.5%",
+                  "6%"
+                ],
+                "layer": 2,
+                "nineslice_size": 30
+              }
+            },
+            {
+              "moldura": {
+                "type": "image",
+                "texture": "textures/ui/kny_moldura_missao",
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "layer": 3
+              }
+            },
+            {
+              "titulo": {
+                "type": "label",
+                "layer": 6,
+                "shadow": true,
+                "text": "#text",
+                "font_scale_factor": 1.2,
+                "color": [
+                  1,
+                  0.85,
+                  0.45
+                ],
+                "text_alignment": "center",
+                "size": [
+                  "40%",
+                  "default"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "left_middle",
+                "offset": [
+                  "30%",
+                  "11.9%"
+                ],
+                "bindings": [
+                  {
+                    "binding_name": "#title_text"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(#title_text - 'kny_ctr|')",
+                    "target_property_name": "#text"
+                  }
+                ]
+              }
+            },
+            {
+              "area_rolagem": {
+                "type": "panel",
+                "size": [
+                  "82%",
+                  "56%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "9%",
+                  "20.5%"
+                ],
+                "layer": 4,
+                "controls": [
+                  {
+                    "rolagem@server_form.kny_rolagem": {}
+                  }
+                ]
+              }
+            },
+            {
+              "aparencia@kny_oficina.acesso": {
+                "size": ["24%", "8%"],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": ["70.6%", "79.5%"]
+              }
+            },
+            {
+              "area_assinar": {
+                "type": "panel",
+                "size": [
+                  "40%",
+                  "8%"
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  "30%",
+                  "79.5%"
+                ],
+                "controls": [
+                  {
+                    "fabrica": {
+                      "type": "collection_panel",
+                      "size": [
+                        "100%",
+                        "100%"
+                      ],
+                      "factory": {
+                        "name": "buttons",
+                        "control_name": "server_form.kny_btn_S"
+                      },
+                      "collection_name": "form_buttons",
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_length",
+                          "binding_name_override": "#collection_length"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

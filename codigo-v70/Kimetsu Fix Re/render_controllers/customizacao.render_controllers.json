@@ -1,0 +1,369 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.kny.cc_pele": {
+      "geometry": "Geometry.cc_pele",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.cc_cores[variable.cc_pele]"
+      ],
+      "arrays": {
+        "textures": {
+          "Array.cc_cores": [
+            "Texture.cc_pele_porcelana",
+            "Texture.cc_pele_porcelana",
+            "Texture.cc_pele_areia",
+            "Texture.cc_pele_mel",
+            "Texture.cc_pele_terracota",
+            "Texture.cc_pele_bronze",
+            "Texture.cc_pele_cacau",
+            "Texture.cc_pele_ebano"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_rosto": {
+      "geometry": "Geometry.cc_rosto",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.cc_cores[variable.cc_rosto]"
+      ],
+      "arrays": {
+        "textures": {
+          "Array.cc_cores": [
+            "Texture.cc_expressao_1",
+            "Texture.cc_expressao_1",
+            "Texture.cc_expressao_2",
+            "Texture.cc_expressao_3",
+            "Texture.cc_expressao_4"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_olho_e": {
+      "geometry": "Array.cc_modelos[variable.cc_olhos]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.cc_cores[variable.cc_olhoE]"
+      ],
+      "arrays": {
+        "geometries": {
+          "Array.cc_modelos": [
+            "Geometry.cc_olho_e_0",
+            "Geometry.cc_olho_e_0",
+            "Geometry.cc_olho_e_1",
+            "Geometry.cc_olho_e_2",
+            "Geometry.cc_olho_e_3"
+          ]
+        },
+        "textures": {
+          "Array.cc_cores": [
+            "Texture.cc_iris_castanho",
+            "Texture.cc_iris_ambar",
+            "Texture.cc_iris_avela",
+            "Texture.cc_iris_azul",
+            "Texture.cc_iris_jade",
+            "Texture.cc_iris_cinza",
+            "Texture.cc_iris_vinho",
+            "Texture.cc_iris_ametista",
+            "Texture.cc_iris_rosa",
+            "Texture.cc_iris_turquesa"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_olho_d": {
+      "geometry": "Array.cc_modelos[variable.cc_olhos]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.cc_cores[variable.cc_olhoD]"
+      ],
+      "arrays": {
+        "geometries": {
+          "Array.cc_modelos": [
+            "Geometry.cc_olho_d_0",
+            "Geometry.cc_olho_d_0",
+            "Geometry.cc_olho_d_1",
+            "Geometry.cc_olho_d_2",
+            "Geometry.cc_olho_d_3"
+          ]
+        },
+        "textures": {
+          "Array.cc_cores": [
+            "Texture.cc_iris_castanho",
+            "Texture.cc_iris_ambar",
+            "Texture.cc_iris_avela",
+            "Texture.cc_iris_azul",
+            "Texture.cc_iris_jade",
+            "Texture.cc_iris_cinza",
+            "Texture.cc_iris_vinho",
+            "Texture.cc_iris_ametista",
+            "Texture.cc_iris_rosa",
+            "Texture.cc_iris_turquesa"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_cicatriz": {
+      "geometry": "Geometry.cc_cicatriz",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.cc_cores[variable.cc_cicatriz]"
+      ],
+      "arrays": {
+        "textures": {
+          "Array.cc_cores": [
+            "Texture.cc_cicatriz_1",
+            "Texture.cc_cicatriz_1",
+            "Texture.cc_cicatriz_2",
+            "Texture.cc_cicatriz_3",
+            "Texture.cc_cicatriz_4",
+            "Texture.cc_cicatriz_5"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_cabelo": {
+      "geometry": "Array.cc_modelos[variable.cc_cabelo]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.cc_cores[variable.cc_corCabelo]"
+      ],
+      "arrays": {
+        "geometries": {
+          "Array.cc_modelos": [
+            "Geometry.cc_cabelo_1",
+            "Geometry.cc_cabelo_1",
+            "Geometry.cc_cabelo_2",
+            "Geometry.cc_cabelo_3",
+            "Geometry.cc_cabelo_4",
+            "Geometry.cc_cabelo_5",
+            "Geometry.cc_cabelo_6",
+            "Geometry.cc_cabelo_7",
+            "Geometry.cc_cabelo_8"
+          ]
+        },
+        "textures": {
+          "Array.cc_cores": [
+            "Texture.cc_cabelo_carvao",
+            "Texture.cc_cabelo_castanha",
+            "Texture.cc_cabelo_vinho",
+            "Texture.cc_cabelo_acobreada",
+            "Texture.cc_cabelo_dourada",
+            "Texture.cc_cabelo_neve",
+            "Texture.cc_cabelo_cinza",
+            "Texture.cc_cabelo_indigo",
+            "Texture.cc_cabelo_pinho",
+            "Texture.cc_cabelo_ameixa"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_mecha": {
+      "geometry": "Array.cc_modelos[variable.cc_cabelo]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.cc_cores[variable.cc_mecha]"
+      ],
+      "arrays": {
+        "geometries": {
+          "Array.cc_modelos": [
+            "Geometry.cc_mecha_1",
+            "Geometry.cc_mecha_1",
+            "Geometry.cc_mecha_2",
+            "Geometry.cc_mecha_3",
+            "Geometry.cc_mecha_4",
+            "Geometry.cc_mecha_5",
+            "Geometry.cc_mecha_6",
+            "Geometry.cc_mecha_7",
+            "Geometry.cc_mecha_8"
+          ]
+        },
+        "textures": {
+          "Array.cc_cores": [
+            "Texture.cc_cabelo_carvao",
+            "Texture.cc_cabelo_carvao",
+            "Texture.cc_cabelo_castanha",
+            "Texture.cc_cabelo_vinho",
+            "Texture.cc_cabelo_acobreada",
+            "Texture.cc_cabelo_dourada",
+            "Texture.cc_cabelo_neve",
+            "Texture.cc_cabelo_cinza",
+            "Texture.cc_cabelo_indigo",
+            "Texture.cc_cabelo_pinho",
+            "Texture.cc_cabelo_ameixa"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_roupa": {
+      "geometry": "Array.cc_modelos[variable.cc_roupa]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.cc_cores[variable.cc_corRoupa]"
+      ],
+      "arrays": {
+        "geometries": {
+          "Array.cc_modelos": [
+            "Geometry.cc_roupa_1",
+            "Geometry.cc_roupa_1",
+            "Geometry.cc_roupa_2",
+            "Geometry.cc_roupa_3",
+            "Geometry.cc_roupa_4",
+            "Geometry.cc_roupa_5",
+            "Geometry.cc_roupa_6",
+            "Geometry.cc_roupa_7",
+            "Geometry.cc_roupa_8"
+          ]
+        },
+        "textures": {
+          "Array.cc_cores": [
+            "Texture.cc_tecido_carvao",
+            "Texture.cc_tecido_castanha",
+            "Texture.cc_tecido_vinho",
+            "Texture.cc_tecido_acobreada",
+            "Texture.cc_tecido_dourada",
+            "Texture.cc_tecido_neve",
+            "Texture.cc_tecido_cinza",
+            "Texture.cc_tecido_indigo",
+            "Texture.cc_tecido_pinho",
+            "Texture.cc_tecido_ameixa"
+          ]
+        }
+      },
+      "part_visibility": [
+        {
+          "body": "!query.has_armor_slot(1)"
+        },
+        {
+          "leftArm": "!query.has_armor_slot(1)"
+        },
+        {
+          "rightArm": "!query.has_armor_slot(1)"
+        },
+        {
+          "leftLeg": "!query.has_armor_slot(2) && !query.has_armor_slot(3)"
+        },
+        {
+          "rightLeg": "!query.has_armor_slot(2) && !query.has_armor_slot(3)"
+        }
+      ]
+    },
+    "controller.render.kny.cc_cabeca": {
+      "geometry": "Array.cc_modelos[variable.cc_cabeca]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.cc_adornos"
+      ],
+      "arrays": {
+        "geometries": {
+          "Array.cc_modelos": [
+            "Geometry.cc_cabeca_1",
+            "Geometry.cc_cabeca_1",
+            "Geometry.cc_cabeca_2",
+            "Geometry.cc_cabeca_3"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_mascara": {
+      "geometry": "Array.cc_modelos[variable.cc_mascara]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.cc_adornos"
+      ],
+      "arrays": {
+        "geometries": {
+          "Array.cc_modelos": [
+            "Geometry.cc_mascara_1",
+            "Geometry.cc_mascara_1",
+            "Geometry.cc_mascara_2"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_brincos": {
+      "geometry": "Array.cc_modelos[variable.cc_brincos]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.cc_adornos"
+      ],
+      "arrays": {
+        "geometries": {
+          "Array.cc_modelos": [
+            "Geometry.cc_brincos_1",
+            "Geometry.cc_brincos_1",
+            "Geometry.cc_brincos_2"
+          ]
+        }
+      }
+    },
+    "controller.render.kny.cc_demonio": {
+      "geometry": "Array.cc_modelos[variable.cc_demonio]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.cc_tracos"
+      ],
+      "arrays": {
+        "geometries": {
+          "Array.cc_modelos": [
+            "Geometry.cc_traco_1",
+            "Geometry.cc_traco_1",
+            "Geometry.cc_traco_2",
+            "Geometry.cc_traco_3",
+            "Geometry.cc_traco_4",
+            "Geometry.cc_traco_5"
+          ]
+        }
+      }
+    }
+  }
+}
