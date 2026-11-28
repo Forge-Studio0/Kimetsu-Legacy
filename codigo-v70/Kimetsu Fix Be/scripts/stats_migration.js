@@ -112,6 +112,16 @@ export function lerRegistro(raw) {
     atributos,
     migracao: origem.migracao ?? null,
   };
+  const m = origem.missao;
+  if (m !== undefined) {
+    const valorValido = (v) => Number.isSafeInteger(v) && v >= 0 && v <= LIMITE_SALDO;
+    if (!m || !Number.isSafeInteger(m.seq) || m.seq < 1 ||
+        !["pontos", "bonus", "patente", "dinheiro"].every((k) => valorValido(m.premio?.[k])) ||
+        (m.placares !== undefined && (!Array.isArray(m.placares) || m.placares.length !== 2 ||
+          !["upslayer", "updemon"].includes(m.placares[0]?.[0]) || m.placares[1]?.[0] !== "kny_dinheiro" ||
+          !m.placares.every((par) => valorValido(par[1]))))) return undefined;
+    dados.missao = m;
+  }
   dados.saldo = Math.min(dados.saldo, LIMITE_SALDO - totalInvestido(dados));
   return dados;
 }

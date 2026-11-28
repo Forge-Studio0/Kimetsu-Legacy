@@ -64,8 +64,19 @@ function mestre(resp = "water", op = {}) {
   return p;
 }
 function aulaComTreino(professor, aluno, id, forma) {
+  if (dominio.atribuirAprendizado(professor, aluno, id, forma)) return false;
   for (const { tipo, meta } of tarefasDaForma(id, forma)) dominio.registrarTreinoRespiracao(aluno, tipo, meta);
-  return dominio.registrarAula(professor, aluno, id, forma);
+  return !dominio.aprendizadoAtivo(aluno) && dominio.dominioHumano(aluno, id) === forma;
+}
+function atribuir(p, id) {
+  const resp = RESP_H_ID.get(id);
+  p.getComponent("minecraft:inventory").container.setItem(1, { typeId: resp.item });
+  const dia = dominio.requisitosProximaForma(p, id).k;
+  assert.equal(dominio.atribuirAprendizado(lider, p, id, dia), undefined);
+}
+function cancelar(p) {
+  const m = dominio.aprendizadoAtivo(p);
+  assert.ok(dominio.cancelarAprendizado(p, m.aluno, m.id, "Cancelado no teste"));
 }
 function hibrido() {
   const p = mestre();
@@ -98,20 +109,18 @@ function oniV72(p) {
   return p;
 }
 
-test("patente e placares antigos não são provas. Hashira pode completar aulas reais", () => {
+test("patente, placares antigos e tag solta não provam domínio ou autoridade", () => {
   const p = cacador({ hashira: true });
   stats.pontuar(p, "kf_water", 10);
+  p.addTag("hashira_lider");
   assert.equal(dominio.avaliarDominio(p).resp, undefined);
-  assert.equal(dominio.registrarAula(p, p, "water", 1), false);
-  assert.equal(dominio.registrarAula(lider, p, "water", 2), false);
-  p.location.x = 20;
-  assert.equal(dominio.registrarAula(lider, p, "water", 1), false);
-  p.location.x = 0;
-  assert.equal(dominio.registrarAula(lider, p, "water", 1), false);
+  assert.match(dominio.atribuirAprendizado(p, p, "water", 1), /titular/);
+  assert.match(dominio.atribuirAprendizado(lider, p, "water", 2), /próxima forma/);
+  p.location.x = 200;
   for (let k = 1; k <= 10; k++) assert.equal(aulaComTreino(lider, p, "water", k), true);
   assert.equal(dominio.avaliarDominio(p).resp.obj, "water");
   assert.equal(stats.getScore(p, "kf_water"), 10);
-  assert.equal(dominio.registrarAula(lider, p, "water", 10), false);
+  assert.match(dominio.atribuirAprendizado(lider, p, "water", 10), /concluída/);
   assert.equal(sistema.transformar(p, "rei", rei).hibrido, true);
   assert.equal(p.hasTag("hashira"), false);
   assert.equal(stats.getScore(p, "updemon"), 0);
@@ -131,44 +140,39 @@ test("as listas fixas da Água e da Básica correspondem ao pacote do cliente", 
   assert.equal(tarefasDaForma("mist", 1)[0].tipo, "meditar");
 });
 
-test("treinos aparecem com cor e avançam apenas a próxima aula, sem tocar nos outros contadores", async () => {
+test("treinos aparecem com cor, continuam após reconexão e avançam apenas a forma atribuída", async () => {
   const p = cacador({ nome: "TreinosAgua" });
   stats.pontuar(p, "kf_water", 10);
-  p.setDynamicProperty("kny_req", JSON.stringify({ "water:1": { nadar: 12 } }));
+  p.setDynamicProperty("kny_req", JSON.stringify({ "water:1": { nadar: 12 }, "flame:1": { oni: 1 } }));
   dominio.registrarTreinoRespiracao(p, "oni", 3);
-  assert.equal(dominio.registrarAula(lider, p, "water", 1), false);
-  assert.equal(stats.getScore(p, "kf_water"), 10);
+  assert.equal(treinosDaForma(p, "water", 1).find((t) => t.tipo === "oni").atual, 0);
+  atribuir(p, "water");
+  assert.match(dominio.atribuirAprendizado(lider, p, "flame", 1), /já tem/);
+  dominio.registrarTreinoRespiracao(p, "oni", 3);
   assert.equal(dominio.dominioHumano(p, "water"), 0);
 
   p.escolhas.push(selecionar("Respir."), selecionar("Respiração da Água"));
   abrirMenu(p, "");
   await executarAgendados();
   const quadro = p.telas.at(-1).buttons.find(({ texto }) => texto.startsWith("G:")).texto;
-  assert.match(quadro, /§cNadar: 12\/50 m/);
+  assert.match(quadro, /§7Nadar: 12\/50 m/);
   assert.match(quadro, /§aMatar onis: 3\/3 onis/);
   p.escolhas.push(selecionar("Respirações"), selecionar("Respiração da Água"));
   abrirMenu(p);
   await executarAgendados();
   assert.match(p.telas.at(-1).corpo, /§aMatar onis: 3\/3 onis/);
-
-  dominio.registrarTreinoRespiracao(p, "nadar", 38);
-  assert.ok(p.mensagens.some((t) => /forma 1 da Respiração da Água .*Procure o Líder/.test(t)));
-  const avisos = p.mensagens.filter((t) => /forma 1 da Respiração da Água .*Procure o Líder/.test(t)).length;
-  dominio.registrarTreinoRespiracao(p, "nadar", 150);
-  assert.equal(p.mensagens.filter((t) => /forma 1 da Respiração da Água .*Procure o Líder/.test(t)).length, avisos);
-  const salvo = JSON.parse(p.getDynamicProperty("kny_req"));
-  assert.equal(salvo["water:2"], undefined);
-  assert.ok(salvo["flame:1"].oni > 0);
   p.desconectar();
 
   const aluno = jogador(p.name, p.dinamicos);
   aluno.addTag("slayer");
   aluno.dimension = dim;
+  dominio.registrarTreinoRespiracao(aluno, "nadar", 38);
+  assert.equal(dominio.aprendizadoAtivo(aluno).estado, "pendente");
   aluno.getComponent("minecraft:inventory").container.setItem(1, { typeId: RESP_H_ID.get("water").item });
-  assert.equal(dominio.requisitosProximaForma(aluno, "water").faltas.length, 0);
-  assert.ok(dominio.registrarAula(lider, aluno, "water", 1));
-  delete salvo["water:1"];
-  assert.deepEqual(JSON.parse(aluno.getDynamicProperty("kny_req")), salvo);
+  assert.ok(dominio.concluirAprendizado(aluno));
+  assert.equal(dominio.concluirAprendizado(aluno), false);
+  assert.equal(dominio.dominioHumano(aluno, "water"), 1);
+  assert.deepEqual(JSON.parse(aluno.getDynamicProperty("kny_req")), { "flame:1": { oni: 1 } });
   const proxima = dominio.requisitosProximaForma(aluno, "water");
   assert.equal(proxima.k, 2);
   assert.ok(proxima.treinos.every((t) => t.atual === 0));
@@ -182,6 +186,7 @@ test("métricas de movimento e de abate contam pelo jogo e preservam a recompens
     executarIntervalos(1);
     executarIntervalos(1);
   };
+  atribuir(p, "water");
   amostrar();
   p.isSwimming = true;
   p.location.x += 0.75;
@@ -190,6 +195,9 @@ test("métricas de movimento e de abate contam pelo jogo e preservam a recompens
   amostrar();
   assert.equal(atual("water", "nadar"), 1);
   p.isSwimming = false;
+  cancelar(p);
+  atribuir(p, "thunder");
+  amostrar();
   p.isSprinting = true;
   p.location.x += 1.2;
   amostrar();
@@ -198,6 +206,9 @@ test("métricas de movimento e de abate contam pelo jogo e preservam a recompens
   amostrar();
   assert.equal(atual("thunder", "correr"), 1);
 
+  cancelar(p);
+  atribuir(p, "wind");
+  executarIntervalos(1);
   p.isJumping = true;
   p.isOnGround = false;
   executarIntervalos(1);
@@ -206,15 +217,15 @@ test("métricas de movimento e de abate contam pelo jogo e preservam a recompens
   executarIntervalos(1);
   assert.equal(atual("wind", "pular"), 1);
 
-  p.addTag("animacao");
+  cancelar(p);
+  atribuir(p, "water");
   const saldo = stats.disponiveis(p);
   world.afterEvents.entityDie.emit({
     deadEntity: { id: "OniTreino", typeId: "kny:demon" }, damageSource: { damagingEntity: p },
   });
   assert.equal(atual("water", "oni"), 1);
-  assert.equal(atual("flame", "oni"), 1);
+  assert.equal(atual("flame", "oni"), 0);
   assert.equal(stats.disponiveis(p), saldo + 250);
-  p.removeTag("animacao");
   p.addTag("demon");
   dominio.registrarTreinoRespiracao(p, "oni", 9);
   assert.equal(atual("water", "oni"), 1);
@@ -228,6 +239,7 @@ test("o treino do menu e o dummy continuam valendo para respiração com o atrib
     assert.ok(stats.comprar(p, a, 20, stats.statusAtributo(p, a)).feitas);
     assert.equal(stats.statusAtributo(p, a).proximo, null);
   }
+  atribuir(p, "gyomei");
   p.escolhas.push(selecionar("Treinamento"), selecionar("Flexão"));
   abrirMenu(p);
   await executarAgendados();
@@ -236,6 +248,7 @@ test("o treino do menu e o dummy continuam valendo para respiração com o atrib
   assert.equal(treinosDaForma(p, "gyomei", 1).find((t) => t.tipo === "flexao").atual, 1);
 
   const escola = [...RESP_H_ID.keys()].find((id) => tarefasDaForma(id, 1).some((t) => t.tipo === "dummy"));
+  if (escola !== "gyomei") { cancelar(p); atribuir(p, escola); }
   const golpe = { hitEntity: { typeId: "kny:dummy_treino" }, damagingEntity: p };
   world.afterEvents.entityHitEntity.emit(golpe);
   world.afterEvents.entityHitEntity.emit(golpe);
@@ -245,16 +258,19 @@ test("o treino do menu e o dummy continuam valendo para respiração com o atrib
   p.desconectar();
 });
 
-test("a aula da Básica consome as metas e mantém a progressão própria da lâmina colorida", async () => {
+test("atribuição da Básica pelo menu mantém a progressão própria da lâmina colorida", async () => {
   const p = cacador({ nome: "AlunoBasicaTreino" });
   p.getComponent("minecraft:inventory").container.setItem(2, { typeId: "kny:lamina_cinza", hasTag: (tag) => tag === "nichirin_cor" });
-  for (const meta of [19, 1]) {
-    dominio.registrarTreinoRespiracao(p, "pular", meta);
-    lider.escolhas.push(selecionar("Ensinar Respiração"), selecionar("Respiração Básica"), selecionar(p.name));
-    abrirMenu(lider);
-    await executarAgendados();
-    assert.equal(stats.getScore(p, "kf_basica"), meta === 1 ? 1 : 0);
-  }
+  lider.escolhas.push(selecionar("Missões de Aprendizado"), selecionar("Atribuir missão"), selecionar(p.name),
+    selecionar("PRÓXIMA"), selecionar("PRÓXIMA"), selecionar("PRÓXIMA"), selecionar("PRÓXIMA"),
+    selecionar("Respiração Básica"), selecionar("ATRIBUIR MISSÃO"));
+  abrirMenu(lider);
+  await executarAgendados(15);
+  assert.equal(dominio.aprendizadoAtivo(p)?.resp, "basica");
+  dominio.registrarTreinoRespiracao(p, "pular", 19);
+  assert.equal(stats.getScore(p, "kf_basica"), 0);
+  dominio.registrarTreinoRespiracao(p, "pular", 1);
+  assert.equal(stats.getScore(p, "kf_basica"), 1);
   assert.equal(dominio.dominioHumano(p, "basica"), 0);
   assert.equal(JSON.parse(p.getDynamicProperty("kny_req"))["basica:1"], undefined);
   assert.equal(dominio.requisitosProximaForma(p, "basica").k, 2);
@@ -321,7 +337,7 @@ test("somente o Rei titular, a Staff autorizada ou o sangue legítimo iniciam a 
   assert.equal(stats.getScore(p, "blood"), 1);
   assert.equal(p.getComponent("minecraft:inventory").container.getItem(0), undefined);
   assert.equal(sistema.transformar(p, "sangue").ok, false);
-  assert.equal(dominio.registrarAula(lider, p, "water", 2), false);
+  assert.match(dominio.atribuirAprendizado(lider, p, "water", 2), /caçador humano/);
 });
 
 test("a patente Híbrida exige ficha ativa e respeita a titularidade única do Rei", async () => {
@@ -459,17 +475,20 @@ test("Rei titular e cargo administrativo exigem a decisão de virar Oni comum", 
   assert.equal(stats.titularDe(OBJ_REI), rei.name);
 });
 
-test("aula selecionada antes de outro registro exige selecionar novamente a próxima forma", async () => {
+test("a confirmação antiga não começa outra missão se a próxima forma mudou", async () => {
   const p = cacador({ nome: "Concorrencia" });
-  lider.escolhas.push(selecionar("Ensinar Respiração"), selecionar("Respiração da Água"), (f) => {
-    const selecao = selecionar(p.name)(f);
-    assert.ok(aulaComTreino(lider, p, "water", 1));
-    return selecao;
-  });
+  lider.escolhas.splice(0);
+  lider.escolhas.push(selecionar("Missões de Aprendizado"), selecionar("Atribuir missão"), selecionar(p.name),
+    selecionar("Respiração da Água"), (f) => {
+      const selecao = selecionar("ATRIBUIR MISSÃO")(f);
+      assert.ok(aulaComTreino(lider, p, "water", 1));
+      return selecao;
+    });
   abrirMenu(lider);
-  await executarAgendados();
+  await executarAgendados(15);
   assert.equal(dominio.dominioHumano(p, "water"), 1);
-  assert.match(lider.mensagens.at(-1), /O progresso mudou/);
+  assert.equal(dominio.aprendizadoAtivo(p), undefined);
+  assert.match(lider.mensagens.at(-1), /próxima forma mudou/);
   p.desconectar();
 });
 
@@ -569,15 +588,16 @@ test("certificação tem autoridade, evidência, histórico e rejeita autocertif
   assert.ok(world.getDynamicPropertyIds().some((k) => k.startsWith("kny:h_auditoria_") && /certificar_dominio/.test(String(world.getDynamicProperty(k)))));
 });
 
-test("outro Hashira orienta o líder sem obter autoridade para ensinar iniciantes", () => {
+test("só o Líder pode atribuir inclusive a si mesmo após cumprir os requisitos", () => {
   const orientador = cacador({ hashira: true });
   const iniciante = cacador();
-  assert.equal(dominio.registrarAula(orientador, iniciante, "water", 1), false);
-  assert.equal(dominio.registrarAula(lider, lider, "water", 1), false);
+  assert.match(dominio.atribuirAprendizado(orientador, iniciante, "water", 1), /titular/);
+  assert.match(dominio.atribuirAprendizado(orientador, lider, "water", 1), /titular/);
   lider.getComponent("minecraft:inventory").container.setItem(1, { typeId: "kny:nichirin_water" });
   stats.pontuar(lider, "upslayer", 10000);
-  for (let k = 1; k <= 10; k++) assert.ok(aulaComTreino(orientador, lider, "water", k));
+  for (let k = 1; k <= 10; k++) assert.ok(aulaComTreino(lider, lider, "water", k));
   assert.equal(dominio.avaliarDominio(lider).resp.obj, "water");
+  assert.ok(world.getDynamicPropertyIds().some((k) => k.startsWith("kny:h_auditoria_") && /"autoatribuicao":true/.test(String(world.getDynamicProperty(k)))));
 });
 
 test("uma transformação interrompida é retomada sem duplicar dose, saldo ou identidade", () => {

@@ -1,7 +1,7 @@
 import { GameMode, ItemStack, system, world } from "@minecraft/server";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
 import { ESPECIAIS, RESP_H_ID } from "./hybrid_config.js";
-import { registrarAula, registrarTreinoRespiracao, requisitosProximaForma } from "./hybrid_mastery.js";
+import { atribuirAprendizado, dominioHumano, registrarTreinoRespiracao } from "./hybrid_mastery.js";
 import { tarefasDaForma } from "./treino_respiracao.js";
 import { getTrueRace, racaHibrida, revelar, transformar, trocarDisfarce } from "./hybrid_system.js";
 import { administrarPoder, ativarHabilidade, habilidadeDe } from "./hybrid_abilities.js";
@@ -46,11 +46,9 @@ function aprender(lider, p) {
   const agua = RESP_H_ID.get("water");
   item(p, agua.item);
   for (let i = 1; i <= agua.formas.length; i++) {
+    eq(atribuirAprendizado(lider, p, agua.obj, i), undefined, "Atribuir forma " + i);
     for (const { tipo, meta } of tarefasDaForma(agua.obj, i)) registrarTreinoRespiracao(p, tipo, meta);
-    const requisitos = requisitosProximaForma(p, agua.obj);
-    eq(requisitos.faltas.length, 0, "Preparação da aula " + i + " " + requisitos.faltas.join(", "));
-    const posicoes = JSON.stringify({ aluno: p.location, professor: lider.location });
-    eq(registrarAula(lider, p, agua.obj, i), true, "aula " + i + " " + posicoes);
+    eq(dominioHumano(p, agua.obj), i, "Domínio " + i);
   }
 }
 function ficha(p) {

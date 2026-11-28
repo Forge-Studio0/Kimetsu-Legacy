@@ -1,0 +1,476 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "kny:slayer",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": { "kny:em_missao": { "type": "bool", "default": false } },
+      "scripts":{
+        "animate":["slayer", {"slayer_death": "!query.property('kny:em_missao')"}, "main", "skill"]
+      },
+      "animations":{
+        "slayer":"controller.animation.slayer_target",
+        "slayer_death":"controller.animation.mark_damage",
+        "main":"controller.animation.main",
+        "skill":"controller.animation.skills",
+        "tomioka1": "animation.tomioka1",
+        "tomioka2": "animation.tomioka2",
+        "tomioka3": "animation.tomioka3",
+        "tomioka4": "animation.tomioka4",
+        "tomioka5": "animation.tomioka5",
+        "tomioka6": "animation.tomioka6",
+        "tomioka7": "animation.tomioka7",
+        "tomioka8": "animation.tomioka8",
+        "tomioka9": "animation.tomioka9",
+        "tomioka10": "animation.tomioka10",
+        "rengoku1": "animation.rengoku1",
+        "rengoku2": "animation.rengoku2",
+        "rengoku3": "animation.rengoku3",
+        "rengoku4": "animation.rengoku4",
+        "rengoku5": "animation.rengoku5",
+        "rengoku6": "animation.rengoku6",
+        "sanemi1": "animation.sanemi1",
+        "sanemi2": "animation.sanemi2",
+        "sanemi3": "animation.sanemi3",
+        "sanemi4": "animation.sanemi4",
+        "sanemi5": "animation.sanemi5",
+        "sanemi6": "animation.sanemi6",
+        "sanemi7": "animation.sanemi7",
+        "sanemi8": "animation.sanemi8",
+        "zenitsu1": "animation.zenitsu1",
+        "kaigaku1": "animation.kaigaku1",
+        "kaigaku2": "animation.kaigaku2",
+        "kaigaku3": "animation.kaigaku3",
+        "kaigaku4": "animation.kaigaku4",
+        "kaigaku5": "animation.kaigaku5"
+      }
+    },
+    "component_groups": {
+      "kny:ator_missao": {
+        "minecraft:loot": {
+          "table": "loot_tables/kny_missao_vazio.json"
+        },
+        "minecraft:experience_reward": {
+          "on_death": "0"
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 2,
+          "within_radius": 6,
+          "reselect_targets": true,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "player"
+                  },
+                  {
+                    "test": "has_tag",
+                    "subject": "other",
+                    "value": "kny_missao_protegido"
+                  }
+                ]
+              },
+              "max_dist": 24
+            }
+          ]
+        },
+        "minecraft:damage_sensor": {
+          "triggers": [
+            {
+              "cause": "starve",
+              "deals_damage": true
+            },
+            {
+              "cause": "wither",
+              "deals_damage": true
+            },
+            {
+              "cause": "fall",
+              "deals_damage": true
+            },
+            {
+              "cause": "lightning",
+              "deals_damage": true
+            },
+            {
+              "cause": "freezing",
+              "deals_damage": true
+            },
+            {
+              "on_damage": {
+                "filters": {
+                  "test": "actor_health",
+                  "operator": "<=",
+                  "value": 0
+                },
+                "event": "kny:on_death"
+              }
+            }
+          ]
+        },
+        "minecraft:equipment": {
+          "table": "loot_tables/equip/slayer.json",
+          "slot_drop_chance": [
+            {
+              "slot": "slot.weapon.mainhand",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.weapon.offhand",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.head",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.chest",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.legs",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.feet",
+              "drop_chance": 0.0
+            }
+          ]
+        }
+      },
+      "kny:slayer_none": {
+        "minecraft:variant": { "value": 0 }
+      },
+      "kny:slayer_water": {
+        "minecraft:variant": { "value": 1 },
+           "minecraft:health": {
+              "value": 80,
+              "max": 80
+          }
+      },
+      "kny:slayer_wind": {
+        "minecraft:variant": { "value": 2 },
+          "minecraft:health": {
+              "value": 80,
+              "max": 80
+           }
+      },
+      "kny:slayer_flame": {
+        "minecraft:variant": { "value": 3 },
+           "minecraft:health": {
+              "value": 80,
+              "max": 80
+         }
+      },
+      "kny:slayer_thunder": {
+        "minecraft:variant": { "value": 4 },
+          "minecraft:health": {
+              "value": 100,
+              "max": 100
+           }
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": ["slayer"]
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 2,
+        "within_radius": 6,
+        "reselect_targets": true,
+        "entity_types": [
+          {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "demon"
+                }
+              ]
+            },
+            "max_dist": 20
+          },
+          {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player_demon"
+                }
+              ]
+            },
+            "max_dist": 20
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "muzan"
+                },
+                {
+                  "test": "in_water",
+                  "subject": "other",
+                  "operator": "!=",
+                  "value": true
+                }
+              ]
+            },
+            "max_dist": 20
+          }
+        ]
+      },
+      "minecraft:timer": {
+        "looping": false,
+        "randomInterval": false,
+        "time": 0.1,
+        "time_down_event": {
+          "event": "kny:be_wild",
+          "target": "self"
+        }
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:equip_item": {},
+      "minecraft:behavior.equip_item": {
+        "priority": 3
+      },
+      "minecraft:behavior.pickup_items": {
+        "priority": 7,
+        "max_dist": 3,
+        "goal_radius": 2,
+        "speed_multiplier": 1.0
+      },
+      "minecraft:knockback_resistance": {
+        "value": 0
+      },
+      "minecraft:movement": {
+        "value": 0.3
+      },
+      "minecraft:follow_range": {
+        "value": 100,
+        "max": 100
+      },
+      "minecraft:scale": {
+        "value": 1
+      },
+      "minecraft:health": {
+        "value": 30,
+        "max": 30
+      },
+      "minecraft:attack": {
+        "damage": 2.5
+      },
+      "minecraft:nameable": {},
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:movement.basic": {
+        "value": 1
+      },
+      "minecraft:navigation.walk": {
+        "is_amphibious": true,
+        "can_pass_doors": true,
+        "can_break_doors": false,
+        "can_walk": true,
+        "can_open_doors": true,
+        "can_path_over_water": true,
+        "avoid_water": true
+      },
+      "minecraft:jump.static": {},
+      "minecraft:hurt_on_condition": {
+        "damage_conditions": [
+          {
+            "filters": {
+              "test": "in_lava",
+              "subject": "self",
+              "operator": "==",
+              "value": true
+            },
+            "cause": "lava",
+            "damage_per_tick": 4
+          }
+        ]
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 4,
+        "track_target": true,
+        "speed_multiplier": 1
+      },
+      "minecraft:equipment": {
+        "table": "loot_tables/equip/slayer.json"
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/loot/slayer.json"
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 6,
+        "speed_multiplier": 1
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 9,
+        "look_distance": 10,
+        "probability": 0.02
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 7,
+        "speed_multiplier": 1
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          { "cause": "starve", "deals_damage": true },
+          { "cause": "wither", "deals_damage": true },
+          { "cause": "fall", "deals_damage": true },
+          { "cause": "lightning", "deals_damage": true },
+          { "cause": "freezing", "deals_damage": true },
+          {
+            "on_damage": {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "slayer"
+                  }
+                ]
+              }
+            },
+            "deals_damage": false
+          },
+          {
+            "on_damage": {
+              "filters": {"test":"actor_health","operator":"<=","value":0},
+              "event":"kny:on_death"
+            }
+          }
+        ]
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:behavior.float": {
+        "priority": 0
+      }
+    },
+    "events":{
+      "kny:missao_spawn": {
+        "sequence": [
+          {
+            "randomize": [
+              {
+                "weight": 50,
+                "add": {
+                  "component_groups": [
+                    "kny:slayer_none"
+                  ]
+                }
+              },
+              {
+                "weight": 20,
+                "add": {
+                  "component_groups": [
+                    "kny:slayer_water"
+                  ]
+                }
+              },
+              {
+                "weight": 15,
+                "add": {
+                  "component_groups": [
+                    "kny:slayer_wind"
+                  ]
+                }
+              },
+              {
+                "weight": 15,
+                "add": {
+                  "component_groups": [
+                    "kny:slayer_thunder"
+                  ]
+                }
+              },
+              {
+                "weight": 15,
+                "add": {
+                  "component_groups": [
+                    "kny:slayer_flame"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "set_property": {
+              "kny:em_missao": true
+            },
+            "add": {
+              "component_groups": [
+                "kny:ator_missao"
+              ]
+            }
+          }
+        ]
+      },
+      "minecraft:entity_spawned": {
+        "randomize": [
+          {
+            "weight": 50,
+            "add": { "component_groups": ["kny:slayer_none"] }
+          },
+          {
+            "weight": 20,
+            "add": { "component_groups": ["kny:slayer_water"] }
+          },
+          {
+            "weight": 15,
+            "add": { "component_groups": ["kny:slayer_wind"] }
+          },
+          {
+            "weight": 15,
+            "add": { "component_groups": ["kny:slayer_thunder"] }
+          },
+          {
+            "weight": 15,
+            "add": { "component_groups": ["kny:slayer_flame"] }
+          }
+        ]
+      },
+      "kny:on_death": {
+        "queue_command":{
+          "command":["execute unless entity @s[tag=kny_missao_ator] run scoreboard players add @p[r=5,tag=!demon] updemon 1", "execute unless entity @s[tag=kny_missao_ator] run tellraw @p[r=5]{\"rawtext\":[{\"text\":\"Killed the Slayer\"}]}"]
+        }
+      },
+      "kny:be_wild":{
+        "add":{
+          "component_groups":[
+            "kny:wild"
+          ]
+        }
+      },
+      "kny:on_hit":{
+        "add":{
+          "component_groups":[
+            "kny:hantengu_run"
+          ]
+        }
+      }
+    }
+  }
+}

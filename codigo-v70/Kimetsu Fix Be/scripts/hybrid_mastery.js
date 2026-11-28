@@ -1,11 +1,14 @@
+import { system, world } from "@minecraft/server";
 import { DOMINAVEL, RESP_H, RESP_H_ID } from "./hybrid_config.js";
-import { CHAVE_DOMINIO, gravarJson, identificador, lerJson, personagem, registrarAuditoria } from "./hybrid_records.js";
+import { CHAVE_DOMINIO, gravarJson, idExistente, identificador, lerJson, personagem, registrarAuditoria } from "./hybrid_records.js";
 import { getScore, patenteDe, pontuar } from "./stats.js";
 import { ehStaff, estadoBloqueado } from "./hybrid_system.js";
 import { modoDeJogo } from "./compat.js";
 import { haTreinoPendente, limparTreinosDaForma, somarTreino, textoTreinoDaForma, treinosDaForma } from "./treino_respiracao.js";
 
-export const DISTANCIA_AULA = 12;
+const PREFIXO_APRENDIZADO = "kny:aprender_";
+const SEQ_APRENDIZADO = "kny:aprender_seq";
+const ORIGENS = ["humano:aula", "humano:certificado", "humano:missao"];
 export const ehCacadorHumano = (p) => p?.isValid && !p.hasTag("demon") && !p.hasTag("kny_hybrid") &&
   (p.hasTag("slayer") || p.hasTag("slayer2") || p.hasTag("mizunoto"));
 
@@ -16,8 +19,9 @@ function dominio(p) {
   for (const [id, aulas] of Object.entries(d.aulas)) {
     const resp = RESP_H_ID.get(id);
     if (!resp || !Array.isArray(aulas) || aulas.length > resp.formas.length ||
-        aulas.some((a) => !Array.isArray(a) || !["humano:aula", "humano:certificado"].includes(a[0]) ||
-          typeof a[1] !== "string" || !Number.isSafeInteger(a[2]))) return null;
+        aulas.some((a) => !Array.isArray(a) || !ORIGENS.includes(a[0]) ||
+          typeof a[1] !== "string" || !Number.isSafeInteger(a[2]) ||
+          (a[0] === "humano:missao" && (typeof a[3] !== "string" || !/^a[1-9][0-9]*$/.test(a[3]))))) return null;
   }
   return d;
 }
@@ -77,7 +81,8 @@ function fichaHumana(p) {
   return registro === undefined || registro?.estado === "curado";
 }
 
-const podeRegistrar = (p) => fichaHumana(p) && !estadoBloqueado(p);
+const emJogo = (p) => !["creative", "spectator"].includes(modoDeJogo(p));
+const podeRegistrar = (p) => fichaHumana(p) && !estadoBloqueado(p) && emJogo(p);
 
 function formaSeguinte(p, resp, d) {
   const aprendidas = DOMINAVEL(resp.obj) ? (d.aulas[resp.obj]?.length ?? 0) : formasLiberadas(p, resp);
@@ -96,28 +101,98 @@ function faltasAula(p, resp, forma) {
   return faltas;
 }
 
-function requisitosDaForma(p, resp, forma) {
-  const treinos = treinosDaForma(p, resp.obj, forma);
-  const faltas = faltasAula(p, resp, forma);
-  faltas.push(...treinos.filter((t) => !t.concluido).map(textoTreinoDaForma));
-  return { k: forma, faltas, treinos };
-}
-
 export function requisitosProximaForma(p, id) {
   const resp = RESP_H_ID.get(id);
   const d = dominio(p);
   const k = resp && d ? formaSeguinte(p, resp, d) : 0;
-  return k ? requisitosDaForma(p, resp, k) : { k: 0, faltas: [], treinos: [], invalido: d === null };
+  return {
+    k,
+    faltas: k ? faltasAula(p, resp, k) : [],
+    treinos: k ? treinosDaForma(p, resp.obj, k) : [],
+    honra: k ? (k - 1) * (id === "basica" ? 5 : 10) : 0,
+    invalido: d === null,
+  };
+}
+
+const chaveAprendizado = (id) => PREFIXO_APRENDIZADO + id;
+
+function fichaAprendizado(id) {
+  if (!id) return { v: 1, historico: [] };
+  const dados = lerJson(world, chaveAprendizado(id));
+  if (dados === undefined) return { v: 1, historico: [] };
+  if (!dados || !Array.isArray(dados.historico)) return null;
+  const m = dados.ativa;
+  if (m && (m.aluno !== id || !/^a[1-9][0-9]*$/.test(m.id) || !/^h[1-9][0-9]*$/.test(m.professor) ||
+      !Number.isSafeInteger(m.quando) || !Number.isSafeInteger(m.forma) || m.forma < 1 ||
+      m.forma > (RESP_H_ID.get(m.resp)?.formas.length ?? 0) ||
+      !["andamento", "pendente", "aprovada"].includes(m.estado))) return null;
+  return dados;
+}
+
+export const podeAtribuirAprendizado = (p) => podeRegistrar(p) && patenteDe(p).tag === "hashira_lider";
+export const podeSerAluno = (p) => podeRegistrar(p) && !!dominio(p);
+export const aprendizadoAtivo = (p) => fichaAprendizado(idExistente(p))?.ativa;
+export const historicoAprendizado = (p) => fichaAprendizado(idExistente(p))?.historico ?? [];
+
+export function registrosAprendizado() {
+  return world.getDynamicPropertyIds().filter((chave) => /^kny:aprender_h[1-9][0-9]*$/.test(chave))
+    .map((chave) => fichaAprendizado(chave.slice(PREFIXO_APRENDIZADO.length))).filter(Boolean);
+}
+
+export function atribuirAprendizado(professor, aluno, id, formaMostrada) {
+  if (!podeAtribuirAprendizado(professor)) return "A atribuição exige o titular do cargo de Líder dos Hashiras.";
+  if (!podeSerAluno(aluno)) return "O aluno precisa ser um caçador humano em estado válido.";
+  const alunoId = identificador(aluno);
+  const ficha = fichaAprendizado(alunoId);
+  if (!ficha) return "Histórico de aprendizado incompatível. Consulte a Staff.";
+  if (ficha.ativa) return "O aluno já tem uma missão de aprendizado ativa.";
+  const { k, faltas } = requisitosProximaForma(aluno, id);
+  if (!k || k !== formaMostrada) return "A próxima forma mudou ou a respiração já foi concluída.";
+  if (faltas.length) return faltas.join(" · ");
+  const n = world.getDynamicProperty(SEQ_APRENDIZADO) ?? 0;
+  if (!Number.isSafeInteger(n) || n >= Number.MAX_SAFE_INTEGER - 1 || n < 0) return "Sequência de aprendizado indisponível.";
+  const professorId = identificador(professor);
+  const m = {
+    id: "a" + (n + 1), aluno: alunoId, nome: aluno.name, professor: professorId, nomeProfessor: professor.name,
+    resp: id, forma: k, quando: Date.now(), estado: "andamento",
+  };
+  world.setDynamicProperty(SEQ_APRENDIZADO, n + 1);
+  gravarJson(world, chaveAprendizado(alunoId), { ...ficha, ativa: m });
+  registrarAuditoria("aprendizado_atribuido", { ...m, autoatribuicao: professorId === alunoId });
+  aluno.sendMessage("§e[Respirações] O Líder dos Hashiras atribuiu uma missão. Confira os objetivos em Missões.");
+  concluirAprendizado(aluno);
+  return undefined;
+}
+
+function encerrarAprendizado(ficha, m, estado, motivo) {
+  const entrada = { ...m, estado, motivo, encerrado: Date.now() };
+  gravarJson(world, chaveAprendizado(m.aluno), { v: 1, historico: [entrada, ...ficha.historico].slice(0, 24) });
+}
+
+export function cancelarAprendizado(autor, alunoId, missaoId, motivo) {
+  if (!autor?.isValid || (!podeAtribuirAprendizado(autor) && idExistente(autor) !== alunoId)) return false;
+  const ficha = fichaAprendizado(alunoId);
+  const m = ficha?.ativa;
+  if (!m || m.id !== missaoId || m.estado === "aprovada") return false;
+  const alvo = world.getPlayers().find((p) => idExistente(p) === alunoId);
+  encerrarAprendizado(ficha, m, "cancelada", motivo);
+  registrarAuditoria("aprendizado_cancelado", { missao: m.id, autor: identificador(autor), aluno: alunoId, motivo });
+  alvo?.sendMessage("§e[Respirações] Missão cancelada. O progresso pode ser aproveitado na mesma forma.");
+  return true;
+}
+
+export function progressoAprendizado(p, m) {
+  if (!m || m.aluno !== idExistente(p)) return [];
+  return treinosDaForma(p, m.resp, m.forma);
 }
 
 function etapasDeTreino(p) {
-  if (!fichaHumana(p) || p.hasTag("kny_caido") || modoDeJogo(p) === "spectator" ||
+  if (!fichaHumana(p) || !emJogo(p) || p.hasTag("kny_caido") || p.hasTag("kny_finalizando") || p.hasTag("kny_finalizado") ||
       (p.getComponent("minecraft:health")?.currentValue ?? 1) <= 0) return [];
-  const d = dominio(p);
-  if (!d) return [];
-  return RESP_H
-    .map((resp) => ({ resp, forma: formaSeguinte(p, resp, d) }))
-    .filter(({ forma }) => forma > 0);
+  const m = aprendizadoAtivo(p);
+  const resp = m && RESP_H_ID.get(m.resp);
+  const d = resp && dominio(p);
+  return d && m.estado === "andamento" && formaSeguinte(p, resp, d) === m.forma ? [{ resp, forma: m.forma }] : [];
 }
 
 export function podeTreinarRespiracao(p, tipo) {
@@ -128,16 +203,13 @@ export function podeTreinarRespiracao(p, tipo) {
 export function registrarTreinoRespiracao(p, tipo, quantidade) {
   const etapas = etapasDeTreino(p);
   if (etapas.length === 0) return;
-  const concluidas = somarTreino(p, etapas, tipo, quantidade);
-  if (concluidas.length === 0) return;
-  const onde = concluidas.length === 1 ? concluidas[0].resp.nome : `${concluidas.length} respirações`;
-  p.sendMessage(`§a[Respirações] Treino cumprido: ${concluidas[0].nome} §7(${onde})`);
-  if (!p.hasTag("kny_cfg_som_off")) {
-    try { p.playSound("random.levelup", { pitch: 1.4, volume: 0.5 }); } catch {}
-  }
-  const prontas = concluidas.filter(({ completa, resp, forma }) => completa && faltasAula(p, resp, forma).length === 0);
-  for (const { resp, forma } of prontas) {
-    p.sendMessage(`§e[Respirações] A forma ${forma} da ${resp.nome} está pronta para a aula. Procure o Líder dos Hashiras para aprender.`);
+  for (const concluida of somarTreino(p, etapas, tipo, quantidade)) {
+    const objetivo = treinosDaForma(p, concluida.resp.obj, concluida.forma).find((t) => t.tipo === tipo);
+    p.sendMessage("§a[Respirações] Treinamento concluído: " + textoTreinoDaForma(objetivo));
+    if (!p.hasTag("kny_cfg_som_off")) {
+      try { p.playSound("random.levelup", { pitch: 1.4, volume: 0.5 }); } catch {}
+    }
+    if (concluida.completa) concluirAprendizado(p);
   }
 }
 
@@ -145,28 +217,64 @@ function registrar(p, d, resp, aulas) {
   const id = resp.obj;
   identificador(p);
   gravarJson(p, CHAVE_DOMINIO, { ...d, aulas: { ...d.aulas, [id]: aulas } });
-  const chave = "kf_" + id;
-  if (getScore(p, chave) < aulas.length) pontuar(p, chave, aulas.length);
+  espelharForma(p, id, aulas.length);
 }
 
-export function registrarAula(professor, aluno, id, forma) {
-  const resp = RESP_H_ID.get(id);
-  if (!resp || !DOMINAVEL(id) || !podeRegistrar(professor) || !podeRegistrar(aluno)) return false;
-  const cargo = patenteDe(professor).tag;
-  const cargoAluno = patenteDe(aluno).tag;
-  if ((cargo !== "hashira_lider" && !(cargo === "hashira" && ["hashira", "hashira_lider"].includes(cargoAluno))) ||
-      professor.id === aluno.id || aluno.dimension.id !== professor.dimension.id) return false;
-  const a = aluno.location;
-  const b = professor.location;
-  if (Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) > DISTANCIA_AULA) return false;
-  const d = dominio(aluno);
+function espelharForma(p, id, forma) {
+  const chave = "kf_" + id;
+  if (getScore(p, chave) < forma) pontuar(p, chave, forma);
+}
+
+export function concluirAprendizado(p) {
+  const id = idExistente(p);
+  const ficha = fichaAprendizado(id);
+  const m = ficha?.ativa;
+  if (!m || !podeRegistrar(p)) return false;
+  const resp = RESP_H_ID.get(m.resp);
+  const d = dominio(p);
   if (!d) return false;
-  const aulas = d.aulas[id] ?? [];
-  if (forma !== aulas.length + 1 || forma > resp.formas.length || requisitosDaForma(aluno, resp, forma).faltas.length > 0) return false;
-  registrar(aluno, d, resp, [...aulas, ["humano:aula", identificador(professor), Date.now()]]);
-  limparTreinosDaForma(aluno, id, forma);
+  const aulas = d.aulas[m.resp] ?? [];
+  const gravada = aulas[m.forma - 1]?.[3] === m.id;
+  const dominavel = DOMINAVEL(m.resp);
+  if (!gravada && m.estado !== "aprovada") {
+    if (formaSeguinte(p, resp, d) !== m.forma) {
+      encerrarAprendizado(ficha, m, "cancelada", "A forma avançou por outro procedimento.");
+      registrarAuditoria("aprendizado_cancelado", { missao: m.id, aluno: id, motivo: "Forma avançou por outro procedimento" });
+      return false;
+    }
+    if (progressoAprendizado(p, m).some((t) => !t.concluido)) return false;
+    const faltas = faltasAula(p, resp, m.forma);
+    if (faltas.length) {
+      if (m.estado !== "pendente") {
+        gravarJson(world, chaveAprendizado(id), { ...ficha, ativa: { ...m, estado: "pendente" } });
+        p.sendMessage("§e[Respirações] Objetivos cumpridos. Falta " + faltas.join(" · ") + ".");
+      }
+      return false;
+    }
+    gravarJson(world, chaveAprendizado(id), { ...ficha, ativa: { ...m, estado: "aprovada" } });
+  }
+  if (dominavel && !gravada) {
+    if (aulas.length !== m.forma - 1) return false;
+    registrar(p, d, resp, [...aulas, ["humano:missao", m.professor, Date.now(), m.id]]);
+  }
+  espelharForma(p, m.resp, m.forma);
+  limparTreinosDaForma(p, m.resp, m.forma);
+  encerrarAprendizado(ficha, m, "concluida");
+  registrarAuditoria("aprendizado_concluido", { missao: m.id, aluno: id, professor: m.professor, resp: m.resp, forma: m.forma });
+  p.sendMessage(`§a[Respirações] Você dominou ${m.forma}ª forma da ${resp.nome}: ${resp.formas[m.forma - 1]}!`);
+  if (m.forma === resp.formas.length) {
+    p.sendMessage("§aVocê dominou completamente sua respiração." +
+      (DOMINAVEL(m.resp) ? " Confira a respiração original em Guia → Domínio humano." : ""));
+  }
   return true;
 }
+
+system.runInterval(() => {
+  for (const p of world.getPlayers()) {
+    try { concluirAprendizado(p); }
+    catch (e) { console.warn("[Aprendizado] " + e); }
+  }
+}, 40);
 
 export function certificarHistorico(autor, aluno, id, prova) {
   return podeRegistrar(aluno) && certificarAulas(autor, aluno, id, prova, "certificar_dominio");

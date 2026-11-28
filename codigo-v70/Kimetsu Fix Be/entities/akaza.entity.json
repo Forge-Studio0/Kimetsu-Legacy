@@ -1,0 +1,395 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "kny:akaza",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": { "kny:em_missao": { "type": "bool", "default": false } },
+      "scripts":{
+        "animate":["akaza_target", {"m7": "!query.property('kny:em_missao')"}, {"updemon": "!query.property('kny:em_missao')"}, {"death_day": "!query.property('kny:em_missao')"}, "skill", "main", "akaza_damage", "akaza_damage2", "akaza_crisis", {"updemon": "!query.property('kny:em_missao')"}]
+      },
+      "animations":{
+        "updemon":"controller.animation.upper3",
+        "akaza_target":"controller.animation.akaza_target",
+        "akaza_crisis":"controller.animation.akaza_crisis",
+        "m7":"controller.animation.akaza_m7",
+        "death_day":"controller.animation.kill_burn",
+        "akaza_damage":"controller.animation.akaza_damage",
+        "main":"controller.animation.main",
+        "skill":"controller.animation.skills",
+        "akaza1": "animation.akaza1",
+        "akaza2": "animation.akaza2",
+        "akaza3": "animation.akaza3",
+        "akaza4": "animation.akaza4",
+        "akaza5": "animation.akaza5",
+        "akaza6": "animation.akaza6",
+        "akaza7": "animation.akaza7"
+      }
+    },
+    "component_groups":{
+      "kny:ator_missao": {
+        "minecraft:loot": {
+          "table": "loot_tables/kny_missao_vazio.json"
+        },
+        "minecraft:experience_reward": {
+          "on_death": "0"
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 2,
+          "within_radius": 6,
+          "reselect_targets": true,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "player"
+                  },
+                  {
+                    "test": "has_tag",
+                    "subject": "other",
+                    "value": "kny_missao_protegido"
+                  }
+                ]
+              },
+              "max_dist": 24
+            }
+          ]
+        },
+        "minecraft:damage_sensor": {
+          "triggers": [
+            {
+              "cause": "starve",
+              "deals_damage": true
+            },
+            {
+              "cause": "wither",
+              "deals_damage": true
+            },
+            {
+              "cause": "fall",
+              "deals_damage": true
+            },
+            {
+              "cause": "lightning",
+              "deals_damage": true
+            },
+            {
+              "cause": "freezing",
+              "deals_damage": true
+            },
+            {
+              "on_damage": {
+                "filters": {
+                  "test": "actor_health",
+                  "operator": "<=",
+                  "value": 0
+                },
+                "event": "kny:on_death"
+              }
+            }
+          ]
+        },
+        "minecraft:equipment": {
+          "table": "loot_tables/equip/akaza.json",
+          "slot_drop_chance": [
+            {
+              "slot": "slot.weapon.mainhand",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.weapon.offhand",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.head",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.chest",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.legs",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.feet",
+              "drop_chance": 0.0
+            }
+          ]
+        }
+      },
+      "kny:wild":{
+        "minecraft:variant":{
+          "value":0
+        }
+      }
+    },
+
+    "components": {
+        "minecraft:type_family": {
+        "family": [ "uppermoon", "sword", "akaza", "demon"]
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 2,
+        "within_radius": 6,
+        "reselect_targets": true,
+        "entity_types": [
+          {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "slayer"
+                }
+              ]
+            },
+            "max_dist": 20
+          },
+          {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "hashira"
+                }
+              ]
+            },
+            "max_dist": 20
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
+                },
+                {
+                  "test": "in_water",
+                  "subject": "other",
+                  "operator": "!=",
+                  "value": true
+                }
+              ]
+            },
+            "max_dist": 20
+          }
+        ]
+      },
+      "minecraft:timer": {
+        "looping": false,
+        "randomInterval": false,
+        "time": 0.1,
+        "time_down_event": {
+         "event": "kny:be_wild",
+         "target": "self"
+        }
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:equip_item": {
+      },
+      "minecraft:behavior.equip_item": {
+        "priority": 3
+      },
+      "minecraft:behavior.pickup_items": {
+        "priority": 7,
+        "max_dist": 3,
+        "goal_radius": 2,
+        "speed_multiplier": 1.0
+      },
+      "minecraft:knockback_resistance": {
+       "value": 0.6
+      },
+      "minecraft:movement": {
+        "value": 0.45
+      },
+      "minecraft:follow_range": {
+        "value": 100,
+        "max": 100
+      },
+      "minecraft:scale":{
+        "value":1
+      },
+      "minecraft:health": {
+        "value": 800,
+        "max": 800
+      },
+      "minecraft:attack":{
+        "damage": 7
+      },
+      "minecraft:equipment": {
+        "table": "loot_tables/equip/akaza.json"
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/loot/akaza.json"
+      },
+      "minecraft:nameable": {
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:burns_in_daylight": {},
+      "minecraft:movement.basic": {
+        "value": 1.3
+      },
+      "minecraft:navigation.walk": {
+        "is_amphibious": true,
+        "can_pass_doors":true,
+        "can_break_doors":false,
+        "can_walk":true,
+        "can_open_doors": true,
+        "can_path_over_water": true,
+        "avoid_water": true
+      },
+      "minecraft:jump.static": {},
+      "minecraft:hurt_on_condition": {
+        "damage_conditions": [
+          {
+            "filters": {
+              "test": "in_lava",
+              "subject": "self",
+              "operator": "==",
+              "value": true
+            },
+            "cause": "lava",
+            "damage_per_tick": 4
+          }
+        ]
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 4,
+        "track_target": true,
+        "speed_multiplier": 1
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 6,
+        "speed_multiplier": 1
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 9,
+        "look_distance": 10,
+        "probability": 0.02
+      },
+      "minecraft:behavior.random_look_around":{
+        "priority":7,
+        "speed_multiplier":1
+      },
+      "minecraft:physics": {
+      },
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "starve",
+            "deals_damage": true
+          },
+          {
+            "cause": "wither",
+            "deals_damage": true
+          },
+          {
+            "cause": "fall",
+            "deals_damage": true
+          },
+          {
+            "cause": "lightning",
+            "deals_damage": true
+          },
+          {
+            "cause": "freezing",
+            "deals_damage": true
+          },
+          {
+            "on_damage": {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "demon"
+                  }
+                ]
+              }
+            },
+            "deals_damage": false
+          },
+          {// death
+            "on_damage": {
+              "filters": {"test":"actor_health","operator":"<=","value":0},
+              "event":"kny:on_death"
+            }
+          }
+        ]
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:behavior.float": {
+        "priority": 0
+      }
+    },
+    "events":{
+      "kny:missao_spawn": {
+        "sequence": [
+          {
+            "add": {
+              "component_groups": [
+                "kny:wild"
+              ]
+            }
+          },
+          {
+            "set_property": {
+              "kny:em_missao": true
+            },
+            "add": {
+              "component_groups": [
+                "kny:ator_missao"
+              ]
+            }
+          }
+        ]
+      },
+      "minecraft:entity_spawned": {
+        "add": {
+          "component_groups": [
+            "kny:wild"
+          ]
+        }
+      },
+      "kny:on_death": {
+        "queue_command":{
+          "command":["execute unless entity @s[tag=kny_missao_ator] run scoreboard players add @p[r=5,tag=!demon] upslayer 10", "execute unless entity @s[tag=kny_missao_ator] run tellraw @p[r=5]{\"rawtext\":[{\"text\":\"Killed the Demon\"}]}"]
+        }
+     },
+      "kny:be_wild":{
+        "add":{
+          "component_groups":[
+            "kny:wild"
+          ]
+        }
+      },
+        "add":{
+          "component_groups":[
+            "kny:wild"
+          ]
+        }
+      }
+    }
+}

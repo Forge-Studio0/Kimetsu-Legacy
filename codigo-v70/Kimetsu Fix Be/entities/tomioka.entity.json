@@ -1,0 +1,377 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "kny:tomioka",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": { "kny:em_missao": { "type": "bool", "default": false } },
+      "scripts":{
+        "animate":["tomioka", "skill", "main", {"tomioka_training": "!query.property('kny:em_missao')"}, "tomioka_damage", "tomioka_crisis", {"updemon": "!query.property('kny:em_missao')"}]
+      },
+      "animations":{
+        "tomioka":"controller.animation.tomioka_target",
+        "tomioka_crisis":"controller.animation.tomioka_crisis",
+        "tomioka_damage":"controller.animation.mark_damage",
+        "tomioka_training":"controller.animation.tomioka_training",
+        "main":"controller.animation.main",
+        "skill":"controller.animation.skills",
+        "tomioka1": "animation.tomioka1",
+        "tomioka2": "animation.tomioka2",
+        "tomioka3": "animation.tomioka3",
+        "tomioka4": "animation.tomioka4",
+        "tomioka5": "animation.tomioka5",
+        "tomioka6": "animation.tomioka6",
+        "tomioka7": "animation.tomioka7",
+        "tomioka8": "animation.tomioka8",
+        "tomioka9": "animation.tomioka9",
+        "tomioka10": "animation.tomioka10",
+        "tomioka11": "animation.tomioka11"
+      }
+    },
+    "component_groups":{
+      "kny:ator_missao": {
+        "minecraft:loot": {
+          "table": "loot_tables/kny_missao_vazio.json"
+        },
+        "minecraft:experience_reward": {
+          "on_death": "0"
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 2,
+          "within_radius": 6,
+          "reselect_targets": true,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "player"
+                  },
+                  {
+                    "test": "has_tag",
+                    "subject": "other",
+                    "value": "kny_missao_protegido"
+                  }
+                ]
+              },
+              "max_dist": 24
+            }
+          ]
+        },
+        "minecraft:damage_sensor": {
+          "triggers": [
+            {
+              "cause": "starve",
+              "deals_damage": true
+            },
+            {
+              "cause": "wither",
+              "deals_damage": true
+            },
+            {
+              "cause": "fall",
+              "deals_damage": true
+            },
+            {
+              "cause": "lightning",
+              "deals_damage": true
+            },
+            {
+              "cause": "freezing",
+              "deals_damage": true
+            }
+          ]
+        },
+        "minecraft:equipment": {
+          "table": "loot_tables/equip/tomioka.json",
+          "slot_drop_chance": [
+            {
+              "slot": "slot.weapon.mainhand",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.weapon.offhand",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.head",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.chest",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.legs",
+              "drop_chance": 0.0
+            },
+            {
+              "slot": "slot.armor.feet",
+              "drop_chance": 0.0
+            }
+          ]
+        }
+      },
+      "kny:wild":{
+        "minecraft:variant":{
+          "value":0
+        }
+      }
+    },
+
+    "components": {
+        "minecraft:type_family": {
+        "family": [ "hashira", "tomioka", "slayer"]
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 2,
+        "within_radius": 6,
+        "reselect_targets": true,
+        "entity_types": [
+          {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "demon"
+                }
+              ]
+            },
+            "max_dist": 20
+          },
+          {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "uppermoon"
+                }
+              ]
+            },
+            "max_dist": 20
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player_demon"
+                },
+                {
+                  "test": "in_water",
+                  "subject": "other",
+                  "operator": "!=",
+                  "value": true
+                }
+              ]
+            },
+            "max_dist": 20
+          }
+        ]
+      },
+      "minecraft:timer": {
+        "looping": false,
+        "randomInterval": false,
+        "time": 0.1,
+        "time_down_event": {
+         "event": "kny:be_wild",
+         "target": "self"
+        }
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:equip_item": {
+      },
+      "minecraft:behavior.equip_item": {
+        "priority": 3
+      },
+      "minecraft:behavior.pickup_items": {
+        "priority": 7,
+        "max_dist": 3,
+        "goal_radius": 2,
+        "speed_multiplier": 1.0
+      },
+      "minecraft:knockback_resistance": {
+       "value": 0.4
+      },
+      "minecraft:movement": {
+        "value": 0.45
+      },
+      "minecraft:follow_range": {
+        "value": 100,
+        "max": 100
+      },
+      "minecraft:scale":{
+        "value":1
+      },
+      "minecraft:health": {
+        "value": 260,
+        "max": 260
+      },
+      "minecraft:attack":{
+        "damage": 5
+      },
+      "minecraft:equipment": {
+        "table": "loot_tables/equip/tomioka.json"
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/loot/tomioka.json"
+      },
+      "minecraft:nameable": {
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:fire_immune": true,
+      "minecraft:movement.basic": {
+        "value": 1.5
+      },
+      "minecraft:navigation.walk": {
+        "is_amphibious": true,
+        "can_pass_doors":true,
+        "can_break_doors":false,
+        "can_walk":true,
+        "can_open_doors": true,
+        "can_path_over_water": true,
+        "avoid_water": true
+      },
+      "minecraft:jump.static": {},
+      "minecraft:hurt_on_condition": {
+        "damage_conditions": [
+          {
+            "filters": {
+              "test": "in_lava",
+              "subject": "self",
+              "operator": "==",
+              "value": true
+            },
+            "cause": "lava",
+            "damage_per_tick": 4
+          }
+        ]
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 4,
+        "track_target": true,
+        "speed_multiplier": 0.9
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 6,
+        "speed_multiplier": 1
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 9,
+        "look_distance": 10,
+        "probability": 0.02
+      },
+      "minecraft:behavior.random_look_around":{
+        "priority":7,
+        "speed_multiplier":1
+      },
+      "minecraft:physics": {
+      },
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "starve",
+            "deals_damage": true
+          },
+          {
+            "cause": "wither",
+            "deals_damage": true
+          },
+          {
+            "cause": "fall",
+            "deals_damage": true
+          },
+          {
+            "cause": "lightning",
+            "deals_damage": true
+          },
+          {
+            "cause": "freezing",
+            "deals_damage": true
+          },
+          {
+            "on_damage": {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "slayer"
+                  }
+                ]
+              }
+            },
+            "deals_damage": false
+          }
+        ]
+      },
+      "minecraft:conditional_bandwidth_optimization": {
+      },
+      "minecraft:behavior.float": {
+        "priority": 0
+      }
+    },
+    "events":{
+      "kny:missao_spawn": {
+        "sequence": [
+          {
+            "add": {
+              "component_groups": [
+                "kny:wild"
+              ]
+            }
+          },
+          {
+            "set_property": {
+              "kny:em_missao": true
+            },
+            "add": {
+              "component_groups": [
+                "kny:ator_missao"
+              ]
+            }
+          }
+        ]
+      },
+      "minecraft:entity_spawned": {
+        "add": {
+          "component_groups": [
+            "kny:wild"
+          ]
+        }
+      },
+      "kny:be_wild":{
+        "add":{
+          "component_groups":[
+            "kny:wild"
+          ]
+        }
+      },
+        "add":{
+          "component_groups":[
+            "kny:wild"
+          ]
+        }
+      }
+    }
+}

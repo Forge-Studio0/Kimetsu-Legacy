@@ -158,6 +158,7 @@ async function concluir(v) {
 
 let serial = 0;
 export function viajar(p, id = "castelo", direcao = "entrada") {
+  if (p.dimension.id === "kny:missoes") return "Este acesso está bloqueado durante a permanência nas arenas de missões.";
   if (!["entrada", "saida"].includes(direcao)) return "Sentido inválido.";
   const castelo = id === "castelo";
   const d = locais();

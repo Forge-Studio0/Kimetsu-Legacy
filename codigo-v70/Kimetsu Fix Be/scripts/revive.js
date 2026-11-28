@@ -39,6 +39,10 @@ const pendentes = new Map(); // idMorto -> { loc, dim }
 const morteReal = new Set(); // ids que morreram de verdade estando caídos
 const ultimaPos = new Map(); // id -> { loc, dim }
 const cooldownMenu = new Map();
+const ouvintesReanimacao = new Set();
+
+export const aguardaResgate = (id) => pendentes.has(id) || caidos.has(id);
+export const aoReanimar = (ouvir) => ouvintesReanimacao.add(ouvir);
 
 export function resgateEmCurso(p) {
   if (caidos.has(p.id) || carregando.has(p.id)) return true;
@@ -140,6 +144,10 @@ function reviver(p, quem) {
   tentar(() => kcmd(p, "playsound random.levelup @s"));
   barraAcao(p, "§aVocê foi reanimado!");
   if (quem) barraAcao(quem, `§aVocê reanimou ${p.name}!`);
+  for (const ouvir of ouvintesReanimacao) {
+    try { ouvir(quem, p); }
+    catch (e) { console.warn("[Reviver] Observador: " + e); }
+  }
   world.sendMessage(`§a${p.name} foi reanimado${quem ? ` por ${quem.name}` : ""}!`);
 }
 

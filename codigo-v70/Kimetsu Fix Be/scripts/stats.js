@@ -267,6 +267,7 @@ function aplicarSemFalhar(p, reg, r) {
 export function atualizarStats(p) {
   const r = patenteDe(p);
   const reg = dadosAtuais(p, r);
+  if (!reg.invalido) concluirPlacaresMissao(p, reg);
   sincronizar(p, reg, r);
   aplicarSemFalhar(p, reg, r);
   return { reg, r };
@@ -433,6 +434,43 @@ export function premiarOni(p, tipo) {
     aplicarSemFalhar(p, reg, r);
   }
   return ganho;
+}
+
+// Os pontos e o comprovante são gravados no mesmo registro. Os placares usam
+// alvos fixos nessa transação, para que repetir a recuperação não some duas vezes.
+export function creditarMissao(p, seq, valores, faccao) {
+  const r = patenteDe(p);
+  const reg = dadosAtuais(p, r);
+  if (reg.invalido) return undefined;
+  if (reg.dados.missao?.seq > seq) return undefined;
+  concluirPlacaresMissao(p, reg);
+  if (reg.dados.missao?.seq === seq) return reg.dados.missao.premio;
+  sincronizar(p, reg, r);
+  const d = { ...reg.dados };
+  const obj = faccao === "cacador" ? "upslayer" : "updemon";
+  const marca = obj === "upslayer" ? "honraVista" : "maldicaoVista";
+  const rankAntes = natural(getScore(p, obj));
+  const dinheiroAntes = natural(getScore(p, "kny_dinheiro"));
+  const rankAte = Math.min(LIMITE_SALDO, rankAntes + natural(valores.patente));
+  const dinheiroAte = Math.min(LIMITE_SALDO, dinheiroAntes + natural(valores.dinheiro));
+  const pontos = somarPontos(d, natural(valores.pontos));
+  const bonus = somarPontos(d, Math.max(0, rankAte - Math.max(rankAntes, d[marca])) * PTS_POR_PONTO_DE_RANK);
+  d[marca] = Math.max(d[marca], rankAte);
+  const premio = { pontos, bonus, patente: rankAte - rankAntes, dinheiro: dinheiroAte - dinheiroAntes };
+  const placares = [[obj, rankAte], ["kny_dinheiro", dinheiroAte]];
+  d.missao = { seq, premio, placares };
+  gravar(p, reg, d);
+  concluirPlacaresMissao(p, reg);
+  aplicarSemFalhar(p, reg, r);
+  return premio;
+}
+
+function concluirPlacaresMissao(p, reg) {
+  const m = reg.dados.missao;
+  if (!m?.placares) return;
+  for (const [obj, alvo] of m.placares) if (getScore(p, obj) < alvo) pontuar(p, obj, alvo);
+  const { seq, premio } = m;
+  gravar(p, reg, { ...reg.dados, missao: { seq, premio } });
 }
 
 function medidor(p, obj, max) {

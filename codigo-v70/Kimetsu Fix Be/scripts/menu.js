@@ -4,10 +4,12 @@ import { ActionFormData } from "@minecraft/server-ui";
 import { RESPIRACOES, KEKKIJUTSUS, ITEM_OBJ } from "./menu_data.js";
 import { H, ARTE_H_ID, DOMINAVEL, RESP_H_ID, ROTULOS } from "./hybrid_config.js";
 import {
-  DISTANCIA_AULA, dominioHumano, ehCacadorHumano, formasLiberadas, podeTreinarRespiracao, progressoDominio, registrarAula,
+  aprendizadoAtivo, dominioHumano, ehCacadorHumano, formasLiberadas, podeAtribuirAprendizado, podeTreinarRespiracao, progressoDominio,
   registrarTreinoRespiracao, requisitosProximaForma, selecionarOriginal,
 } from "./hybrid_mastery.js";
-import { limparTreinosDaForma, textoTreinoDaForma } from "./treino_respiracao.js";
+import { textoTreinoDaForma } from "./treino_respiracao.js";
+import { abrirAprendizado, abrirMissoes } from "./missoes_interface.js";
+import { entidadeDeMissao, missaoEmAndamento } from "./missoes_sessoes.js";
 import { apresentarEditor } from "./character_editor.js";
 import { retornoPendente, sairEstudio } from "./character_studio.js";
 import { edicaoInicialDisponivel, prepararAparenciaInicial } from "./character_system.js";
@@ -347,11 +349,10 @@ try {
 
 /* ---------------------------------------------------------------------
    APRENDIZADO POR HABILIDADE
-   - Cada respiração (e a Respiração Básica das lâminas coloridas) tem várias
-     habilidades (formas). Elas são aprendidas UMA POR UMA, em ordem, com um Hashira.
+   - As formas são aprendidas em ordem, em missões atribuídas pelo Líder dos Hashiras.
    - kf_<respiração> guarda quantas habilidades estão liberadas.
    - Os controllers do addon só liberam a forma N se kf_<respiração> >= N.
-   - A patente Hashira libera as formas para combate. Aulas registram o domínio humano.
+   - A patente Hashira libera as formas para combate. Missões concluídas registram o domínio humano.
    - Requisitos para aprender a habilidade K:
        respirações: espada do estilo, honra por forma anterior e a lista de treinos da próxima forma.
 --------------------------------------------------------------------- */
@@ -368,8 +369,6 @@ const TODAS_RESPIRACOES = [BASICA, ...RESPIRACOES];
 const POR_OBJ = {};
 for (const g of TODAS_RESPIRACOES) POR_OBJ[g.obj] = g;
 
-const DIST_ENSINO = DISTANCIA_AULA;
-
 const objForma = (g) => "kf_" + g.obj;
 const ehHashira = (p) => p.hasTag("hashira") && !isOni(p);
 
@@ -379,14 +378,17 @@ function marcarForma(p, g, k) {
   obj.setScore(p, k);
 }
 
-function textoProximaAula(p, g) {
+function textoProximoAprendizado(p, g) {
   const { k, faltas, treinos, invalido } = requisitosProximaForma(p, g.obj);
   if (invalido) return "§cHistórico de domínio incompatível. Consulte a Staff.\n";
   if (k === 0) return DOMINAVEL(g.obj) ? "§aDomínio completo. Confira a original em Guia → Domínio humano.\n" : "";
-  const linhas = [`§7Próxima aula (${k})`];
+  const ativa = aprendizadoAtivo(p);
+  const autorizada = ativa?.resp === g.obj && ativa.forma === k;
+  const linhas = [`§7${autorizada ? "Missão ativa" : "Próxima forma"} · ${k}`];
   for (const falta of faltas) linhas.push("§c" + falta);
-  for (const treino of treinos) if (treino.concluido) linhas.push("§a" + textoTreinoDaForma(treino));
-  if (faltas.length === 0) linhas.push("§aProcure o Líder dos Hashiras.");
+  for (const treino of treinos) linhas.push((treino.concluido ? "§a" : "§7") + textoTreinoDaForma(treino));
+  if (!autorizada) linhas.push("§eAguarda atribuição do Líder dos Hashiras.");
+  else if (ativa.estado === "pendente") linhas.push("§eAguarda requisitos finais.");
   return linhas.join("\n") + "\n";
 }
 
@@ -513,6 +515,7 @@ GRUPOS[BASICA.obj] = BASICA;
 system.runInterval(() => {
   for (const p of world.getPlayers()) {
     try {
+      if (missaoEmAndamento(p)) continue;
       const oni = isOni(p);
       const c1 = oni ? "§4" : "§9";
       const partes = [];
@@ -530,7 +533,7 @@ system.runInterval(() => {
         }
         const aprendidas = oni ? g.formas.length : formasLiberadas(p, g);
         if (!oni && aprendidas < 1) {
-          p.onScreenDisplay.setActionBar(`§c§l${g.nome} bloqueada§r §8| §7aprenda com um Hashira`);
+          p.onScreenDisplay.setActionBar(`§c§l${g.nome} bloqueada§r §8| §7consulte o Líder dos Hashiras`);
           continue;
         }
         if (!p.hasTag(TAG_DICA_OFF)) {
@@ -598,7 +601,7 @@ async function painelPrincipal(p) {
     if (ehRei(p)) extras.push(["Transf.", t.icones.personagem, () => transformarMenu(p)]);
     if (ehOperador(p)) extras.push(["Cargo", t.icones.config, () => alterarCargo(p)]);
   } else {
-    if (ehLider(p) || ehHashira(p)) extras.push([ehLider(p) ? "Ensinar" : "Aulas", "textures/icons/menu_teach", () => ensinar(p)]);
+    if (podeAtribuirAprendizado(p)) extras.push(["Aprendizado", "textures/icons/menu_teach", () => ensinar(p)]);
     if (ehOperador(p)) extras.push(["Cargo", t.icones.config, () => alterarCargo(p)]);
   }
   for (const [txt, icone, acao] of [...nav, ...extras].slice(0, 6)) add("R:", txt, icone, acao);
@@ -702,8 +705,8 @@ async function menuClassico(p) {
     extras.push("painel");
     f.button("§l§cTreinamento\n§r§7Exercícios e dummy", t.icones.status);
     extras.push("treino");
-    if (ehLider(p) || ehHashira(p)) {
-      f.button(ehLider(p) ? "§l§cEnsinar Respiração\n§r§7Líder dos Hashiras" : "§l§cAulas de domínio\n§r§7Entre Hashiras", "textures/icons/menu_teach");
+    if (podeAtribuirAprendizado(p)) {
+      f.button("§l§cMissões de Aprendizado\n§r§7Líder dos Hashiras", "textures/icons/menu_teach");
       extras.push("ensinar");
     }
     if (ehOperador(p)) {
@@ -766,7 +769,7 @@ async function menuDominio(p, peloSangue = false) {
   const f = novoForm(p).title("§lDOMÍNIO HUMANO").body(
     (d.invalido ? "Histórico incompatível. Consulte a Staff."
       : `${previa.resp ? "Híbrido pronto · " + previa.resp.nome : previa.motivo}\n\n` +
-        (resumo || "Nenhuma forma ou aula registrada. Procure o Líder dos Hashiras para iniciar o domínio.") + outros +
+        (resumo || "Nenhum aprendizado registrado. Procure o Líder dos Hashiras para iniciar o domínio.") + outros +
         (peloSangue ? "\n\nEscolha a original e use o sangue de novo." : ""))
   ).button(TXT_VOLTAR);
   for (const g of d.completas) f.button("Definir original · " + g.nome);
@@ -916,11 +919,9 @@ function resumoRespiracao(p, g) {
 
 const MARCA_ARTE = "kny_arte|";
 const MARCA_CONF = "kny_conf|";
-const MARCA_MISS = "kny_miss|";
 const MARCA_TXT = "kny_txt|"; // guia (tela com rolagem)
 const MARCA_CTR = "kny_ctr|"; // contrato do caçador (tela com rolagem)
 const TXT_VOLTAR = "§b§l< VOLTAR"; // destacado (azul-claro) e sempre na direita
-const ultimaPagEnsino = new Map();
 
 // nome curto de uma forma: tira o prefixo em inglês antes de ": "
 const nomeCurto = (n) => (n.includes(": ") ? n.split(": ").slice(1).join(": ") : n);
@@ -997,7 +998,7 @@ async function painelDetalheArte(p, g, voltarPag = 0, pagina = 0) {
   add("B:", TXT_VOLTAR, null, () => painelArtes(p, voltarPag));
 
   let resumo = `§l${g.nome}§r\n§7${oni ? `${g.formas.length} formas` : resumoRespiracao(p, g)}\n`;
-  if (!oni) resumo += textoProximaAula(p, g);
+  if (!oni) resumo += textoProximoAprendizado(p, g);
   resumo += `§8Agache para trocar a habilidade e segure o botão de usar para executar.`;
   add("G:", resumo, g.icon, null);
 
@@ -1064,7 +1065,7 @@ async function detalheArte(p, g) {
     else corpo += i < aprendidas ? `§a[OK] ${t.texto}${i + 1}. ${nome}\n` : `§8[  ] ${i + 1}. ${nome}\n`;
   });
 
-  if (!oni) corpo += `\n${t.linha}\n${resumoRespiracao(p, g)}\n${textoProximaAula(p, g)}`;
+  if (!oni) corpo += `\n${t.linha}\n${resumoRespiracao(p, g)}\n${textoProximoAprendizado(p, g)}`;
   corpo +=
     `\n${t.linha}\n${t.suave}Como usar: empunhe ${g.basica ? "uma lâmina colorida" : "o item"}, ${t.texto}agache (Shift)${t.suave} para trocar a habilidade e ` +
     `${t.texto}segure o botão de usar${t.suave} para executá-la.\n`;
@@ -1596,14 +1597,19 @@ function medirTreinoMovimento(p) {
     movimentoTreino.delete(p.id);
     return;
   }
+  const m = aprendizadoAtivo(p);
+  if (!m || m.estado !== "andamento") {
+    movimentoTreino.delete(p.id);
+    return;
+  }
   const { x, z } = p.location;
   const agora = system.currentTick;
   const noChao = p.isOnGround;
   const pulando = p.isJumping;
   const nadando = p.isSwimming;
   const anterior = movimentoTreino.get(p.id);
-  if (!anterior) {
-    movimentoTreino.set(p.id, { x, z, tick: agora, noChao, pulando, correr: 0, nadar: 0, ultimoPulo: -RECARGA_PULO });
+  if (anterior?.missao !== m.id) {
+    movimentoTreino.set(p.id, { missao: m.id, x, z, tick: agora, noChao, pulando, correr: 0, nadar: 0, ultimoPulo: -RECARGA_PULO });
     return;
   }
   const distancia = Math.hypot(x - anterior.x, z - anterior.z);
@@ -1944,7 +1950,7 @@ const ultimoAtacanteOni = new Map(); // idDoOni -> { id: idDoJogador, tick }
 
 world.afterEvents.entityHurt.subscribe((ev) => {
   const alvo = ev.hurtEntity;
-  if (!alvo || !PONTOS_POR_ONI.has(alvo.typeId)) return;
+  if (!alvo || !PONTOS_POR_ONI.has(alvo.typeId) || entidadeDeMissao(alvo)) return;
   const atk = ev.damageSource?.damagingEntity;
   if (atk?.typeId === "minecraft:player") {
     if (ultimoAtacanteOni.size > 300) {
@@ -1956,7 +1962,7 @@ world.afterEvents.entityHurt.subscribe((ev) => {
 
 world.afterEvents.entityDie.subscribe((ev) => {
   const morto = ev.deadEntity;
-  if (!morto || !PONTOS_POR_ONI.has(morto.typeId)) return;
+  if (!morto || !PONTOS_POR_ONI.has(morto.typeId) || entidadeDeMissao(morto)) return;
   let jogador = ev.damageSource?.damagingEntity;
   if (jogador?.typeId !== "minecraft:player") jogador = undefined;
   const reg = ultimoAtacanteOni.get(morto.id);
@@ -2370,195 +2376,10 @@ system.runInterval(() => {
 }, 2);
 
 /* ---------------------------------------------------------------------
-   ENSINAR RESPIRAÇÃO: uma habilidade por vez
+   MISSÕES DE APRENDIZADO
 --------------------------------------------------------------------- */
 
-function alunosPerto(p, g) {
-  const lista = [];
-  for (const q of world.getPlayers()) {
-    try {
-      if (q.id === p.id || q.dimension.id !== p.dimension.id) continue;
-      if (!ehCacadorHumano(q) || estadoBloqueado(q)) continue;
-      if (!ehLider(p) && (!DOMINAVEL(g.obj) || !["hashira", "hashira_lider"].includes(patenteDe(q).tag))) continue;
-      const d = Math.hypot(q.location.x - p.location.x, q.location.y - p.location.y, q.location.z - p.location.z);
-      if (d <= DIST_ENSINO && requisitosProximaForma(q, g.obj).k > 0) lista.push(q);
-    } catch {}
-  }
-  return lista;
-}
-
-async function ensinarClassico(p) {
-  const t = TEMA_CACADOR;
-  if (!ehLider(p) && !ehHashira(p)) return;
-  const f = novoForm(p)
-    .title("§l§cENSINAR RESPIRAÇÃO")
-    .body(
-      `${t.linha}\n${t.suave}Escolha a respiração. A aula registra uma forma por vez, em ordem. O aluno precisa estar a até ${DIST_ENSINO} blocos.\n${t.linha}`
-    )
-    .button(`§l${t.destaque}Voltar`, t.icones.voltar);
-  const acoes = ["voltar"];
-  for (const g of TODAS_RESPIRACOES) {
-    f.button(`§l${t.destaque}${g.nome}\n§r${t.suave}${g.formas.length} habilidades`, g.icon);
-    acoes.push(g);
-  }
-
-  const res = await mostrar(f, p);
-  if (res.canceled) return;
-  const a = acoes[res.selection];
-  if (a === "voltar") return menuPrincipal(p);
-  if (a) return escolherAluno(p, a);
-}
-
-async function escolherAlunoClassico(p, g) {
-  const t = TEMA_CACADOR;
-  const alunos = alunosPerto(p, g).map((aluno) => ({ aluno, ...requisitosProximaForma(aluno, g.obj) }));
-  const f = novoForm(p).title(`§l§c${g.nome.toUpperCase()}`);
-  if (alunos.length === 0) {
-    f.body(
-      `${t.linha}\n§cNenhum caçador por perto para ensinar.\n${t.suave}O aluno deve estar a até ${DIST_ENSINO} blocos, ter assinado o contrato e ainda ter habilidades desta respiração para aprender.\n${t.linha}`
-    ).button(`§l${t.destaque}Voltar`, t.icones.voltar);
-    const r = await mostrar(f, p);
-    if (!r.canceled) return ensinar(p);
-    return;
-  }
-  f.body(`${t.linha}\n${t.suave}Quem vai aprender a próxima habilidade da ${g.nome}?\n${t.linha}`).button(`§l${t.destaque}Voltar`, t.icones.voltar);
-  for (const { aluno, k, faltas } of alunos) {
-    f.button(`§l${t.destaque}${aluno.name}\n§r${t.suave}aula ${k}/${g.formas.length}${faltas.length ? " · requisitos pendentes" : ""}`, t.icones.personagem);
-  }
-
-  const res = await mostrar(f, p);
-  if (res.canceled) return;
-  if (res.selection === 0) return ensinar(p);
-  const escolhido = alunos[res.selection - 1];
-  if (escolhido) return ensinarPara(p, escolhido.aluno, g, escolhido.k);
-}
-
-// Aulas no painel com as mesmas permissões da interface clássica.
-async function painelEnsinar(p, pagina = 0) {
-  const lista = TODAS_RESPIRACOES;
-  const paginar = lista.length > 6;
-  const porPag = paginar ? 5 : 6;
-  const total = Math.max(1, Math.ceil(lista.length / porPag));
-  pagina = ((pagina % total) + total) % total;
-  const itens = lista.slice(pagina * porPag, pagina * porPag + porPag);
-  const acoes = [];
-  const f = new ActionFormData().title(`${MARCA_ARTE}§lENSINAR RESPIRAÇÃO`).body(" ");
-  const add = (prefixo, texto, icone, acao) => {
-    if (icone) f.button(prefixo + texto, icone);
-    else f.button(prefixo + texto);
-    acoes.push(acao ?? null);
-  };
-  add("B:", TXT_VOLTAR, null, () => menuPrincipal(p));
-  add(
-    "G:",
-    `§lEnsinar respiração§r\n§7Escolha a respiração. Cada aluno aprende uma habilidade por vez, em ordem, se cumprir os requisitos. Ele precisa estar a até ${DIST_ENSINO} blocos.`,
-    itens[0]?.icon,
-    null
-  );
-  for (const g of itens) {
-    add("L:", `§f§l${g.nome}\n§r§7${g.formas.length} habilidades`, null, () => {
-      ultimaPagEnsino.set(p.id, pagina);
-      return painelAlunos(p, g, 0);
-    });
-  }
-  if (paginar) add("L:", `§6§lPróxima página §7(${pagina + 1}/${total})`, null, () => painelEnsinar(p, pagina + 1));
-
-  const res = await mostrar(f, p);
-  if (res.canceled) {
-    if (res.cancelationReason === undefined) return ensinarClassico(p);
-    return;
-  }
-  const acao = acoes[res.selection];
-  if (!acao) return painelEnsinar(p, pagina);
-  return acao();
-}
-
-async function painelAlunos(p, g, pagina = 0) {
-  const alunos = alunosPerto(p, g);
-  const paginar = alunos.length > 6;
-  const porPag = paginar ? 5 : 6;
-  const total = Math.max(1, Math.ceil(alunos.length / porPag));
-  pagina = ((pagina % total) + total) % total;
-  const itens = alunos.slice(pagina * porPag, pagina * porPag + porPag);
-  const acoes = [];
-  const f = new ActionFormData().title(`${MARCA_ARTE}§l${g.nome.toUpperCase()}`).body(" ");
-  const add = (prefixo, texto, icone, acao) => {
-    if (icone) f.button(prefixo + texto, icone);
-    else f.button(prefixo + texto);
-    acoes.push(acao ?? null);
-  };
-  add("B:", TXT_VOLTAR, null, () => painelEnsinar(p, ultimaPagEnsino.get(p.id) ?? 0));
-  add(
-    "G:",
-    alunos.length === 0
-      ? `§l${g.nome}§r\n§cNenhum caçador por perto para ensinar.\n§7O aluno deve estar a até ${DIST_ENSINO} blocos, ter assinado o contrato e ainda ter habilidades desta respiração para aprender.`
-      : `§l${g.nome}§r\n§7Quem vai aprender a próxima habilidade?`,
-    g.icon,
-    null
-  );
-  for (const q of itens) {
-    const r = requisitosProximaForma(q, g.obj);
-    add("L:", `§f§l${q.name}\n§r§7aula ${r.k}/${g.formas.length}${r.faltas.length ? " · requisitos pendentes" : ""}`, null, () =>
-      ensinarPara(p, q, g, r.k)
-    );
-  }
-  if (paginar) add("L:", `§6§lPróxima página §7(${pagina + 1}/${total})`, null, () => painelAlunos(p, g, pagina + 1));
-
-  const res = await mostrar(f, p);
-  if (res.canceled) return;
-  const acao = acoes[res.selection];
-  if (!acao) return painelAlunos(p, g, pagina);
-  return acao();
-}
-
-async function ensinar(p) {
-  if (!ehLider(p) && !ehHashira(p)) {
-    p.sendMessage("§cSomente Hashiras têm acesso às aulas.");
-    return;
-  }
-  if (!p.hasTag(TAG_CLASSICO)) return painelEnsinar(p, 0);
-  return ensinarClassico(p);
-}
-
-async function escolherAluno(p, g) {
-  if (!p.hasTag(TAG_CLASSICO)) return painelAlunos(p, g, 0);
-  return escolherAlunoClassico(p, g);
-}
-
-async function ensinarPara(p, aluno, g, formaMostrada) {
-  try {
-    if (!(ehLider(p) || ehHashira(p)) || !aluno?.isValid || !alunosPerto(p, g).some((q) => q.id === aluno.id)) return;
-    const r = requisitosProximaForma(aluno, g.obj);
-    if (r.k !== formaMostrada) {
-      p.sendMessage("§eO progresso mudou. Confira a aula atual antes de ensinar.");
-    } else if (r.faltas.length) {
-      p.sendMessage(`§c${aluno.name} ainda não pode aprender a forma ${r.k}. Requisitos: ${r.faltas.join("; ")}.`);
-      aluno.sendMessage(`§cPara aprender a forma ${r.k} da ${g.nome} você precisa de: ${r.faltas.join("; ")}.`);
-    } else {
-      if (DOMINAVEL(g.obj)) {
-        if (!registrarAula(p, aluno, g.obj, r.k)) {
-          p.sendMessage("§cA aula não pôde ser registrada. Confira a presença e o histórico do aluno.");
-          return escolherAluno(p, g);
-        }
-      } else {
-        marcarForma(aluno, g, r.k);
-        limparTreinosDaForma(aluno, g.obj, r.k);
-      }
-      const nomeForma = g.formas[r.k - 1];
-      p.sendMessage(`§cVocê ensinou a forma ${r.k} da ${g.nome} (${nomeForma}) a §l${aluno.name}§r§c.`);
-      aluno.sendMessage(`§cO Hashira §l${p.name}§r§c ensinou a forma ${r.k} da ${g.nome}: ${nomeForma}.`);
-      if (DOMINAVEL(g.obj)) {
-        aluno.sendMessage(`§aDomínio comprovado ${r.k}/${g.formas.length}.` +
-          (r.k === g.formas.length ? " Confira se esta é a sua original em Guia → Domínio humano." : ""));
-      }
-      som(p, "random.levelup", 1.2, 0.6);
-      som(aluno, "random.levelup", 1.2, 0.8);
-    }
-  } catch (e) {
-    reportar(p, e);
-  }
-  return escolherAluno(p, g);
-}
+const ensinar = (p) => abrirAprendizado(p, mostrar, menuPrincipal);
 
 /* ---------------------------------------------------------------------
    COMO JOGAR
@@ -2571,7 +2392,7 @@ const GUIA_CACADOR = [
       "Você começa como caçador de demônios.\n\n" +
       "Segure o botão de usar com a Nichirin Blade: a lâmina muda de cor, como no anime. " +
       "Cada cor dá bônus diferentes, e a preta é a mais forte.\n\n" +
-      "As lâminas coloridas usam a §cRespiração Básica§f, de 3 habilidades que você aprende com um Hashira. Respirações de verdade, como a do Trovão, exigem uma espada daquele estilo. Veja tudo em §cRespirações§f.\n\n" +
+      "As lâminas coloridas usam a §cRespiração Básica§f, de 3 habilidades que você aprende em missões atribuídas pelo Líder dos Hashiras. Respirações de verdade, como a do Trovão, exigem uma espada daquele estilo. Veja tudo em §cRespirações§f.\n\n" +
       "O livro de conquistas e este menu ficam sempre com você.",
   },
   {
@@ -2581,7 +2402,7 @@ const GUIA_CACADOR = [
       "Para aprender a próxima forma, tenha a espada da respiração, 10 de honra por forma anterior e conclua os treinos mostrados em §cRespirações§f. A Respiração Básica pede uma lâmina colorida, 5 de honra por forma anterior e metas reduzidas pela metade.\n\n" +
       "Abater onis, correr, nadar e pular contam automaticamente. Faça flexão, abdominal, meditação, agachamento e dummy no menu §cTreino§f. Cada atividade vale para a próxima forma de todas as suas respirações que pedem aquele treino. Ao aprender a forma, ela dá lugar a uma nova lista com contadores próprios.\n\n" +
       "Fique a até 12 blocos do Líder dos Hashiras. Ele abre o Menu Kimetsu, escolhe §cEnsinar Respiração§f, a respiração e o seu nome. Entre Hashiras, um colega pode usar §cAulas de domínio§f.\n\n" +
-      "A patente Hashira libera formas para combate. O domínio humano avança com aulas registradas ou histórico certificado. Confira o progresso em §cGuia → Domínio humano§f.",
+      "O Líder dos Hashiras atribui uma missão por vez. Só a forma autorizada recebe progresso. Conclua os treinos e mantenha honra e espada para aprender automaticamente. A patente Hashira libera formas para combate. O domínio humano avança com aprendizado registrado. Confira o progresso em §cGuia → Domínio humano§f.",
   },
   {
     nome: "Lâminas coloridas",
@@ -2743,165 +2564,7 @@ async function paginaGuia(p, g) {
   if (!res.canceled) return comoJogar(p);
 }
 
-/* ---------------------------------------------------------------------
-   MISSÕES (tags reais do livro de conquistas)
---------------------------------------------------------------------- */
-
-const MISSOES_CACADOR = [
-  { nome: "Missão 1 · Montanha Sagiri", desc: "Entre na Montanha Sagiri.", tag: "m1", wip: true },
-  { nome: "Missão 2 · Sabito", desc: "Vença Sabito.", tag: "m2" },
-  { nome: "Missão 3 · Demônio das Mãos", desc: "Mate o Demônio das Mãos.", tag: "m3" },
-  { nome: "Missão 4 · Montanha Natagumo", desc: "Entre na Montanha Natagumo.", tag: "m4", wip: true },
-  { nome: "Missão 5 · Rui", desc: "Mate Rui (Lua Inferior 5) junto com Tanjiro.", tag: "m5" },
-  { nome: "Missão 6 · Enmu", desc: "Mate Enmu (Lua Inferior 1) junto com Rengoku.", tag: "m6", wip: true },
-  { nome: "Missão 7 · Akaza", desc: "Enfrente Akaza (Lua Superior 3).", tag: "m7" },
-  { nome: "Treino · Água", desc: "Vença Tomioka.", tag: "training_water" },
-  { nome: "Treino · Inseto", desc: "Vença Shinobu.", tag: "training_insect" },
-  { nome: "Treino · Chamas", desc: "Vença Rengoku.", tag: "training_flame" },
-  { nome: "Treino · Som", desc: "Vença Uzui.", tag: "training_sound" },
-  { nome: "Treino · Névoa", desc: "Vença Muichiro.", tag: "training_mist" },
-  { nome: "Treino · Amor", desc: "Vença Mitsuri.", tag: "training_love" },
-  { nome: "Treino · Serpente", desc: "Vença Obanai.", tag: "training_serpent", wip: true },
-  { nome: "Treino · Vento", desc: "Vença Sanemi.", tag: "training_wind" },
-  { nome: "Treino · Pedra", desc: "Vença Gyomei.", tag: "training_stone" },
-  { nome: "Batalha · Lua Inferior 6", desc: "Vença Kamanue.", tag: "blood6" },
-  { nome: "Batalha · Lua Inferior 5", desc: "Vença Rui.", tag: "blood5" },
-  { nome: "Batalha · Lua Inferior 4", desc: "Vença Mukago.", tag: "blood4" },
-  { nome: "Batalha · Lua Inferior 3", desc: "Vença Wakuraba.", tag: "blood3" },
-  { nome: "Batalha · Lua Inferior 2", desc: "Vença Rokuro.", tag: "blood2" },
-  { nome: "Batalha · Lua Inferior 1", desc: "Vença Enmu.", tag: "blood1" },
-  { nome: "Batalha · Lua Superior 6", desc: "Vença Gyutaro.", tag: "bloodupper6" },
-  { nome: "Batalha · Lua Superior 5", desc: "Vença Gyokko.", tag: "bloodupper5" },
-  { nome: "Batalha · Lua Superior 4", desc: "Vença Zohakuten.", tag: "bloodupper4" },
-  { nome: "Batalha · Lua Superior 3", desc: "Vença Akaza.", tag: "bloodupper3" },
-  { nome: "Batalha · Lua Superior 2", desc: "Vença Doma.", tag: "bloodupper2" },
-  { nome: "Batalha · Lua Superior 1", desc: "Vença Kokushibo.", tag: "bloodupper1" },
-  { nome: "Guerreiro Sangrento", desc: "Sobreviva à Lua Vermelha sem morrer.", tag: "guerra_vermelha" },
-  { nome: "Líder dos Hashiras", desc: "Alcance 10000 de honra sendo Hashira. Só um caçador por vez.", tag: "hashira_lider" },
-];
-
-function missoesOni(p) {
-  const r = infoRank(p);
-  const hibrido = isHybrid(p);
-  const lista = [
-    { nome: "Tornar-se oni", desc: "Seja transformado em oni.", ok: p.hasTag("demon") },
-    { nome: "Superar o sol", desc: "Use qualquer respiração do Sol.", ok: p.hasTag("sunshield") },
-    { nome: "Quebrar a maldição", desc: "Fale com Tamayo.", ok: p.hasTag("breakcurse") },
-  ];
-  for (const rk of RANKS_ONI) {
-    if (hibrido && rk === REI_ONI) {
-      lista.push({ nome: HIBRIDO_SUPERIOR.nome, desc: "Conclua a transformação com uma respiração dominada.", ok: true });
-    }
-    lista.push({
-      nome: rk.nome,
-      desc: rk.unico ? `Alcance ${rk.min} de maldição. Só um oni por vez é Rei dos Onis.` : `Acumule ${rk.min} de maldição (você tem ${r.pontos}).`,
-      ok: rk === REI_ONI ? ehRei(p) : p.hasTag(rk.tag),
-    });
-  }
-  const lutas = [
-    ["blood6", "Kamanue"], ["blood5", "Rui"], ["blood4", "Mukago"], ["blood3", "Wakuraba"], ["blood2", "Rokuro"],
-    ["blood1", "Enmu"], ["bloodupper6", "Gyutaro"], ["bloodupper5", "Gyokko"], ["bloodupper4", "Zohakuten"],
-    ["bloodupper3", "Akaza"], ["bloodupper2", "Doma"], ["bloodupper1", "Kokushibo"],
-  ];
-  for (const [tag, nome] of lutas) lista.push({ nome: `Batalha · ${nome}`, desc: `Vença ${nome}.`, ok: p.hasTag(tag), tag, marcavel: true });
-  lista.push({ nome: "Guerreiro Sangrento", desc: "Sobreviva à Lua Vermelha sem morrer.", ok: p.hasTag("guerra_vermelha"), tag: "guerra_vermelha", marcavel: true });
-  return lista;
-}
-
-// missões no painel: 6 por página, com botão para a própria pessoa marcar / desmarcar
-const MISSOES_POR_PAG = 6;
-async function painelMissoes(p, pagina = 0) {
-  const t = tema(p);
-  const oni = isOni(p);
-  const lista = oni
-    ? missoesOni(p)
-    : MISSOES_CACADOR.map((m) => ({
-        nome: m.nome,
-        desc: m.desc,
-        ok: p.hasTag(m.tag),
-        wip: m.wip,
-        tag: m.tag,
-        marcavel: !m.wip && m.tag !== "hashira_lider", // o cargo de Líder é automático e único
-      }));
-  const feitas = lista.filter((m) => m.ok).length;
-  const total = Math.max(1, Math.ceil(lista.length / MISSOES_POR_PAG));
-  pagina = ((pagina % total) + total) % total;
-  const itens = lista.slice(pagina * MISSOES_POR_PAG, pagina * MISSOES_POR_PAG + MISSOES_POR_PAG);
-
-  const acoes = [];
-  const f = new ActionFormData().title(`${MARCA_MISS}§l${oni ? "CAÇADAS" : "MISSÕES"}`).body(" ");
-  const add = (prefixo, texto, acao) => {
-    f.button(prefixo + texto);
-    acoes.push(acao ?? null);
-  };
-  add("B:", TXT_VOLTAR, () => menuPrincipal(p));
-  add(
-    "H:",
-    `§7${oni ? "Caçadas concluídas" : "Missões concluídas"}: §f${feitas}/${lista.length}   §8|   §7Página §f${pagina + 1}/${total}\n` +
-      `${barra(feitas, lista.length, 30, t.destaque)}`
-  );
-  for (const m of itens) {
-    const pref = m.wip ? "QW:" : m.marcavel ? (m.ok ? "Q1:" : "Q0:") : m.ok ? "QB:" : "QA:";
-    const txt = `${m.ok ? "§a" : "§f"}§l${m.nome}\n§r§7${m.desc}`;
-    add(
-      pref,
-      txt,
-      m.marcavel
-        ? () => {
-            if (m.ok) {
-              p.removeTag(m.tag);
-              p.sendMessage(`§7Missão desmarcada: §f${m.nome}`);
-            } else {
-              p.addTag(m.tag);
-              p.sendMessage(`§aMissão marcada como feita: §f${m.nome}`);
-            }
-            return painelMissoes(p, pagina);
-          }
-        : null
-    );
-  }
-  if (total > 1) {
-    add("NP:", "§e§l< ANTERIOR", () => painelMissoes(p, pagina - 1));
-    add("NN:", "§e§lPRÓXIMA >", () => painelMissoes(p, pagina + 1));
-  }
-
-  const res = await mostrar(f, p);
-  if (res.canceled) {
-    if (res.cancelationReason === undefined) return missoesClassica(p);
-    return;
-  }
-  const acao = acoes[res.selection];
-  if (!acao) return painelMissoes(p, pagina);
-  return acao();
-}
-
-async function missoes(p) {
-  if (!p.hasTag(TAG_CLASSICO)) return painelMissoes(p);
-  return missoesClassica(p);
-}
-
-async function missoesClassica(p) {
-  const t = tema(p);
-  const oni = isOni(p);
-  const lista = oni
-    ? missoesOni(p)
-    : MISSOES_CACADOR.map((m) => ({ nome: m.nome, desc: m.desc, ok: p.hasTag(m.tag), wip: m.wip }));
-
-  const feitas = lista.filter((m) => m.ok).length;
-  let c = `${t.linha}\n${t.suave}${oni ? "Caçadas concluídas" : "Missões concluídas"}: ${t.texto}${feitas}/${lista.length}\n`;
-  c += `${barra(feitas, lista.length, 24, t.destaque)}\n${t.linha}\n`;
-  for (const m of lista) {
-    const marca = m.ok ? "§a[OK] " : m.wip ? "§8[em breve] " : `${t.destaque}[ ] `;
-    c += `${marca}${m.ok ? "§7" : t.texto}${m.nome}\n${t.suave}   ${m.desc}\n`;
-  }
-
-  const f = novoForm(p)
-    .title(oni ? "§l§4MISSÕES · CAÇADAS" : "§l§cMISSÕES")
-    .body(c)
-    .button(`§l${t.destaque}Voltar`, t.icones.voltar);
-  const res = await mostrar(f, p);
-  if (!res.canceled) return menuPrincipal(p);
-}
+const missoes = (p) => abrirMissoes(p, mostrar, menuPrincipal);
 
 // Mantém a interface usada pelos demais scripts da addon.
 export { staminaDe, folegoDe, isOni, pontuar, lerBruto, getScore };

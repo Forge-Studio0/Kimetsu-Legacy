@@ -1,11 +1,11 @@
 import { GameMode, ItemStack, system, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
-import { registrarAula, registrarTreinoRespiracao, requisitosProximaForma } from "./hybrid_mastery.js";
+import { aprendizadoAtivo, atribuirAprendizado, cancelarAprendizado, dominioHumano, registrarTreinoRespiracao, requisitosProximaForma } from "./hybrid_mastery.js";
 import { tarefasDaForma, treinosDaForma } from "./treino_respiracao.js";
 import { comprar, disponiveis, pontuar, statusAtributo } from "./stats.js";
 import { ATR, OBJ_LIDER } from "./stats_config.js";
-import { RESP_H } from "./hybrid_config.js";
+import { RESP_H, RESP_H_ID } from "./hybrid_config.js";
 
 const wait = (ticks) => system.waitTicks(ticks);
 const log = (texto) => console.warn("KNY-TEST TREINO " + texto);
@@ -63,8 +63,19 @@ async function testar() {
   lider.addTag("hashira");
   lider.addTag("hashira_lider");
   const titulares = world.scoreboard.getObjective(OBJ_LIDER) ?? world.scoreboard.addObjective(OBJ_LIDER);
+  for (const antigo of titulares.getParticipants()) titulares.removeParticipant(antigo);
   titulares.setScore(lider.name, 1);
+  const mochila = p.getComponent("minecraft:inventory").container;
+  function atribuir(id) {
+    const existente = aprendizadoAtivo(p);
+    if (existente) assert(cancelarAprendizado(p, existente.aluno, existente.id, "Troca de treino no teste"), "cancelar treino anterior");
+    mochila.setItem(1, new ItemStack(RESP_H_ID.get(id).item, 1));
+    const erro = atribuirAprendizado(lider, p, id, 1);
+    assert(!erro, `Atribuição de ${id}: ${erro}`);
+  }
 
+  atribuir("thunder");
+  await wait(3);
   p.isSprinting = true;
   p.move(1, 0, 1);
   await wait(20);
@@ -72,6 +83,7 @@ async function testar() {
   p.isSprinting = false;
   assert(metros(p, "thunder", "correr") > 0, "Corrida do jogador simulado sem progresso");
 
+  atribuir("wind");
   p.teleport(pos);
   await wait(8);
   assert(p.isOnGround, "Base do pulo em " + JSON.stringify(p.location));
@@ -79,6 +91,7 @@ async function testar() {
   await wait(12);
   assert(metros(p, "wind", "pular") === 1, "Pulo real sem progresso");
 
+  atribuir("water");
   dim.runCommand("fill 64 208 54 78 213 60 stone hollow");
   dim.runCommand("fill 65 209 55 77 212 59 water");
   p.teleport({ x: 66.5, y: 210, z: 57.5 });
@@ -99,11 +112,12 @@ async function testar() {
   oni.applyDamage(2000, { cause: "entityAttack", damagingEntity: p });
   await wait(4);
   assert(metros(p, "water", "oni") === 1, "Abate não entrou no treino da Água");
-  assert(metros(p, "flame", "oni") === 1, "Abate não entrou em Chamas");
+  assert(metros(p, "flame", "oni") === 0, "Abate entrou em respiração sem atribuição");
   assert(disponiveis(p) >= saldo + 250, "Recompensa de Stats do Oni não foi preservada");
 
   const dummy = dim.spawnEntity("kny:dummy_treino", { x: 53, y: 210, z: 65.5 });
   const estilo = RESP_H.find((r) => tarefasDaForma(r.obj, 1).some((t) => t.tipo === "dummy")).obj;
+  atribuir(estilo);
   assert(p.attackEntity(dummy), "O jogador simulado não golpeou o dummy");
   await wait(5);
   assert(metros(p, estilo, "dummy") === 1, "Golpe no dummy não entrou no treino");
@@ -113,21 +127,19 @@ async function testar() {
   const oferta = statusAtributo(p, ATR.def);
   assert(comprar(p, ATR.def, 10, oferta).feitas > 0, "Preparação do teto de Defesa");
   assert(statusAtributo(p, ATR.def).proximo === null, "Defesa fora do teto");
-  const mochila = p.getComponent("minecraft:inventory").container;
+  atribuir("gyomei");
   // Usa a entrada de menu do addon para isolar o exercício da simulação de combate.
   plano.set(p.id, ["Treinamento", "Flexão"]);
   p.runCommand("scriptevent kny:menu classico");
   await wait(49);
   assert(metros(p, "gyomei", "flexao") >= 1, "Flexão pelo menu com Defesa no teto");
-  log("Oni, dummy e flexão pelo menu contados em paralelo");
+  log("Oni, dummy e flexão validados em atribuições distintas");
 
-  mochila.setItem(1, new ItemStack("kny:nichirin_water", 1));
-  assert(!registrarAula(lider, p, "water", 1), "Aula aceitou progresso incompleto");
+  atribuir("water");
+  assert(dominioHumano(p, "water") === 0, "Atribuição liberou forma sem cumprir o treino");
   for (const { tipo, meta } of tarefasDaForma("water", 1)) registrarTreinoRespiracao(p, tipo, meta);
-  const antes = JSON.parse(p.getDynamicProperty("kny_req"));
-  assert(registrarAula(lider, p, "water", 1), "Aula não aceitou treinos completos");
   const depois = JSON.parse(p.getDynamicProperty("kny_req"));
-  assert(!depois["water:1"] && depois["flame:1"].oni === antes["flame:1"].oni, "Reset incorreto após a aula");
+  assert(dominioHumano(p, "water") === 1 && !depois["water:1"], "Conclusão automática ou reset incorreto");
   assert(requisitosProximaForma(p, "water").treinos.every((t) => t.atual === 0), "A forma 2 herdou treinos da primeira");
   p.disconnect();
   lider.disconnect();

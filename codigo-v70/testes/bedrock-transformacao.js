@@ -2,7 +2,7 @@ import { GameMode, ItemStack, system, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
 import { RESP_H_ID } from "./hybrid_config.js";
-import { dominioHumano, registrarAula, registrarTreinoRespiracao } from "./hybrid_mastery.js";
+import { aprendizadoAtivo, atribuirAprendizado, dominioHumano, registrarTreinoRespiracao } from "./hybrid_mastery.js";
 import { tarefasDaForma } from "./treino_respiracao.js";
 import { guardarPersonagem, identificador } from "./hybrid_records.js";
 import { getTrueRace, racaHibrida } from "./hybrid_system.js";
@@ -73,8 +73,9 @@ function aprender(p, professor, id, slot) {
   const r = RESP_H_ID.get(id);
   item(p, r.item, slot);
   for (let i = 1; i <= r.formas.length; i++) {
+    eq(atribuirAprendizado(professor, p, id, i), undefined, "Atribuir " + id + " " + i);
     cumprir(p, id, i);
-    eq(registrarAula(professor, p, id, i), true, "Aula " + id + " " + i);
+    eq(dominioHumano(p, id), i, "Domínio " + id + " " + i);
   }
 }
 
@@ -124,22 +125,21 @@ async function testar() {
   item(aluno, RESP_H_ID.get("water").item, 1);
   item(lider, "kny:menu_kimetsu");
   const cliques = planos.get(lider.id).cliques;
-  cliques.push("Ensinar", "Respiração da Água", aluno.name);
   for (let i = 1; i <= 10; i++) {
-    cliques.push(() => {
-      eq(dominioHumano(aluno, "water"), i - 1, "Somente aulas com treino avançam o domínio");
-      cumprir(aluno, "water", i);
-      return aluno.name;
-    });
+    cliques.push("Aprendizado", "Atribuir missão", aluno.name, "Respiração da Água", "ATRIBUIR MISSÃO");
+    await usa(lider, 8);
+    eq(aprendizadoAtivo(aluno)?.forma, i, "Autorização pela interface da forma " + i);
+    eq(dominioHumano(aluno, "water"), i - 1, "Atribuição preserva a sequência");
+    cumprir(aluno, "water", i);
+    eq(dominioHumano(aluno, "water"), i, "Treino desbloqueia a forma autorizada");
   }
-  await usa(lider, 22);
-  eq(dominioHumano(aluno, "water"), 10, "Dez aulas gravadas pela interface do Líder");
-  eq(getScore(aluno, "kf_water"), 10, "Aulas também liberam o combate");
+  eq(dominioHumano(aluno, "water"), 10, "Dez missões iniciadas pela interface do Líder");
+  eq(getScore(aluno, "kf_water"), 10, "Domínio liberou o combate");
   item(aluno, "kny:blood");
   await usa(aluno);
   eq(racaHibrida(aluno)?.resp, "water", "Domínio único produz Híbrido pelo sangue sem etapa adicional");
   eq(dosesNaMao(aluno), 0, "Dose consumida pelo Híbrido");
-  log("dez aulas pelo menu nativo do Líder resultaram em Híbrido da Água");
+  log("dez missões pelo menu nativo do Líder resultaram em Híbrido da Água");
 
   const multi = cacador("MultiV73");
   aprender(multi, lider, "water", 1);
@@ -194,7 +194,7 @@ async function testar() {
   log("ficha v72 recuperada ganhou patente e painel novos com saldo e sangue preservados");
 
   for (const p of jogadores) p.disconnect();
-  log("FIM TRANSFORMAÇÃO V75");
+  log("FIM TRANSFORMAÇÃO V81");
 }
 
 system.runTimeout(() => testar().catch((e) => log("FALHA " + e + "\n" + (e.stack ?? ""))), 40);
