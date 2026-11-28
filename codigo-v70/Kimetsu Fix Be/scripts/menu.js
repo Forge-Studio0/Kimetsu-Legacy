@@ -8,7 +8,7 @@ import {
   registrarTreinoRespiracao, requisitosProximaForma, selecionarOriginal,
 } from "./hybrid_mastery.js";
 import { limparTreinosDaForma, textoTreinoDaForma } from "./treino_respiracao.js";
-import { abrirEditor } from "./character_editor.js";
+import { apresentarEditor } from "./character_editor.js";
 import { edicaoInicialDisponivel, prepararAparenciaInicial } from "./character_system.js";
 import { garantirItemMenu } from "./menu_item.js";
 import "./character_admin.js";
@@ -303,8 +303,8 @@ function pedirAbertura(p, classico = false, automatico = false) {
     if (!p.isValid) return;
     if (!jaEscolheu(p)) prepararAparenciaInicial(p);
     const editar = edicaoInicialDisponivel(p);
-    if (editar) await abrirEditor(p);
-    if (!p.isValid || p.hasTag("kny_caido")) return;
+    if (editar) await apresentarEditor(p);
+    if (!p.isValid || p.hasTag("kny_caido") || edicaoInicialDisponivel(p)) return;
     if (!jaEscolheu(p)) return escolha(p);
     if (!editar && !automatico) return menuPrincipal(p);
   }, true);

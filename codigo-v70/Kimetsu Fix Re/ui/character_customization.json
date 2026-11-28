@@ -144,6 +144,44 @@
       { "binding_name": "#form_button_length", "binding_name_override": "#collection_length" }
     ]
   },
+  "botao_criacao@kny_oficina.botao": {
+    "size": ["100%", "100%"],
+    "$vis": "(#form_button_text = 'Crie seu personagem')",
+    "$txt": "#form_button_text",
+    "$lbl_scale": 1.05
+  },
+  "criacao": {
+    "type": "panel",
+    "size": ["56%", "34%"],
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "controls": [
+      { "moldura@kny_oficina.moldura": {} },
+      {
+        "titulo": {
+          "type": "label",
+          "text": "KIMETSU LEGACY",
+          "color": [0.95, 0.8, 0.47],
+          "font_scale_factor": 1.2,
+          "text_alignment": "center",
+          "size": ["90%", "default"],
+          "anchor_from": "center",
+          "anchor_to": "center",
+          "offset": [0, "-22%"],
+          "layer": 5
+        }
+      },
+      {
+        "avancar@kny_oficina.botoes": {
+          "$item": "kny_oficina.botao_criacao",
+          "size": ["82%", "32%"],
+          "anchor_from": "center",
+          "anchor_to": "center",
+          "offset": [0, "19%"]
+        }
+      }
+    ]
+  },
   "editor": {
     "type": "panel",
     "size": ["100%", "100%"],

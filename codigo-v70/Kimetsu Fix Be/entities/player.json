@@ -393,10 +393,21 @@
           "range": [-1, 16777215],
           "default": -1,
           "client_sync": true
+        },
+        "kny:cc_edicao": {
+          "type": "bool",
+          "default": false,
+          "client_sync": true
         }
       }
     },
     "component_groups": {
+      "kny:criacao_protegida": {
+        "minecraft:pushable": {
+          "is_pushable": false,
+          "is_pushable_by_piston": false
+        }
+      },
       "kny:caido_grp": {
         "minecraft:interact": {
           "interactions": [
@@ -2505,6 +2516,14 @@
       "minecraft:scaffolding_climber": {}
     },
     "events": {
+      "kny:criacao_proteger": {
+        "add": { "component_groups": ["kny:criacao_protegida"] },
+        "set_property": { "kny:cc_edicao": true }
+      },
+      "kny:criacao_liberar": {
+        "remove": { "component_groups": ["kny:criacao_protegida"] },
+        "set_property": { "kny:cc_edicao": false }
+      },
       "kny:stats_limpar_grupos": {
         "remove": {
           "component_groups": [

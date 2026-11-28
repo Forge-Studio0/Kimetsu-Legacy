@@ -140,6 +140,18 @@
         }
       },
       {
+        "criacao@kny_oficina.criacao": {
+          "bindings": [
+            { "binding_name": "#title_text" },
+            {
+              "binding_type": "view",
+              "source_property_name": "(('%.10s' * #title_text) = 'kny_criar|')",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
         "oficina@kny_oficina.editor": {
           "bindings": [
             { "binding_name": "#title_text" },

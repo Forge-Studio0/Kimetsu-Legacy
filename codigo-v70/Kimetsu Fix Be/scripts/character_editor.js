@@ -2,6 +2,7 @@ import { system } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { CAMPOS, CATEGORIAS, VISUAL_PADRAO, opcaoDe } from "./character_config.js";
 import { atualizarCamera } from "./character_camera.js";
+import { liberarCriacao, protegerCriacao } from "./character_protection.js";
 import {
   definirVisual, edicaoInicialDisponivel, encerrarEdicao, indisponivel, iniciarEdicao, lerCatalogo,
   opcaoPermitida, salvarEdicao, sessaoAtual, sessaoSegura, usarRetrato,
@@ -120,8 +121,10 @@ export async function abrirEditor(p) {
     sessao = iniciarEdicao(p);
     while (sessaoSegura(sessao)) {
       const { f, acoes } = painel(sessao);
+      protegerCriacao(p);
       const resposta = await mostrar(f, sessao);
       if (resposta.cancelationReason === "UserBusy" && sessaoAtual(p) === sessao) {
+        liberarCriacao(p);
         sessao.aguardandoTela = true;
         if (!sessaoSegura(sessao)) return;
         usarRetrato(sessao);
@@ -148,5 +151,25 @@ export async function abrirEditor(p) {
     if (p.isValid) p.sendMessage("§e[Aparência] " + (e.message ?? e));
   } finally {
     if (sessao && sessaoAtual(p) === sessao) encerrarEdicao(sessao);
+  }
+}
+
+export async function apresentarEditor(p) {
+  let estilizada = true;
+  while (p.isValid && edicaoInicialDisponivel(p)) {
+    const form = new ActionFormData()
+      .title(estilizada ? "kny_criar|§6KIMETSU LEGACY" : "§6KIMETSU LEGACY")
+      .button("Crie seu personagem");
+    const resposta = await form.show(p);
+    if (resposta.cancelationReason === "UserBusy") {
+      await espera(20);
+      continue;
+    }
+    if (estilizada && resposta.canceled && resposta.cancelationReason === undefined) {
+      estilizada = false;
+      continue;
+    }
+    if (!resposta.canceled && resposta.selection === 0) await abrirEditor(p);
+    return;
   }
 }

@@ -55,14 +55,20 @@ const fechar = () => ({ canceled: true, cancelationReason: "UserClosed" });
 
 test("o primeiro acesso abre a aparência sozinho, guarda pele, cabelo e olhos e passa ao contrato", async () => {
   const p = novo();
+  p.inputPermissions.setPermissionCategory(6, false);
   p.runCommand = (cmd) => {
     assert.equal(cmd, "function start_slayer");
     p.addTag("slayer");
     p.addTag("mizunoto");
     return { successCount: 1 };
   };
-  p.escolhas.push((f) => {
+  p.escolhas.push(confirmar("Crie seu personagem"), (f) => {
     assert.ok(isEditor(f));
+    const vida = p.getComponent("minecraft:health").currentValue;
+    assert.equal(p.applyDamage(20), false);
+    assert.equal(p.getComponent("minecraft:health").currentValue, vida);
+    assert.equal(p.inputPermissions.isPermissionCategoryEnabled(4), false);
+    assert.equal(p.getProperty("kny:cc_edicao"), true);
     assert.deepEqual(f.buttons.filter((b) => /^[CS]:/.test(b.texto)).map((b) => semCor(b.texto).slice(2)),
       ["Pele", "Cabelo", "Olhos"]);
     assert.ok(!f.buttons.some((b) => /Acessórios|Informações|Vestimentas|Conjuntos|Expressão/.test(b.texto)));
@@ -71,7 +77,8 @@ test("o primeiro acesso abre a aparência sozinho, guarda pele, cabelo e olhos e
   confirmar("Íris direita"), confirmar("Próximo"), confirmar("CONFIRMAR"), confirmar("ASSINAR O CONTRATO"));
   entrar(p);
   await executarAgendados();
-  assert.ok(isEditor(p.telas[0]));
+  assert.match(p.telas[0].titulo, /^kny_criar\|/);
+  assert.ok(isEditor(p.telas[1]));
   assert.ok(isContrato(p.telas.at(-1)));
   const base = lerAparencia(p).perfis.base;
   assert.equal(base.peleIntegral, "pele_a_c98f65");
@@ -83,6 +90,9 @@ test("o primeiro acesso abre a aparência sozinho, guarda pele, cabelo e olhos e
   assert.ok(p.hasTag("kny_escolheu"));
   assert.ok(p.hasTag("mizunoto"));
   assert.equal(p.camera.atual, undefined);
+  assert.equal(p.inputPermissions.isPermissionCategoryEnabled(4), true);
+  assert.equal(p.inputPermissions.isPermissionCategoryEnabled(6), false);
+  assert.equal(p.getProperty("kny:cc_edicao"), false);
   assert.deepEqual(canais(p, PROP_RASCUNHO), [-1, -1, -1]);
   digitar(p, "kny:menu");
   await executarAgendados();
@@ -91,15 +101,35 @@ test("o primeiro acesso abre a aparência sozinho, guarda pele, cabelo e olhos e
   assert.throws(() => iniciarEdicao(p), /somente na primeira entrada/);
 });
 
+test("trocar de dimensão limpa a proteção da edição e devolve os controles", async () => {
+  const p = novo();
+  let devolver;
+  p.escolhas.push(() => new Promise((resolve) => { devolver = resolve; }));
+  const edicao = abrirEditor(p);
+  await executarAgendados();
+  assert.equal(p.getProperty("kny:cc_edicao"), true);
+  assert.equal(p.applyDamage(10), false);
+  p.dimension = { id: "minecraft:nether" };
+  world.afterEvents.playerDimensionChange.emit({ player: p });
+  devolver(fechar());
+  await edicao;
+  await executarAgendados();
+  assert.equal(p.getProperty("kny:cc_edicao"), false);
+  assert.equal(p.inputPermissions.isPermissionCategoryEnabled(4), true);
+  assert.equal(p.camera.atual, undefined);
+  assert.equal(p.applyDamage(1), true);
+});
+
 test("fechar ou cancelar leva ao contrato e o item não reabre a aparência", async () => {
   for (const acao of [fechar, confirmar("Cancelar")]) {
     const p = novo();
-    p.escolhas.push(acao, fechar);
+    p.escolhas.push(confirmar("Crie seu personagem"), acao, fechar);
     // O item pode ser usado antes de o formulário automático abrir.
     entrar(p);
     digitar(p, "kny:menu");
     await executarAgendados();
-    assert.deepEqual(p.telas.map((f) => isEditor(f) ? "editor" : "contrato"), ["editor", "contrato"]);
+    assert.match(p.telas[0].titulo, /^kny_criar\|/);
+    assert.deepEqual(p.telas.slice(1).map((f) => isEditor(f) ? "editor" : "contrato"), ["editor", "contrato"]);
     assert.equal(p.getDynamicProperty(CHAVE_VISUAL), undefined);
     digitar(p, "kny:menu", "classico");
     await executarAgendados();
@@ -253,7 +283,7 @@ test("câmera começa em um ângulo livre quando o jogador nasce virado para uma
 test("a tela ocupada por mais de oito tentativas mantém a escolha pendente antes do contrato", async () => {
   const p = novo();
   const ocupado = () => ({ canceled: true, cancelationReason: "UserBusy" });
-  p.escolhas.push(...Array(12).fill(ocupado), (f) => {
+  p.escolhas.push(confirmar("Crie seu personagem"), ...Array(12).fill(ocupado), (f) => {
     assert.match(f.titulo, /^kny_edit\|R/);
     assert.equal(p.camera.atual, undefined);
     return confirmar("CONFIRMAR")(f);
@@ -269,7 +299,7 @@ test("a tela ocupada por mais de oito tentativas mantém a escolha pendente ante
 
 test("a entrada espera a inicialização nativa e reage ao sinal persistido mesmo que o evento atrase", async () => {
   const p = jogador();
-  p.escolhas.push(confirmar("CONFIRMAR"), fechar);
+  p.escolhas.push(confirmar("Crie seu personagem"), confirmar("CONFIRMAR"), fechar);
   entrar(p);
   digitar(p, "kny:menu");
   system.runTimeout(() => {
@@ -277,7 +307,7 @@ test("a entrada espera a inicialização nativa e reage ao sinal persistido mesm
     p.addTag("kny_aparencia_novo");
   }, 110);
   await executarAgendados(16);
-  assert.ok(isEditor(p.telas[0]));
+  assert.ok(isEditor(p.telas[1]));
   assert.ok(isContrato(p.telas.at(-1)));
   assert.equal(p.getDynamicProperty(CHAVE_ENTRADA), "v78");
 });
@@ -311,16 +341,16 @@ test("Staff recupera somente uma oportunidade da v77 sem ficha salva e sem reass
   const recuperar = 'recuperar_entrada "' + p.name + '"';
   digitar(p, "kny:aparencia", recuperar);
   assert.equal(p.getDynamicProperty(CHAVE_ENTRADA), true);
-  p.escolhas.push(confirmar("CONFIRMAR"));
+  p.escolhas.push(confirmar("Crie seu personagem"), confirmar("CONFIRMAR"));
   digitar(staff, "kny:aparencia", recuperar);
   await executarAgendados();
-  assert.equal(p.telas.length, 1);
-  assert.ok(isEditor(p.telas[0]));
+  assert.equal(p.telas.length, 2);
+  assert.ok(isEditor(p.telas[1]));
   assert.ok(p.hasTag("slayer"));
   assert.equal(p.getDynamicProperty(CHAVE_ENTRADA), "v78");
   digitar(staff, "kny:aparencia", recuperar);
   await executarAgendados();
-  assert.equal(p.telas.length, 1);
+  assert.equal(p.telas.length, 2);
 
   const salvo = jogador("Ficha anterior");
   salvo.setDynamicProperty(CHAVE_ENTRADA, true);

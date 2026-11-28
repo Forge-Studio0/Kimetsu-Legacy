@@ -3,6 +3,7 @@ const jogadores = new Map();
 const depois = [];
 const intervalos = [];
 const mundoDinamico = new Map();
+export const InputPermissionCategory = { LateralMovement: 4, Sneak: 5, Jump: 6, Mount: 7, Dismount: 8 };
 
 function sinais() {
   return new Proxy({}, {
@@ -108,6 +109,7 @@ export const uiManager = {
 
 let conta = 0;
 export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
+  const bloqueadas = new Set();
   const id = "mock:" + nome;
   const tags = new Set();
   const mensagens = [];
@@ -134,6 +136,10 @@ export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
   const p = {
     id, name: nome, typeId: "minecraft:player", isValid: true, tags, mensagens, titulos, dinamicos, telas: [], escolhas: [],
     camera, formulariosFechados: 0, nameTag: nome,
+    inputPermissions: {
+      isPermissionCategoryEnabled(c) { return !bloqueadas.has(c); },
+      setPermissionCategory(c, enabled) { if (enabled) bloqueadas.delete(c); else bloqueadas.add(c); },
+    },
     scoreboardIdentity: { id, name: nome },
     dimension: { id: "minecraft:overworld" }, location: { x: 0, y: 70, z: 0 }, selectedSlotIndex: 0,
     isSprinting: false, isSneaking: false, isOnGround: true,
@@ -151,7 +157,12 @@ export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
     getViewDirection() { return { x: 1, y: 0, z: 0 }; },
     getRotation() { return { x: 0, y: 0 }; },
     tryTeleport(pos, op) { this.location = { ...pos }; if (op.dimension) this.dimension = op.dimension; return true; },
-    triggerEvent(eventId) { world.afterEvents.dataDrivenEntityTrigger.emit({ entity: this, eventId }); },
+    triggerEvent(eventId) {
+      if (eventId === "kny:criacao_proteger" || eventId === "kny:criacao_liberar") {
+        this.setProperty("kny:cc_edicao", eventId === "kny:criacao_proteger");
+      }
+      world.afterEvents.dataDrivenEntityTrigger.emit({ entity: this, eventId });
+    },
     getComponent(nome) {
       if (nome === "minecraft:health") return hp;
       if (nome === "minecraft:movement") return movimento;

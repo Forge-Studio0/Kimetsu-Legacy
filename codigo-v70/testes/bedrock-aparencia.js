@@ -1,4 +1,4 @@
-import { GameMode, ItemStack, system, world } from "@minecraft/server";
+import { GameMode, InputPermissionCategory, ItemStack, system, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
 import { CHAVE_ENTRADA, CHAVE_VISUAL, iniciarEdicao, lerAparencia } from "./character_system.js";
@@ -8,7 +8,7 @@ const CAMERA = "kny:aparencia_camera";
 const CHECKPOINT = "kny:teste_v78_ficha";
 const MENU = "kny:menu_kimetsu";
 const LIVRO = "kny:book_archievement";
-const log = (s) => console.warn("KNY-TEST ENTRADA V78 " + s);
+const log = (s) => console.warn("KNY-TEST ENTRADA V79 " + s);
 const ok = (cond, msg) => { if (!cond) throw new Error(msg); };
 const eq = (a, b, msg) => ok(a === b, msg + " (" + a + " × " + b + ")");
 const canais = (p, props) => props.map((k) => p.getProperty(k)).join(",");
@@ -45,12 +45,33 @@ function interceptarFormularios() {
       plano.ocupado--;
       return Promise.resolve({ canceled: true, cancelationReason: "UserBusy" });
     }
+    if (tela.titulo.startsWith("kny_edit|§") && plano.testarProtecao) {
+      plano.testarProtecao = false;
+      return testarProtecao(p).then(() => selecionar(plano, tela));
+    }
+    return selecionar(plano, tela);
+  };
+}
+
+function selecionar(plano, tela) {
     const acao = plano.acoes.shift();
     if (!acao) return Promise.resolve({ canceled: true, cancelationReason: "UserClosed" });
     const selection = tela.botoes.findIndex((b) => b.includes(acao));
     ok(selection >= 0, acao + " ausente em " + tela.titulo + " [" + tela.botoes.join(" | ") + "]");
     return Promise.resolve({ canceled: false, selection });
-  };
+}
+
+async function testarProtecao(p) {
+  await wait(2);
+  const movimento = InputPermissionCategory.LateralMovement;
+  eq(p.inputPermissions.isPermissionCategoryEnabled(movimento), false, "movimento bloqueado durante o painel");
+  eq(p.getProperty("kny:cc_edicao"), true, "propriedade do retrato durante o painel");
+  const vida = p.getComponent("minecraft:health");
+  const antes = vida.currentValue;
+  p.applyDamage(30, { cause: "override" });
+  p.applyDamage(2, { cause: "fire" });
+  await wait(3);
+  eq(vida.currentValue, antes, "dano real cancelado durante a edição");
 }
 
 async function spawn(nome, x, acoes = [], { antigo = false, salvo, caixa = false, ocupado = 0, preparar } = {}) {
@@ -115,13 +136,13 @@ async function run() {
   }
 
   const { p: novo, plano: escolhas } = await spawn("V78Escolha", 131, [
-    "Próximo", "C:Cabelo", "Cor principal", "‹ Anterior", "C:Olhos", "Íris esquerda", "‹ Anterior",
+    "Crie seu personagem", "Próximo", "C:Cabelo", "Cor principal", "‹ Anterior", "C:Olhos", "Íris esquerda", "‹ Anterior",
     "Girar ›", "Aproximar", "Ver corpo", "CONFIRMAR", "ASSINAR O CONTRATO",
   ], { preparar: (p) => {
     inv(p).setItem(1, new ItemStack(MENU)); // Este cenário dava duas cópias na v77.
     inv(p).setItem(9, new ItemStack(LIVRO));
   } });
-  const { p: visita, plano: fechado } = await spawn("V78Caixa", 138, ["Cancelar"], { caixa: true, ocupado: 10,
+  const { p: visita, plano: fechado } = await spawn("V78Caixa", 138, ["Crie seu personagem", "Cancelar"], { caixa: true, ocupado: 10,
     preparar: (p) => {
       inv(p).setItem(0, new ItemStack(MENU));
       inv(p).setItem(3, new ItemStack(MENU));
@@ -139,13 +160,15 @@ async function run() {
       p.setDynamicProperty(CHAVE_ENTRADA, true);
     },
   });
+  escolhas.testarProtecao = true;
   await wait(125);
 
   eq(novo.getDynamicProperty(CHAVE_ENTRADA), "v78", "função nativa reservou a primeira entrada");
   eq(escolhas.acoes.length, 0, "ações de edição e contrato executadas");
-  ok(escolhas.telas[0]?.titulo.startsWith("kny_edit|§"), "editor com câmera abre antes do contrato");
+  ok(escolhas.telas[0]?.titulo.startsWith("kny_criar|"), "tela de criação abre primeiro");
+  ok(escolhas.telas[1]?.titulo.startsWith("kny_edit|§"), "editor com câmera abre antes do contrato");
   ok(escolhas.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "confirmação abre o contrato");
-  eq(escolhas.telas[0].botoes.filter((t) => /^[CS]:/.test(t)).map((t) => t.slice(2)).join(","), "Pele,Cabelo,Olhos", "três categorias");
+  eq(escolhas.telas[1].botoes.filter((t) => /^[CS]:/.test(t)).map((t) => t.slice(2)).join(","), "Pele,Cabelo,Olhos", "três categorias");
   eq(slotsMenu(novo).join(","), "1", "login com item já presente mantém uma cópia no mesmo slot");
   eq(inv(novo).getItem(9)?.typeId, LIVRO, "livro preservado");
   const salvo = novo.getDynamicProperty(CHAVE_VISUAL);
@@ -156,8 +179,10 @@ async function run() {
   eq(visual.olhoE, "ciano", "cor dos olhos");
   eq(canais(novo, PROP_APARENCIA), codificarVisual(visual).join(","), "canais nativos do visual confirmado");
   eq(novo.getDynamicProperty(CAMERA), undefined, "câmera restaurada ao confirmar");
+  eq(novo.getProperty("kny:cc_edicao"), false, "visibilidade restaurada");
+  eq(novo.inputPermissions.isPermissionCategoryEnabled(InputPermissionCategory.LateralMovement), true, "controle restaurado");
   eq(slotsMenu(visita).length, 1, "duas cópias preexistentes viraram uma");
-  ok(fechado.telas[0]?.titulo.startsWith("kny_edit|R"), "sala fechada recebe o painel com retrato");
+  ok(fechado.telas[1]?.titulo.startsWith("kny_edit|R"), "sala fechada recebe o painel com retrato");
   ok(!fechado.telas.some((tela) => tela.titulo.startsWith("kny_ctr|")), "contrato aguardando durante a tela ocupada");
   log("câmera em área aberta, painel com retrato em espaço fechado e item único no login");
 
@@ -177,11 +202,11 @@ async function run() {
   await wait(5);
   eq(recuperacao.telas.length, 0, "jogador comum não recupera uma entrada");
   novo.addTag("kny_op");
-  recuperacao.acoes.push("CONFIRMAR");
+  recuperacao.acoes.push("Crie seu personagem", "CONFIRMAR");
   novo.runCommand("scriptevent kny:aparencia recuperar_entrada V78Legado");
   await wait(8);
-  ok(recuperacao.telas[0]?.titulo.startsWith("kny_edit|"), "Staff abriu a recuperação da v77");
-  eq(recuperacao.telas.length, 1, "Caçador de recuperação não reassina o contrato");
+  ok(recuperacao.telas[1]?.titulo.startsWith("kny_edit|"), "Staff abriu a recuperação da v77");
+  eq(recuperacao.telas.length, 2, "Caçador de recuperação não reassina o contrato");
   eq(legado.getDynamicProperty(CHAVE_ENTRADA), "v78", "recuperação registrada uma vez");
   ok(lerAparencia(legado).perfis.base.peleIntegral, "ficha recuperada salva");
 

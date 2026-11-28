@@ -6,6 +6,7 @@ import { emCombate, estadoBloqueado, getTrueRace, racaHibrida } from "./hybrid_s
 import { lerJson, gravarJson, personagem } from "./hybrid_records.js";
 import { viagemEmCurso } from "./hybrid_locations.js";
 import { resgateEmCurso } from "./revive.js";
+import { liberarCriacao } from "./character_protection.js";
 
 export const CHAVE_VISUAL = "kny:aparencia";
 export const CHAVE_CATALOGO = "kny:aparencia_catalogo";
@@ -89,6 +90,8 @@ export function encerrarEdicao(sessao, mensagem) {
   sessoes.delete(sessao.p.id);
   const p = sessao.p;
   if (jogadorValido(p)) {
+    try { liberarCriacao(p); }
+    catch (e) { console.warn("[Aparência] Proteção: " + e); }
     if (sessao.formAberto) {
       try { UI.uiManager?.closeAllForms(p); } catch {}
     }
@@ -222,6 +225,7 @@ export function atualizarPersonagem(p, restaurar = false) {
   const atual = sessaoAtual(p);
   if (atual && (restaurar || !sessaoSegura(atual))) encerrarEdicao(atual, "§eEdição encerrada. O rascunho foi descartado.");
   if (!sessaoAtual(p)) {
+    liberarCriacao(p);
     limparCamera(p);
     escreverCanais(p, PROP_RASCUNHO, [-1, -1, -1]);
   }
