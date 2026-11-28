@@ -90,6 +90,12 @@ export class ItemStack {
   constructor(typeId, amount = 1) { this.typeId = typeId; this.amount = amount; }
 }
 
+export class BlockVolume {
+  constructor(from, to) { this.from = from; this.to = to; }
+}
+
+export const BlockPermutation = { resolve(typeId) { return { typeId }; } };
+
 export class ActionFormData {
   buttons = [];
   title(texto) { this.titulo = texto; return this; }

@@ -14,7 +14,7 @@
 		}
 	},
 	"header": {
-		"name": "Kimetsu Survival Craft Re v83",
+		"name": "Kimetsu Survival Craft Re v84",
 		"description": "tenha sua própria experiência no mundo de Demon Slayer, com mobs e armas do Anime",
 		"min_engine_version": [
 			1,
@@ -25,7 +25,7 @@
 		"version": [
 			1,
 			0,
-			65
+			66
 		]
 	},
 	"modules": [
@@ -45,7 +45,7 @@
 			"version": [
 				1,
 				0,
-				65
+				66
 			]
 		}
 	]

@@ -21,6 +21,7 @@ import {
 import {
   DIM_ARENAS, arenas, criarArena, destinoSeguro, erroArena, gravarArena, novoLocal, pegarArena,
 } from "./missoes_arenas.js";
+import { instalarArenasProntas } from "./missoes_arenas_prontas.js";
 import { patenteDe } from "./stats.js";
 
 const POR_PAGINA = 6;
@@ -346,6 +347,7 @@ function confirmarAprendizado(ctx, q, resp, req, consulta) {
 function listarArenas(ctx) {
   if (!ehStaff(ctx.p)) return;
   return quadro(ctx, "ADMINISTRAÇÃO DE ARENAS", "Dimensão privada · " + DIM_ARENAS, [
+    linha("Instalar 2 arenas prontas", "Construa e ative o Pátio e o Refúgio", () => confirmarInstalacao(ctx)),
     linha("Criar arena", "Informe o ID e o nome", () => criarArenaTela(ctx)),
     linha("Auditoria de sessões", "Participantes, resultados e pagamentos", () => auditoria(ctx)),
     linha("Ir à oficina", "Viaje para coordenadas definidas pela Staff", () => oficina(ctx)),
@@ -357,6 +359,23 @@ function listarArenas(ctx) {
       return linha(a.nome, s ? `Sessão ${s.id} · ${s.estado}` : a.ativa ? "Disponível" : "Desativada", () => editarArena(ctx, a.id));
     }),
   ], () => inicio(ctx));
+}
+
+function confirmarInstalacao(ctx) {
+  const { p } = ctx;
+  if (!ehStaff(p)) return;
+  return quadro(ctx, "INSTALAR ARENAS", "Fique sobre um piso seguro no mundo normal.", [
+    linha("Pátio da Vigília", "Abates, ondas, chefes e sobrevivência"),
+    linha("Refúgio das Lanternas", "Localização e proteção"),
+    linha("Confirmar instalação", "Salva a sua posição como saída alternativa", async () => {
+      const { criadas, erro } = await instalarArenasProntas(p);
+      if (!p.isValid) return;
+      if (criadas.length) p.sendMessage("§a[Missões] Arenas ativadas · " + criadas.map((a) => a.nome).join(" e "));
+      if (erro) falha(p, erro);
+      else if (!criadas.length) p.sendMessage("§e[Missões] As duas arenas já foram instaladas. Confira o status na lista.");
+      return listarArenas(ctx);
+    }),
+  ], () => listarArenas(ctx));
 }
 
 function auditoria(ctx) {
