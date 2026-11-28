@@ -8,9 +8,9 @@ import { staminaDe, folegoDe, pontuar, lerBruto, getScore } from "./stats.js";
    - Fôlego:   "chakra" das respirações. Cada forma gasta fôlego; zerou, não dá
                para usar respirações até agachar para recarregar.
    - Stamina:  gasta correndo e lutando (sistema do menu.js).
-   O texto do painel viaja no título, logo depois do "HP<vida>" usado pela
-   barra de vida que já existia. O visual do painel
-   está em hud_screen.json (resource pack), controle "kny_painel".
+   O texto do painel viaja no título, após o prefixo "HP<vida>" reservado
+   pelo formato do HUD. O visual está em hud_screen.json (resource pack),
+   controle "kny_painel".
 ===================================================================== */
 
 // ----- ajustes de equilíbrio (mexa aqui) -----
@@ -20,7 +20,7 @@ const FOLEGO_RECARGA_AGACHADO = 0.02; // fração do máximo recuperada a cada 5
 const FOLEGO_REGEN_PASSIVO = 0; // fôlego recuperado por segundo em pé (0 = só recarrega agachando)
 const CICLO = 5; // ticks entre atualizações
 const REENVIO = 40; // reenvia o painel a cada 2 s mesmo sem mudança (garante que continue na tela)
-const VERSAO = "1.0.66";
+const VERSAO = "1.0.67";
 const avisouInicio = new Set();
 
 const ultimoTitulo = new Map(); // só para diagnóstico: /scriptevent kny:painel
@@ -133,7 +133,7 @@ function cicloJogador(p) {
   }
   const texto = corpo;
 
-  // vida da barra antiga (mesma regra do bars.js): criativo = 0, máximo 100
+  // Mantém o prefixo do título com cinco caracteres.
   let hp = 0;
   const h2 = p.getComponent("minecraft:health");
   if (modo !== "creative" && h2) hp = Math.min(100, Math.floor(h2.currentValue));
@@ -146,7 +146,7 @@ function enviar(p, hp, texto) {
   if (u && u.hp === hp && u.texto === texto && agora - u.tick < REENVIO) return;
   ultimoEnvio.set(p.id, { hp, texto, tick: agora });
   // Título = "HP<vida>" preenchido com espaços até 5 caracteres + texto do painel.
-  // As imagens da barra de vida só procuram "HP<vida>"; o painel lê o que vem depois dos 5 primeiros caracteres.
+  // O painel lê os dados depois dos 5 primeiros caracteres.
   const titulo = ("HP" + hp).padEnd(5, " ") + texto;
   ultimoTitulo.set(p.id, titulo);
   try {

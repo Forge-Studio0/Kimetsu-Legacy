@@ -132,7 +132,8 @@ const fixo = (valor) => ({ valor });
 const padrao = (arr) => [arr[0], ...arr];
 const livre = (slot) => "!query.has_armor_slot(" + slot + ")";
 const semMarca = "query.property('kny:mark') == 0 && query.property('kny:h_publico') < 2";
-const cabecaLivre = livre(0);
+// A mesma consulta de equipamento de cabeça usada pelo jogador do Bedrock.
+const cabecaLivre = "!query.has_head_gear";
 
 // Frentes de rosto, olhos e detalhes compartilham o plano da cabeça.
 const pele = TONS.filter((c) => c.codigo > 0).map((c) => textura("pele_" + c.id, atlas(rgb(c.hex), (t, x, y, bloco, face) => {

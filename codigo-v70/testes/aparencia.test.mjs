@@ -620,3 +620,58 @@ test("canais, controladores, armaduras e as dez texturas de corpo inteiro corres
   }
   assert.deepEqual(codificarVisual(VISUAL_PADRAO), [0, 0, 0]);
 });
+
+test("máscaras usam o item correto e as duas camadas de olhos respeitam o equipamento", () => {
+  const ler = (pack, nome) => JSON.parse(readFileSync(new URL(nome, pack), "utf8").replace(/^\s*\/\/.*$/gm, ""));
+  const player = ler(rp, "entity/player.entity.json")["minecraft:client_entity"].description;
+  const oficina = ler(rp, "models/entity/customizacao/oficina.geo.json")["minecraft:geometry"];
+  const controladores = player.render_controllers;
+  for (const camada of ["olho_e", "olho_d", "demonio"]) {
+    const id = "controller.render.kny.cc_" + camada;
+    const condicao = controladores.find((c) => c[id])?.[id];
+    assert.match(condicao, /!query\.has_head_gear\b/, camada);
+    assert.doesNotMatch(condicao, /cc_peleIntegral/, camada);
+  }
+
+  const frente = (c) => c.origin[2] - (c.inflate ?? 0);
+  const olhos = oficina.filter((g) => /\.cc_(olho_[ed]_\d|traco_4)$/.test(g.description.identifier));
+  assert.equal(olhos.length, 9);
+  const frenteOlhos = Math.min(...olhos.flatMap((g) => g.bones.find((b) => b.name === "head").cubes.map(frente)));
+  for (const nome of ["sabito_mask", "hyottoko_mask", "urokodaki_mask", "boar_head"]) {
+    const id = "kny:" + nome;
+    const { description, components } = ler(bp, "items/armos/" + nome + ".json")["minecraft:item"];
+    const render = ler(rp, "attachables/" + nome + ".json")["minecraft:attachable"].description;
+    assert.equal(description.identifier, id);
+    assert.equal(components["minecraft:wearable"].slot, "slot.armor.head");
+    assert.equal(render.identifier, id);
+    assert.deepEqual(Object.keys(render.item), [id]);
+    const geo = ler(rp, "models/entity/" + nome + ".geo.json")["minecraft:geometry"][0];
+    assert.equal(render.geometry.default, geo.description.identifier);
+    const png = readFileSync(new URL(render.textures.default + ".png", rp));
+    assert.equal(png.toString("ascii", 1, 4), "PNG");
+    if (nome === "sabito_mask" || nome === "hyottoko_mask") {
+      const casco = geo.bones.find((b) => b.name === "hat").cubes.find((c) => c.size[0] === 8 && c.size[1] === 8);
+      assert.ok(frente(casco) < frenteOlhos, nome + " à frente das íris e pupilas");
+      assert.notEqual(casco.uv.north, undefined, nome + " tem face frontal");
+    }
+  }
+});
+
+test("HUD oculta armadura e corações e continua a desenhar o painel Kimetsu", () => {
+  const hud = JSON.parse(readFileSync(new URL("ui/hud_screen.json", rp), "utf8").replace(/\/\*[^]*?\*\//g, ""));
+  assert.equal(hud.namespace, "hud");
+  for (const [nome, binding] of [["heart_renderer", "#show_survival_ui"], ["armor_renderer", "#is_armor_visible"]]) {
+    assert.equal(hud[nome].visible, false);
+    assert.deepEqual(hud[nome].modifications, [
+      { array_name: "bindings", operation: "remove", where: { binding_name: binding } },
+    ]);
+  }
+  for (const nome of ["horse_heart_renderer", "hotbar_renderer", "bubbles_renderer", "hunger_renderer"]) {
+    assert.equal(hud[nome], undefined);
+  }
+  const controles = hud["root_panel_bg@common.empty_panel"].controls;
+  assert.equal(controles.some((c) => Object.keys(c).some((chave) => /^hp\d+$/.test(chave))), false);
+  const painel = controles.find((c) => c.kny_painel)?.kny_painel;
+  assert.ok(painel);
+  for (const label of ["VIDA", "FÔLEGO", "STAMINA"]) assert.ok(JSON.stringify(painel).includes(label));
+});
