@@ -73,10 +73,10 @@ test("o primeiro acesso abre a aparência sozinho, guarda pele, cabelo e olhos e
       ["Pele", "Cabelo", "Olhos"]);
     assert.ok(!f.buttons.some((b) => /Acessórios|Informações|Vestimentas|Conjuntos|Expressão/.test(b.texto)));
     return confirmar("Próximo")(f);
-  }, confirmar("C:Cabelo"), confirmar("Cor principal"), confirmar("Próximo"), confirmar("C:Olhos"),
+  }, confirmar("C:Cabelo"), confirmar("Cor principal"), confirmar("Próximo"), confirmar("Cor da mecha"), confirmar("Próximo"), confirmar("C:Olhos"),
   confirmar("Íris direita"), confirmar("Próximo"), confirmar("CONFIRMAR"), confirmar("ASSINAR O CONTRATO"));
   entrar(p);
-  await executarAgendados();
+  await executarAgendados(24);
   assert.match(p.telas[0].titulo, /^kny_criar\|/);
   assert.ok(isEditor(p.telas[1]));
   assert.ok(isContrato(p.telas.at(-1)));
@@ -84,6 +84,7 @@ test("o primeiro acesso abre a aparência sozinho, guarda pele, cabelo e olhos e
   assert.equal(base.peleIntegral, "pele_a_c98f65");
   assert.equal(base.cabelo, "corte_curto");
   assert.equal(base.corCabelo, "castanha");
+  assert.equal(base.mecha, "carvao");
   assert.equal(base.olhoD, "ambar");
   assert.equal(base.roupa, undefined);
   assert.equal(base.rosto, undefined);
@@ -267,18 +268,33 @@ test("a pele inicial continua disponível na transformação e na troca legítim
   assert.throws(() => iniciarEdicao(p), /somente na primeira entrada/);
 });
 
-test("sala fechada usa o retrato dentro do painel e ainda salva a primeira aparência", async () => {
+test("retratos de reserva atualizam a pele e as camadas no visor antes da confirmação", async () => {
   const p = novo();
   p.dimension.getBlockFromRay = () => ({ block: { location: { x: 0, y: 71, z: 1 } }, faceLocation: { x: 0, y: 0, z: 0 } });
+  const caminho = (f, campo) => f.buttons.find(({ texto }) => texto === campo + ":")?.icone;
   p.escolhas.push((f) => {
-    assert.match(f.titulo, /^kny_edit\|R/);
+    assert.match(f.titulo, /^kny_edit\|R§/);
     assert.ok(!f.buttons.some((b) => b.texto.includes("Girar")));
+    assert.match(caminho(f, "PV"), /pele_a_e8b98f$/);
+    assert.match(caminho(f, "PC"), /1_carvao$/);
+    assert.match(caminho(f, "PE"), /e_4_castanho$/);
+    return confirmar("Anterior")(f);
+  }, (f) => {
+    assert.match(f.titulo, /^kny_edit\|RA/);
+    assert.equal(caminho(f, "PV"), undefined);
+    assert.equal(caminho(f, "PC"), undefined);
+    return confirmar("Próximo")(f);
+  }, confirmar("Próximo"), (f) => {
+    assert.match(caminho(f, "PV"), /pele_a_c98f65$/);
     return confirmar("CONFIRMAR")(f);
   });
-  await abrirEditor(p);
+  const tarefa = abrirEditor(p);
+  await executarAgendados(15);
+  await tarefa;
   assert.equal(p.camera.atual, undefined);
+  assert.equal(p.camera.fov, undefined);
   assert.equal(p.getDynamicProperty(CHAVE_CAMERA), undefined);
-  assert.equal(lerAparencia(p).perfis.base.peleIntegral, "pele_a_e8b98f");
+  assert.equal(lerAparencia(p).perfis.base.peleIntegral, "pele_a_c98f65");
 });
 
 test("falha na abertura da interface personalizada mantém o formulário simples como alternativa", async () => {
@@ -286,11 +302,29 @@ test("falha na abertura da interface personalizada mantém o formulário simples
   p.escolhas.push(() => ({ canceled: true }), (f) => {
     assert.equal(f.titulo, "§6APARÊNCIA DO PERSONAGEM");
     assert.equal(p.camera.atual, undefined);
+    assert.equal(p.camera.fov, undefined);
+    return confirmar("CONFIRMAR")(f);
+  });
+  const tarefa = abrirEditor(p);
+  await executarAgendados();
+  await tarefa;
+  assert.ok(isEditor(p.telas[0]));
+  assert.ok(lerAparencia(p).perfis.base.peleIntegral);
+});
+
+test("uma falha do campo de visão mantém a escolha disponível na prévia frontal", async () => {
+  const p = novo();
+  p.camera.setFov = (opcoes) => {
+    if (opcoes) throw new Error("Campo de visão indisponível no teste");
+  };
+  p.escolhas.push((f) => {
+    assert.match(f.titulo, /^kny_edit\|R§/);
+    assert.equal(p.camera.atual, undefined);
+    assert.equal(p.getDynamicProperty(CHAVE_CAMERA), undefined);
     return confirmar("CONFIRMAR")(f);
   });
   await abrirEditor(p);
-  assert.ok(isEditor(p.telas[0]));
-  assert.ok(lerAparencia(p).perfis.base.peleIntegral);
+  assert.equal(lerAparencia(p).perfis.base.peleIntegral, "pele_a_e8b98f");
 });
 
 test("câmera começa em um ângulo livre quando o jogador nasce virado para uma parede", () => {
@@ -305,21 +339,35 @@ test("câmera começa em um ângulo livre quando o jogador nasce virado para uma
   encerrarEdicao(sessao);
 });
 
-test("a tela ocupada por mais de oito tentativas mantém a escolha pendente antes do contrato", async () => {
+test("uma troca de pele seguida de tela ocupada preserva câmera, rascunho, livro e proteção", async () => {
   const p = novo();
+  const inventario = p.getComponent("minecraft:inventory").container;
+  inventario.setItem(0, new ItemStack("kny:menu_kimetsu"));
   const ocupado = () => ({ canceled: true, cancelationReason: "UserBusy" });
-  p.escolhas.push(confirmar("Crie seu personagem"), ...Array(12).fill(ocupado), (f) => {
-    assert.match(f.titulo, /^kny_edit\|R/);
-    assert.equal(p.camera.atual, undefined);
+  let enquadramento;
+  p.escolhas.push(confirmar("Crie seu personagem"), (f) => {
+    assert.match(f.titulo, /^kny_edit\|§/);
+    enquadramento = { ...p.camera.atual };
+    return confirmar("Próximo")(f);
+  }, ...Array(12).fill(ocupado), (f) => {
+    assert.match(f.titulo, /^kny_edit\|§/);
+    assert.deepEqual(p.camera.atual, enquadramento);
+    assert.equal(p.camera.fov, camera.CAMPO_DE_VISAO_ESTUDIO);
+    assert.ok(f.buttons.some((b) => /Base A · Mel/.test(b.texto)));
+    assert.equal(p.inputPermissions.isPermissionCategoryEnabled(4), false);
+    assert.equal(p.applyDamage(3), false);
+    assert.equal(inventario.getItem(0).typeId, "kny:menu_kimetsu");
+    assert.equal(p.selectedSlotIndex, 0);
     return confirmar("CONFIRMAR")(f);
   }, fechar);
   entrar(p);
   digitar(p, "kny:menu", "classico");
-  await executarAgendados(36);
-  assert.equal(p.telas.filter(isEditor).length, 13);
+  await executarAgendados(40);
+  assert.equal(p.telas.filter(isEditor).length, 14);
   assert.equal(semCor(p.telas.at(-1).titulo), "KIMETSU NO YAIBA");
   assert.ok(p.hasTag("kny_cfg_classico"));
-  assert.ok(lerAparencia(p).perfis.base.peleIntegral);
+  assert.equal(lerAparencia(p).perfis.base.peleIntegral, "pele_a_c98f65");
+  assert.equal(p.camera.fov, undefined);
 });
 
 test("a entrada espera a inicialização nativa e reage ao sinal persistido mesmo que o evento atrase", async () => {
@@ -534,9 +582,41 @@ test("canais, controladores, armaduras e as dez texturas de corpo inteiro corres
   assert.ok(player.scripts.pre_animation.some((l) => l.includes("cc_peleIntegral") && l.includes("4096")));
   assert.ok(!ler(rp, "ui/server_form.json").includes("kny_oficina.acesso"));
   assert.ok(json(rp, "ui/_ui_defs.json").ui_defs.includes("ui/character_customization.json"));
-  const interfaceEditor = json(rp, "ui/character_customization.json").editor;
-  const retrato = interfaceEditor.controls.find((control) => control.retrato).retrato;
+  const ui = json(rp, "ui/character_customization.json");
+  const visor = ui.editor.controls.find((control) => control.visor).visor;
+  assert.equal(visor.clips_children, true);
+  const retrato = visor.controls.find((control) => control.retrato).retrato;
   assert.ok(retrato.bindings.some((b) => b.source_property_name?.includes("kny_edit|R")));
-  assert.ok(retrato.controls.some((control) => control.jogador?.renderer === "live_player_renderer"));
+  assert.equal(retrato.controls.length, 5);
+  assert.doesNotMatch(JSON.stringify(ui.editor), /live_player_renderer/);
+  const controle = (id) => ui.editor.controls.find((c) => Object.hasOwn(c, id))[id];
+  const comandos = controle("camera@kny_oficina.botoes");
+  const decisoes = controle("decisoes@kny_oficina.botoes");
+  const fimVisor = parseFloat(visor.offset[1]) + parseFloat(visor.size[1]);
+  const fimComandos = parseFloat(comandos.offset[1]) + parseFloat(comandos.size[1]);
+  const inicioDecisoes = 100 + parseFloat(decisoes.offset[1]) - parseFloat(decisoes.size[1]);
+  assert.ok(fimVisor < parseFloat(comandos.offset[1]) && fimComandos < inicioDecisoes);
+  assert.equal(ui["opcao@kny_oficina.botao"].clips_children, true);
+  assert.ok(player.scripts.animate.some((a) => a.maos_editor === "query.is_local_player && query.property('kny:cc_edicao')"));
+  const animacao = json(rp, "animations/maos_editor.animation.json").animations[player.animations.maos_editor];
+  assert.deepEqual(Object.keys(animacao.bones), ["rightItem", "leftItem"]);
+  const conferirMiniatura = (nome) => {
+    const png = readFileSync(new URL("textures/ui/customizacao/previa/" + nome + ".png", rp));
+    assert.equal(png.toString("ascii", 1, 4), "PNG");
+    assert.equal(png.readUInt32BE(16), 80, nome);
+    assert.equal(png.readUInt32BE(20), 156, nome);
+  };
+  for (const { id } of peles) conferirMiniatura("pele/" + id);
+  for (const { codigo } of config.CAMPOS.cabelo.opcoes.slice(1)) {
+    for (const { id } of config.CORES_CABELO) {
+      conferirMiniatura(`cabelo/${codigo}_${id}`);
+      conferirMiniatura(`mecha/${codigo}_${id}`);
+    }
+  }
+  for (const { codigo } of config.CAMPOS.olhos.opcoes.slice(1)) {
+    for (const { id } of config.IRIS) {
+      for (const lado of ["e", "d"]) conferirMiniatura(`olho/${lado}_${codigo}_${id}`);
+    }
+  }
   assert.deepEqual(codificarVisual(VISUAL_PADRAO), [0, 0, 0]);
 });

@@ -37,7 +37,10 @@ export async function entrarEstudio(p, podeEntrar) {
   const pos = { x: x + 0.5, y: 80, z: z + 0.5 };
   return comChunk(dim, pos, () => {
     if (!p.isValid || !podeEntrar()) return false;
-    dim.runCommand(`fill ${x - 5} 79 ${z - 5} ${x + 5} 79 ${z + 5} minecraft:polished_deepslate`);
+    dim.runCommand(`fill ${x - 7} 79 ${z - 7} ${x + 7} 79 ${z + 7} minecraft:polished_deepslate`);
+    dim.runCommand(`fill ${x - 7} 80 ${z - 7} ${x + 7} 85 ${z + 7} minecraft:polished_deepslate outline`);
+    dim.runCommand(`fill ${x - 6} 85 ${z - 6} ${x + 6} 85 ${z + 6} minecraft:air`);
+    dim.runCommand(`fill ${x - 6} 80 ${z - 6} ${x + 6} 80 ${z + 6} minecraft:air`);
     p.setDynamicProperty(ORIGEM, JSON.stringify({ dim: p.dimension.id, pos: p.location, rot: p.getRotation() }));
     if (!p.tryTeleport(pos, { dimension: dim, rotation: { x: 0, y: 0 }, keepVelocity: false, checkForBlocks: true })) {
       p.setDynamicProperty(ORIGEM, undefined);

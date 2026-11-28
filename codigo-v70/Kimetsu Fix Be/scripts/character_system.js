@@ -1,12 +1,13 @@
 import { system, world } from "@minecraft/server";
 import * as UI from "@minecraft/server-ui";
 import { CAMPOS, CAMPOS_INICIAIS, PROP_APARENCIA, PROP_RASCUNHO, VISUAL_PADRAO, codificarVisual, opcaoDe } from "./character_config.js";
-import { buscarCameraInicial, cameraInicial } from "./character_camera.js";
+import { CAMPO_DE_VISAO_ESTUDIO, buscarCameraInicial, cameraInicial } from "./character_camera.js";
 import { emCombate, estadoBloqueado, getTrueRace, racaHibrida } from "./hybrid_system.js";
 import { lerJson, gravarJson, personagem } from "./hybrid_records.js";
 import { viagemEmCurso } from "./hybrid_locations.js";
 import { resgateEmCurso } from "./revive.js";
 import { liberarCriacao } from "./character_protection.js";
+import { DIMENSAO_ESTUDIO } from "./character_studio.js";
 
 export const CHAVE_VISUAL = "kny:aparencia";
 export const CHAVE_CATALOGO = "kny:aparencia_catalogo";
@@ -77,6 +78,8 @@ function limparCamera(p) {
   if (p.getDynamicProperty(CHAVE_CAMERA) !== true) return;
   try { p.camera.clear(); }
   catch { p.runCommand("camera @s clear"); }
+  try { p.camera.setFov?.(); }
+  catch (e) { console.warn("[Aparência] Restauração do campo de visão: " + e); }
   p.setDynamicProperty(CHAVE_CAMERA, undefined);
 }
 
@@ -139,7 +142,6 @@ export function sessaoSegura(sessao) {
   const p = sessao.p;
   if (sessoes.get(p.id) !== sessao || indisponivel(p) || p.dimension.id !== sessao.dim ||
       getTrueRace(p) !== sessao.raca || perfilAtivo(p, sessao.raca) !== sessao.identidade) return false;
-  if (sessao.aguardandoTela) return true;
   const { x, y, z } = p.location;
   const origem = sessao.camera.origem;
   return Math.hypot(x - origem.x, y - origem.y, z - origem.z) <= (sessao.temCamera ? 0.8 : 3);
@@ -169,14 +171,20 @@ export function iniciarEdicao(p) {
   entradas.delete(p.id);
   sessoes.set(p.id, sessao);
   try {
-    let camera;
-    try { camera = buscarCameraInicial(p, sessao.camera); } catch {}
+    p.setDynamicProperty(CHAVE_CAMERA, true);
+    const camera = buscarCameraInicial(p, sessao.camera, sessao.dim === DIMENSAO_ESTUDIO);
     if (camera) {
-      sessao.camera = camera;
-      sessao.anguloInicial = camera.angulo;
-      sessao.temCamera = true;
-      try { p.setDynamicProperty(CHAVE_CAMERA, true); }
-      catch (e) { p.camera.clear(); throw e; }
+      try {
+        p.camera.setFov({ fov: CAMPO_DE_VISAO_ESTUDIO });
+        sessao.camera = camera;
+        sessao.anguloInicial = camera.angulo;
+        sessao.temCamera = true;
+      } catch (e) {
+        console.warn("[Aparência] Enquadramento: " + e);
+        limparCamera(p);
+      }
+    } else {
+      limparCamera(p);
     }
     previsualizar(sessao);
     return sessao;

@@ -1,6 +1,8 @@
+export const CAMPO_DE_VISAO_ESTUDIO = 62;
+
 const VISTAS = {
-  corpo: { altura: 1.02, distancia: 3.65, minimo: 2.65, maximo: 5.1 },
-  rosto: { altura: 1.72, distancia: 1.55, minimo: 1.18, maximo: 2.65 },
+  corpo: { altura: 1.08, distancia: 4.6, minimo: 3.8, maximo: 6.3 },
+  rosto: { altura: 1.69, distancia: 1.8, minimo: 1.35, maximo: 3.2 },
 };
 const ANGULOS_INICIAIS = [0, 30, 330, 60, 300, 90, 270, 120, 240, 150, 210, 180];
 
@@ -33,8 +35,8 @@ export function posicionarCamera(p, c, animar = false) {
   return true;
 }
 
-export function buscarCameraInicial(p, camera) {
-  if (!p.isOnGround) return undefined;
+export function buscarCameraInicial(p, camera, noEstudio = false) {
+  if (!noEstudio && !p.isOnGround) return undefined;
   for (const angulo of ANGULOS_INICIAIS) {
     const tentativa = { ...camera, angulo };
     try {

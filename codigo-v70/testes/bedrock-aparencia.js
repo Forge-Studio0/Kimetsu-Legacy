@@ -1,14 +1,16 @@
 import { GameMode, InputPermissionCategory, ItemStack, system, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { spawnSimulatedPlayer } from "@minecraft/server-gametest";
-import { CHAVE_ENTRADA, CHAVE_VISUAL, iniciarEdicao, lerAparencia } from "./character_system.js";
+import { CHAVE_ENTRADA, CHAVE_VISUAL, iniciarEdicao, lerAparencia, prepararAparenciaInicial } from "./character_system.js";
 import { codificarVisual, PROP_APARENCIA, PROP_RASCUNHO } from "./character_config.js";
+
+import { abrirEditor } from "./character_editor.js";
 
 const CAMERA = "kny:aparencia_camera";
 const CHECKPOINT = "kny:teste_v78_ficha";
 const MENU = "kny:menu_kimetsu";
 const LIVRO = "kny:book_archievement";
-const log = (s) => console.warn("KNY-TEST ENTRADA V80 " + s);
+const log = (s) => console.warn("KNY-TEST APARENCIA V82 " + s);
 const ok = (cond, msg) => { if (!cond) throw new Error(msg); };
 const eq = (a, b, msg) => ok(a === b, msg + " (" + a + " × " + b + ")");
 const canais = (p, props) => props.map((k) => p.getProperty(k)).join(",");
@@ -41,6 +43,14 @@ function interceptarFormularios() {
     if (!plano) return show.call(this, p);
     const tela = telas.get(this);
     plano.telas.push(tela);
+    if (plano.ocuparAoTrocar && tela.botoes.some((b) => b.includes("Base A · Mel"))) {
+      plano.ocuparAoTrocar = false;
+      eq(p.getDynamicProperty(CAMERA), true, "câmera de estúdio depois de trocar a pele");
+      eq(p.getProperty("kny:cc_edicao"), true, "proteção depois de trocar a pele");
+      eq(p.selectedSlotIndex, 1, "slot do livro preservado enquanto troca de pele");
+      eq(inv(p).getItem(1)?.typeId, MENU, "livro preservado no inventário durante a edição");
+      return Promise.resolve({ canceled: true, cancelationReason: "UserBusy" });
+    }
     if (tela.titulo.startsWith("kny_edit|") && plano.ocupado > 0) {
       plano.ocupado--;
       return Promise.resolve({ canceled: true, cancelationReason: "UserBusy" });
@@ -151,10 +161,11 @@ async function run() {
     "Crie seu personagem", "Próximo", "C:Cabelo", "Cor principal", "‹ Anterior", "C:Olhos", "Íris esquerda", "‹ Anterior",
     "Girar ›", "Aproximar", "Ver corpo", "CONFIRMAR", "ASSINAR O CONTRATO",
   ], { preparar: (p) => {
-    inv(p).setItem(1, new ItemStack(MENU)); // Este cenário dava duas cópias na v77.
+    inv(p).setItem(1, new ItemStack(MENU));
+    p.selectedSlotIndex = 1;
     inv(p).setItem(9, new ItemStack(LIVRO));
   } });
-  const { p: visita, plano: fechado } = await spawn("V78Caixa", 138, ["Crie seu personagem", "Cancelar"], { caixa: true, ocupado: 10,
+  const { p: visita, plano: fechado } = await spawn("V78Caixa", 138, ["Crie seu personagem", "Cancelar"], { caixa: true, ocupado: 20,
     preparar: (p) => {
       inv(p).setItem(0, new ItemStack(MENU));
       inv(p).setItem(3, new ItemStack(MENU));
@@ -173,6 +184,7 @@ async function run() {
     },
   });
   escolhas.testarProtecao = true;
+  escolhas.ocuparAoTrocar = true;
   await wait(165);
 
   eq(novo.getDynamicProperty(CHAVE_ENTRADA), "v78", "função nativa reservou a primeira entrada");
@@ -195,9 +207,12 @@ async function run() {
   eq(novo.getProperty("kny:cc_edicao"), false, "visibilidade restaurada");
   eq(novo.inputPermissions.isPermissionCategoryEnabled(InputPermissionCategory.LateralMovement), true, "controle restaurado");
   eq(slotsMenu(visita).length, 1, "duas cópias preexistentes viraram uma");
-  ok(fechado.telas.some((tela) => tela.titulo.startsWith("kny_edit|R")), "sala fechada recebe o painel com retrato");
+  ok(fechado.telas.filter((tela) => tela.titulo.startsWith("kny_edit|")).every((tela) =>
+    tela.titulo.startsWith("kny_edit|§")), "a espera mantém a câmera privada");
+  ok(escolhas.telas.filter((tela) => tela.titulo.startsWith("kny_edit|")).every((tela) =>
+    tela.titulo.startsWith("kny_edit|§")), "a mudança de pele e a tela ocupada conservam o mesmo visor");
   ok(!fechado.telas.some((tela) => tela.titulo.startsWith("kny_ctr|")), "contrato aguardando durante a tela ocupada");
-  log("estúdios privados, retorno ao mundo e item único no login");
+  log("estúdios privados, troca de pele com a câmera estável, retorno e livro no slot de origem");
 
   eq(slotsMenu(cheio).length, 0, "inventário cheio sem item");
   eq(cheio.dimension.getEntities({ type: "minecraft:item", location: cheio.location, maxDistance: 2 }).length, 0, "sem item largado no chão");
@@ -224,12 +239,12 @@ async function run() {
   ok(lerAparencia(legado).perfis.base.peleIntegral, "ficha recuperada salva");
 
   for (let i = 0; i < 16 && !fechado.telas.at(-1)?.titulo.startsWith("kny_ctr|"); i++) await wait(12);
-  eq(fechado.telas.filter((t) => t.titulo.startsWith("kny_edit|")).length, 11, "dez bloqueios e exibição do editor");
+  eq(fechado.telas.filter((t) => t.titulo.startsWith("kny_edit|")).length, 21, "vinte bloqueios e exibição do editor");
   ok(fechado.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "só abriu contrato quando a escolha terminou");
   eq(visita.dimension.id, "minecraft:overworld", "voltou ao mundo ao cancelar");
   eq(visita.getDynamicProperty(CHAVE_VISUAL), undefined, "cancelamento preservou a ficha");
   eq(canais(visita, PROP_RASCUNHO), "-1,-1,-1", "rascunho descartado");
-  log("dez tentativas com tela ocupada e recuperação controlada da v77");
+  log("vinte tentativas com tela ocupada mantiveram a câmera e a recuperação da v77 funcionou");
 
   escolhas.acoes.push("Guia");
   await usarMenu(novo);
@@ -241,9 +256,21 @@ async function run() {
   let bloqueou = false;
   try { iniciarEdicao(novo); } catch { bloqueou = true; }
   eq(bloqueou, true, "sessão confirmada não reabre");
+  const { p: prensa, plano: retrato } = await spawn("V82Retrato", 142, ["Anterior", "Próximo", "Próximo", "CONFIRMAR"],
+    { antigo: true, caixa: true });
+  prensa.addTag("kny_aparencia_novo");
+  ok(prepararAparenciaInicial(prensa), "sessão para provar a reserva do visor");
+  await abrirEditor(prensa);
+  ok(retrato.telas[0]?.titulo.startsWith("kny_edit|R§") && retrato.telas[0].botoes.includes("PV:"), "sala apertada usa uma imagem de corpo inteiro");
+  ok(retrato.telas[1]?.titulo.startsWith("kny_edit|RA"), "modalidade alternativa para a pele da conta");
+  eq(lerAparencia(prensa).perfis.base.peleIntegral, "pele_a_c98f65", "troca de pele pelo retrato");
+  ok(retrato.telas.every((t) => !t.botoes.some((b) => b.includes("Girar"))), "reserva exibe apenas ações funcionais");
+  eq(prensa.getDynamicProperty(CAMERA), undefined, "reserva não reteve câmera ativa");
+  prensa.disconnect();
+  log("prévia alternativa, pele da conta e aplicação da pele da addon");
   for (const p of [cheio, legado, visita, novo]) p.disconnect();
   world.setDynamicProperty(CHECKPOINT, salvo);
   log("FIM");
 }
 
-system.runTimeout(() => run().catch((e) => console.error("KNY-TEST FALHA V78 " + e + "\n" + (e.stack ?? ""))), 35);
+system.runTimeout(() => run().catch((e) => console.error("KNY-TEST FALHA APARENCIA V82 " + e + "\n" + (e.stack ?? ""))), 35);

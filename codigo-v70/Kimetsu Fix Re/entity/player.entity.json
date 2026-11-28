@@ -635,12 +635,14 @@
           },
           {
             "treino_agachamento": "query.property('kny:treino') == 4 && !v.is_first_person"
-          }
+          },
+          { "maos_editor": "query.is_local_player && query.property('kny:cc_edicao')" }
         ]
       },
       "animations": {       
         "root": "controller.animation.player.root",
         "caido": "animation.kny.caido",
+        "maos_editor": "animation.kny.maos_editor",
         "treino_flexao": "animation.kny.treino_flexao",
         "treino_abdominal": "animation.kny.treino_abdominal",
         "treino_meditar": "animation.kny.treino_meditar",

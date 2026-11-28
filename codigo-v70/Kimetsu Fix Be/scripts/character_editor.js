@@ -2,7 +2,7 @@ import { system } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { CAMPOS, CATEGORIAS, VISUAL_PADRAO, opcaoDe } from "./character_config.js";
 import { atualizarCamera } from "./character_camera.js";
-import { liberarCriacao, protegerCriacao } from "./character_protection.js";
+import { protegerCriacao } from "./character_protection.js";
 import { entrarEstudio, sairEstudio } from "./character_studio.js";
 import {
   definirVisual, edicaoInicialDisponivel, encerrarEdicao, indisponivel, iniciarEdicao, lerCatalogo,
@@ -29,7 +29,7 @@ function ajustarCamera(sessao, ajuste) {
 function descricao(sessao) {
   const grupo = CATEGORIAS.find((c) => c.id === sessao.categoria);
   const vista = sessao.camera.modo === "rosto" ? "Rosto" : "Corpo inteiro";
-  return `§6§l${grupo.nome}§r\n§fEscolha única\n§7${sessao.temCamera ? vista : "Prévia no painel"}`;
+  return `§6§l${grupo.nome}§r\n§7${sessao.temCamera ? vista : "Prévia frontal"}`;
 }
 
 function disponiveis(sessao, campo, catalogo) {
@@ -54,11 +54,28 @@ function editarCampo(sessao, campo, delta) {
   definirVisual(sessao, alteracoes);
 }
 
+function camadasDoRetrato(visual) {
+  const pele = opcaoDe("peleIntegral", visual.peleIntegral);
+  if (!pele.codigo) return [];
+  const camadas = [["PV", "pele/" + pele.id]];
+  const olhos = opcaoDe("olhos", visual.olhos).codigo;
+  if (olhos) {
+    camadas.push(["PE", `olho/e_${olhos}_${visual.olhoE}`], ["PD", `olho/d_${olhos}_${visual.olhoD}`]);
+  }
+  const cabelo = opcaoDe("cabelo", visual.cabelo).codigo;
+  if (cabelo) {
+    camadas.push(["PC", `cabelo/${cabelo}_${visual.corCabelo}`]);
+    if (visual.mecha !== "nenhum") camadas.push(["PM", `mecha/${cabelo}_${visual.mecha}`]);
+  }
+  return camadas;
+}
+
 function painel(sessao) {
   const p = sessao.p;
   const estilizado = sessao.tela === "editor";
   const titulo = "APARÊNCIA DO PERSONAGEM";
-  const marca = sessao.temCamera ? MARCA : MARCA + "R";
+  const visual = sessao.visual;
+  const marca = sessao.temCamera ? MARCA : MARCA + (opcaoDe("peleIntegral", visual.peleIntegral).codigo ? "R" : "RA");
   const f = new ActionFormData().title(estilizado ? marca + "§6§l" + titulo : "§6" + titulo)
     .body(estilizado ? " " : descricao(sessao));
   const acoes = [];
@@ -69,7 +86,6 @@ function painel(sessao) {
     else f.button(label);
     acoes.push(acao);
   };
-  const visual = sessao.visual;
   const categoria = CATEGORIAS.find((c) => c.id === sessao.categoria);
   const catalogo = lerCatalogo();
   for (const c of CATEGORIAS) {
@@ -85,7 +101,8 @@ function painel(sessao) {
   for (const campo of categoria.campos) {
     const { nome } = CAMPOS[campo];
     const atual = opcaoDe(campo, visual[campo]);
-    add("O", `${campo === sessao.campo ? "§6" : "§f"}${nome}\n§7${atual.nome}`, () => {
+    const ativo = campo === sessao.campo;
+    add(ativo ? "A" : "O", `${ativo ? "§6" : "§f"}${nome}\n§7${atual.nome}`, () => {
       sessao.campo = campo;
     }, atual.hex ? ICONE + "cor_" + atual.hex.slice(1) : undefined);
   }
@@ -110,7 +127,12 @@ function painel(sessao) {
   add("V", "§6§lCONFIRMAR", () => {
     if (!salvarEdicao(sessao)) p.sendMessage("§eConfira os cosméticos liberados antes de salvar.");
   });
-  add("K", "Cancelar", () => encerrarEdicao(sessao, "§7Sua aparência anterior foi mantida."));
+  add("X", "Cancelar", () => encerrarEdicao(sessao, "§7Sua aparência anterior foi mantida."));
+  if (estilizado && !sessao.temCamera) {
+    for (const [prefixo, imagem] of camadasDoRetrato(visual)) {
+      add(prefixo, "", undefined, ICONE + "previa/" + imagem);
+    }
+  }
   return { f, acoes };
 }
 
@@ -125,14 +147,7 @@ export async function abrirEditor(p) {
       protegerCriacao(p);
       const resposta = await mostrar(f, sessao);
       if (resposta.cancelationReason === "UserBusy" && sessaoAtual(p) === sessao) {
-        liberarCriacao(p);
-        sessao.aguardandoTela = true;
-        if (!sessaoSegura(sessao)) return;
-        usarRetrato(sessao);
-        await espera(20);
-        if (!sessaoSegura(sessao)) return;
-        sessao.camera.origem = { ...p.location };
-        sessao.aguardandoTela = false;
+        await espera(10);
         continue;
       }
       if (!sessaoSegura(sessao)) return;
@@ -140,13 +155,14 @@ export async function abrirEditor(p) {
         if (resposta.cancelationReason === undefined && sessao.tela === "editor") {
           usarRetrato(sessao);
           sessao.tela = "simples";
+          await espera(2);
           continue;
         }
         return;
       }
       const acao = acoes[resposta.selection];
-      if (!acao) return;
-      await acao();
+      if (acao) await acao();
+      if (sessaoAtual(p) === sessao) await espera(2);
     }
   } catch (e) {
     if (p.isValid) p.sendMessage("§e[Aparência] " + (e.message ?? e));

@@ -46,7 +46,7 @@
         "realce@kny_oficina.linha_dourada": {
           "bindings": [
             { "binding_name": "#form_button_text", "binding_type": "collection", "binding_collection_name": "form_buttons" },
-            { "binding_type": "view", "source_property_name": "((('%.2s' * #form_button_text) = 'S:') or (('%.2s' * #form_button_text) = 'V:'))", "target_property_name": "#visible" }
+            { "binding_type": "view", "source_property_name": "((('%.2s' * #form_button_text) = 'S:') or (('%.2s' * #form_button_text) = 'V:') or (('%.2s' * #form_button_text) = 'A:'))", "target_property_name": "#visible" }
           ]
         }
       },
@@ -90,15 +90,16 @@
     "$lbl_scale": 0.70
   },
   "opcao@kny_oficina.botao": {
-    "size": ["100%", "25%"],
-    "$vis": "(('%.2s' * #form_button_text) = 'O:')",
-    "$txt": "(#form_button_text - 'O:')",
+    "size": ["100%", "33.33%"],
+    "clips_children": true,
+    "$vis": "((('%.2s' * #form_button_text) = 'A:') or (('%.2s' * #form_button_text) = 'O:'))",
+    "$txt": "((#form_button_text - 'A:') - 'O:')",
     "$lbl_anchor": "left_middle",
-    "$lbl_offset": ["8%", 0],
-    "$lbl_size": ["73%", "default"],
+    "$lbl_offset": ["5%", 0],
+    "$lbl_size": ["76%", "default"],
     "$lbl_align": "left",
-    "$lbl_scale": 0.8,
-    "$icone_tamanho": ["17%", "55%"],
+    "$lbl_scale": 0.72,
+    "$icone_tamanho": ["13%", "51%"],
     "$icone_ancora": "right_middle",
     "$icone_offset": ["-4%", 0]
   },
@@ -127,13 +128,59 @@
     "$txt": "(#form_button_text - 'N:')"
   },
   "comando@kny_oficina.botao": {
-    "size": ["12.5%", "100%"],
-    "$vis": "((('%.2s' * #form_button_text) = 'K:') or (('%.2s' * #form_button_text) = 'V:'))",
-    "$txt": "((#form_button_text - 'K:') - 'V:')",
-    "$lbl_scale": 0.74
+    "size": ["16.6666%", "100%"],
+    "$vis": "(('%.2s' * #form_button_text) = 'K:')",
+    "$txt": "(#form_button_text - 'K:')",
+    "$lbl_scale": 0.65
   },
-  "comando_retrato@kny_oficina.comando": {
-    "size": ["50%", "100%"]
+  "decisao@kny_oficina.botao": {
+    "size": ["50%", "100%"],
+    "$vis": "((('%.2s' * #form_button_text) = 'V:') or (('%.2s' * #form_button_text) = 'X:'))",
+    "$txt": "((#form_button_text - 'V:') - 'X:')"
+  },
+  "cortina": {
+    "type": "image",
+    "texture": "textures/ui/White",
+    "color": [0.07, 0.022, 0.034],
+    "layer": 1
+  },
+  "borda": {
+    "type": "image",
+    "texture": "textures/ui/White",
+    "color": [0.66, 0.47, 0.20],
+    "layer": 3
+  },
+  "camada_retrato": {
+    "type": "image",
+    "size": ["100%", "100%"],
+    "keep_ratio": false,
+    "bindings": [
+      { "binding_type": "collection_details", "binding_collection_name": "form_buttons" },
+      { "binding_name": "#form_button_text", "binding_type": "collection", "binding_collection_name": "form_buttons" },
+      { "binding_name": "#form_button_texture", "binding_name_override": "#texture", "binding_type": "collection", "binding_collection_name": "form_buttons" },
+      { "binding_name": "#form_button_texture_file_system", "binding_name_override": "#texture_file_system", "binding_type": "collection", "binding_collection_name": "form_buttons" },
+      { "binding_type": "view", "source_property_name": "$vis", "target_property_name": "#visible" }
+    ]
+  },
+  "retrato_pele@kny_oficina.camada_retrato": {
+    "$vis": "(('%.3s' * #form_button_text) = 'PV:')",
+    "layer": 4
+  },
+  "retrato_olho_e@kny_oficina.camada_retrato": {
+    "$vis": "(('%.3s' * #form_button_text) = 'PE:')",
+    "layer": 5
+  },
+  "retrato_olho_d@kny_oficina.camada_retrato": {
+    "$vis": "(('%.3s' * #form_button_text) = 'PD:')",
+    "layer": 5
+  },
+  "retrato_cabelo@kny_oficina.camada_retrato": {
+    "$vis": "(('%.3s' * #form_button_text) = 'PC:')",
+    "layer": 6
+  },
+  "retrato_mecha@kny_oficina.camada_retrato": {
+    "$vis": "(('%.3s' * #form_button_text) = 'PM:')",
+    "layer": 7
   },
   "botoes": {
     "type": "collection_panel",
@@ -187,23 +234,36 @@
     "size": ["100%", "100%"],
     "controls": [
       {
+        "fundo_estatico@kny_oficina.cortina": {
+          "size": ["100%", "100%"],
+          "bindings": [
+            { "binding_name": "#title_text" },
+            { "binding_type": "view", "source_property_name": "(('%.10s' * #title_text) = 'kny_edit|R')", "target_property_name": "#visible" }
+          ]
+        }
+      },
+      { "cima@kny_oficina.cortina": { "size": ["100%", "13%"], "anchor_from": "top_middle", "anchor_to": "top_middle" } },
+      { "esquerda@kny_oficina.cortina": { "size": ["24%", "100%"], "anchor_from": "left_middle", "anchor_to": "left_middle" } },
+      { "direita@kny_oficina.cortina": { "size": ["24%", "100%"], "anchor_from": "right_middle", "anchor_to": "right_middle" } },
+      { "baixo@kny_oficina.cortina": { "size": ["100%", "19%"], "anchor_from": "bottom_middle", "anchor_to": "bottom_middle" } },
+      {
         "faixa": {
           "type": "panel",
           "anchor_from": "top_middle",
           "anchor_to": "top_middle",
           "offset": [0, "2%"],
-          "size": ["42%", "9%"],
+          "size": ["51%", "8.5%"],
           "controls": [
             { "moldura@kny_oficina.moldura": {} },
             {
               "nome": {
                 "type": "label",
-                "size": ["95%", "default"],
+                "size": ["96%", "default"],
                 "layer": 5,
                 "text": "APARÊNCIA DO PERSONAGEM",
                 "color": [0.95, 0.8, 0.47],
                 "shadow": true,
-                "font_scale_factor": 0.88,
+                "font_scale_factor": 0.86,
                 "text_alignment": "center",
                 "anchor_from": "center",
                 "anchor_to": "center"
@@ -217,15 +277,15 @@
           "type": "panel",
           "anchor_from": "top_left",
           "anchor_to": "top_left",
-          "offset": ["1.5%", "13%"],
-          "size": ["16%", "34%"],
+          "offset": ["1.6%", "13%"],
+          "size": ["18%", "33%"],
           "controls": [
             { "moldura@kny_oficina.moldura": {} },
             {
               "lista@kny_oficina.botoes": {
                 "type": "stack_panel",
                 "orientation": "vertical",
-                "size": ["93%", "96%"],
+                "size": ["94%", "94%"],
                 "$item": "kny_oficina.categoria"
               }
             }
@@ -237,13 +297,13 @@
           "type": "panel",
           "anchor_from": "top_right",
           "anchor_to": "top_right",
-          "offset": ["-1.5%", "13%"],
-          "size": ["26%", "74%"],
+          "offset": ["-1%", "13%"],
+          "size": ["22%", "68%"],
           "controls": [
             { "moldura@kny_oficina.moldura": {} },
             {
               "categoria@kny_oficina.botoes": {
-                "size": ["94%", "22%"],
+                "size": ["97%", "19%"],
                 "anchor_from": "top_middle",
                 "anchor_to": "top_middle",
                 "offset": [0, "2%"],
@@ -254,16 +314,16 @@
               "config@kny_oficina.botoes": {
                 "type": "stack_panel",
                 "orientation": "vertical",
-                "size": ["91%", "50%"],
+                "size": ["92%", "53%"],
                 "anchor_from": "top_middle",
                 "anchor_to": "top_middle",
-                "offset": [0, "24%"],
+                "offset": [0, "21%"],
                 "$item": "kny_oficina.opcao"
               }
             },
             {
               "nota@kny_oficina.botoes": {
-                "size": ["93%", "9%"],
+                "size": ["94%", "8%"],
                 "anchor_from": "top_middle",
                 "anchor_to": "top_middle",
                 "offset": [0, "74%"],
@@ -272,19 +332,19 @@
             },
             {
               "voltar@kny_oficina.botoes": {
-                "size": ["44%", "12%"],
+                "size": ["45%", "12%"],
                 "anchor_from": "bottom_left",
                 "anchor_to": "bottom_left",
-                "offset": ["4%", "-4%"],
+                "offset": ["3%", "-4%"],
                 "$item": "kny_oficina.anterior"
               }
             },
             {
               "avancar@kny_oficina.botoes": {
-                "size": ["44%", "12%"],
+                "size": ["45%", "12%"],
                 "anchor_from": "bottom_right",
                 "anchor_to": "bottom_right",
-                "offset": ["-4%", "-4%"],
+                "offset": ["-3%", "-4%"],
                 "$item": "kny_oficina.proximo"
               }
             }
@@ -292,74 +352,77 @@
         }
       },
       {
-        "retrato": {
+        "visor": {
           "type": "panel",
-          "size": ["50%", "72%"],
-          "anchor_from": "top_left",
-          "anchor_to": "top_left",
-          "offset": ["20%", "14%"],
-          "bindings": [
-            { "binding_name": "#title_text" },
-            {
-              "binding_type": "view",
-              "source_property_name": "(('%.10s' * #title_text) = 'kny_edit|R')",
-              "target_property_name": "#visible"
-            }
-          ],
+          "size": ["52%", "68%"],
+          "anchor_from": "top_middle",
+          "anchor_to": "top_middle",
+          "offset": [0, "13%"],
+          "clips_children": true,
           "controls": [
-            { "moldura@kny_oficina.moldura": {} },
+            { "linha_cima@kny_oficina.borda": { "size": ["100%", 1], "anchor_from": "top_middle", "anchor_to": "top_middle" } },
+            { "linha_baixo@kny_oficina.borda": { "size": ["100%", 1], "anchor_from": "bottom_middle", "anchor_to": "bottom_middle" } },
+            { "linha_esquerda@kny_oficina.borda": { "size": [1, "100%"], "anchor_from": "left_middle", "anchor_to": "left_middle" } },
+            { "linha_direita@kny_oficina.borda": { "size": [1, "100%"], "anchor_from": "right_middle", "anchor_to": "right_middle" } },
             {
-              "jogador": {
-                "type": "custom",
-                "renderer": "live_player_renderer",
-                "size": ["94%", "93%"],
-                "layer": 3,
+              "retrato": {
+                "type": "panel",
+                "size": ["51.28%y", "88%"],
+                "max_size": ["94%", "88%"],
                 "anchor_from": "center",
                 "anchor_to": "center",
-                "property_bag": { "#look_at_cursor": false }
+                "bindings": [
+                  { "binding_name": "#title_text" },
+                  { "binding_type": "view", "source_property_name": "(('%.10s' * #title_text) = 'kny_edit|R')", "target_property_name": "#visible" }
+                ],
+                "controls": [
+                  { "pele@kny_oficina.botoes": { "$item": "kny_oficina.retrato_pele" } },
+                  { "olho_e@kny_oficina.botoes": { "$item": "kny_oficina.retrato_olho_e" } },
+                  { "olho_d@kny_oficina.botoes": { "$item": "kny_oficina.retrato_olho_d" } },
+                  { "cabelo@kny_oficina.botoes": { "$item": "kny_oficina.retrato_cabelo" } },
+                  { "mecha@kny_oficina.botoes": { "$item": "kny_oficina.retrato_mecha" } }
+                ]
+              }
+            },
+            {
+              "pele_da_conta": {
+                "type": "label",
+                "size": ["86%", "default"],
+                "anchor_from": "center",
+                "anchor_to": "center",
+                "text_alignment": "center",
+                "text": "§6Pele da conta\n§7Você verá sua skin no jogo",
+                "font_scale_factor": 0.84,
+                "layer": 6,
+                "bindings": [
+                  { "binding_name": "#title_text" },
+                  { "binding_type": "view", "source_property_name": "(('%.11s' * #title_text) = 'kny_edit|RA')", "target_property_name": "#visible" }
+                ]
               }
             }
           ]
         }
       },
       {
-        "rodape@kny_oficina.botoes": {
+        "camera@kny_oficina.botoes": {
           "type": "stack_panel",
           "orientation": "horizontal",
-          "size": ["97%", "10%"],
-          "anchor_from": "bottom_middle",
-          "anchor_to": "bottom_middle",
-          "offset": [0, "-1.6%"],
-          "$item": "kny_oficina.comando",
-          "bindings": [
-            { "binding_name": "#form_button_length", "binding_name_override": "#collection_length" },
-            { "binding_name": "#title_text" },
-            {
-              "binding_type": "view",
-              "source_property_name": "(not (('%.10s' * #title_text) = 'kny_edit|R'))",
-              "target_property_name": "#visible"
-            }
-          ]
+          "size": ["52%", "8%"],
+          "anchor_from": "top_middle",
+          "anchor_to": "top_middle",
+          "offset": [0, "81.5%"],
+          "$item": "kny_oficina.comando"
         }
       },
       {
-        "rodape_retrato@kny_oficina.botoes": {
+        "decisoes@kny_oficina.botoes": {
           "type": "stack_panel",
           "orientation": "horizontal",
-          "size": ["50%", "10%"],
+          "size": ["38%", "8%"],
           "anchor_from": "bottom_middle",
           "anchor_to": "bottom_middle",
-          "offset": ["-5%", "-1.6%"],
-          "$item": "kny_oficina.comando_retrato",
-          "bindings": [
-            { "binding_name": "#form_button_length", "binding_name_override": "#collection_length" },
-            { "binding_name": "#title_text" },
-            {
-              "binding_type": "view",
-              "source_property_name": "(('%.10s' * #title_text) = 'kny_edit|R')",
-              "target_property_name": "#visible"
-            }
-          ]
+          "offset": [0, "-1.2%"],
+          "$item": "kny_oficina.decisao"
         }
       }
     ]

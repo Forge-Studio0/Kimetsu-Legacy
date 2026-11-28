@@ -134,7 +134,9 @@ export function jogador(nome = "Teste" + ++conta, dinamicos = new Map()) {
   const movimento = { currentValue: 0.1, setCurrentValue(v) { this.currentValue = v; } };
   const camera = {
     atual: undefined,
+    fov: undefined,
     limpezas: 0,
+    setFov(opcoes) { this.fov = opcoes?.fov; },
     setCamera(preset, opcoes) { this.atual = { preset, ...opcoes }; },
     clear() { this.atual = undefined; this.limpezas++; },
   };

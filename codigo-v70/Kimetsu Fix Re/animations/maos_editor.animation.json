@@ -1,0 +1,12 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kny.maos_editor": {
+      "loop": true,
+      "bones": {
+        "rightItem": { "scale": 0.001 },
+        "leftItem": { "scale": 0.001 }
+      }
+    }
+  }
+}

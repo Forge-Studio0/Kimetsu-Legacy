@@ -187,7 +187,7 @@ const cortes = [
 ];
 const cabelos = cortes.map((c, i) => geometria("cabelo_" + (i + 1), { head: [topo, ...c] }));
 const mechas = cortes.map((_, i) => geometria("mecha_" + (i + 1), { head: [
-  cubo(-2.8 + i % 3 * 0.75, 32.65, -3.75, i % 2 ? 1.25 : 1.7, 0.14, 4.8, 1),
+  cubo(-2.8 + i % 3 * 0.75, 31.9, -4.68, i % 2 ? 1.25 : 1.7, 0.78, 0.12, 1),
 ] }));
 const tintas = CORES_CABELO.map((c) => textura("cabelo_" + c.id, atlas(rgb(c.hex), (t, x, y, bloco) => {
   t.rect(x + 1, y, 1, 8, tom(rgb(c.hex), bloco ? 1.25 : 1.12));

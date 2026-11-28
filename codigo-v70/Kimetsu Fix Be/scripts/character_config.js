@@ -50,8 +50,8 @@ export const PELES_INICIAIS = [
 ];
 const CAMPO = (nome, opcoes) => ({ nome, opcoes });
 export const CAMPOS = {
-  peleIntegral: CAMPO("Pele de corpo inteiro", PELES_INICIAIS),
-  cabelo: CAMPO("Modelo de cabelo", [
+  peleIntegral: CAMPO("Base de pele", PELES_INICIAIS),
+  cabelo: CAMPO("Corte", [
     nenhuma, modelo("corte_curto", "Curto repartido", 1), modelo("franja", "Franja lateral", 2),
     modelo("ondas", "Ondas médias", 3), modelo("longo", "Longo aberto", 4),
     modelo("coque", "Coque alto", 5), modelo("rabo", "Rabo baixo", 6),
@@ -65,7 +65,7 @@ export const CAMPOS = {
     nenhuma, modelo("calma", "Serena", 1), modelo("firme", "Firme", 2),
     modelo("sorriso", "Sorriso", 3), modelo("seria", "Concentrada", 4),
   ]),
-  olhos: CAMPO("Formato dos olhos", [
+  olhos: CAMPO("Formato", [
     nenhuma, modelo("retos", "Retos", 1), modelo("suaves", "Suaves", 2),
     modelo("finos", "Finos", 3), modelo("amplos", "Amplos", 4),
   ]),
