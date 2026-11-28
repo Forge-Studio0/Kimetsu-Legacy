@@ -9,11 +9,13 @@ import {
 } from "./hybrid_mastery.js";
 import { textoTreinoDaForma } from "./treino_respiracao.js";
 import { abrirAprendizado, abrirMissoes } from "./missoes_interface.js";
+import { abrirPainelTalisma } from "./talisma_staff.js";
 import { entidadeDeMissao, missaoEmAndamento } from "./missoes_sessoes.js";
 import { apresentarEditor } from "./character_editor.js";
 import { retornoPendente, sairEstudio } from "./character_studio.js";
 import { edicaoInicialDisponivel, prepararAparenciaInicial } from "./character_system.js";
 import { garantirItemMenu } from "./menu_item.js";
+import { ONI_NATURAL } from "./spawn_noturno_config.js";
 import "./character_admin.js";
 import { canUseBreathing, canUseKekkijutsu, doseEmMaos, ehStaff, estadoBloqueado, isHybrid, preverTransformacao, racaHibrida, transformar, trocarDisfarce } from "./hybrid_system.js";
 import { ativarHabilidade, danoEspecialEmCurso, habilidadeDe } from "./hybrid_abilities.js";
@@ -47,7 +49,7 @@ const TAG_CLASSICO = "kny_cfg_classico";
 const wait = (ticks) => new Promise((res) => system.runTimeout(res, ticks));
 
 // Mostra o formulário e tenta de novo se o jogador estiver com outra tela aberta.
-async function mostrar(form, player) {
+export async function mostrar(form, player) {
   for (let i = 0; i < 12 && player.isValid; i++) {
     const r = await form.show(player);
     if (r.cancelationReason !== "UserBusy") return r;
@@ -752,6 +754,7 @@ async function guiaEAcessos(p, classico = p.hasTag(TAG_CLASSICO)) {
   }
   if (ehStaff(p)) {
     add("L:", "Configurar Castelo Infinito", () => menuCasteloStaff(p));
+    add("L:", "Talismãs da Eternidade", () => abrirPainelTalisma(p, mostrar, () => guiaEAcessos(p)));
   }
   const r = await mostrar(f, p);
   if (r.canceled && r.cancelationReason === undefined && !classico) return guiaEAcessos(p, true);
@@ -1950,7 +1953,7 @@ const ultimoAtacanteOni = new Map(); // idDoOni -> { id: idDoJogador, tick }
 
 world.afterEvents.entityHurt.subscribe((ev) => {
   const alvo = ev.hurtEntity;
-  if (!alvo || !PONTOS_POR_ONI.has(alvo.typeId) || entidadeDeMissao(alvo)) return;
+  if (!alvo || !PONTOS_POR_ONI.has(alvo.typeId) || entidadeDeMissao(alvo) || alvo.hasTag?.(ONI_NATURAL)) return;
   const atk = ev.damageSource?.damagingEntity;
   if (atk?.typeId === "minecraft:player") {
     if (ultimoAtacanteOni.size > 300) {
@@ -1962,7 +1965,7 @@ world.afterEvents.entityHurt.subscribe((ev) => {
 
 world.afterEvents.entityDie.subscribe((ev) => {
   const morto = ev.deadEntity;
-  if (!morto || !PONTOS_POR_ONI.has(morto.typeId) || entidadeDeMissao(morto)) return;
+  if (!morto || !PONTOS_POR_ONI.has(morto.typeId) || entidadeDeMissao(morto) || morto.hasTag?.(ONI_NATURAL)) return;
   let jogador = ev.damageSource?.damagingEntity;
   if (jogador?.typeId !== "minecraft:player") jogador = undefined;
   const reg = ultimoAtacanteOni.get(morto.id);

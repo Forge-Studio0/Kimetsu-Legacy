@@ -6,9 +6,12 @@
       "is_spawnable": true,
       "is_summonable": true,
       "is_experimental": false,
-      "properties": { "kny:em_missao": { "type": "bool", "default": false } },
+      "properties": {
+        "kny:em_missao": { "type": "bool", "default": false },
+        "kny:oni_natural": { "type": "bool", "default": false }
+      },
       "scripts":{
-        "animate":[{"death_day": "!query.property('kny:em_missao')"}, {"start_slayer": "!query.property('kny:em_missao')"}]
+        "animate":[{"death_day": "!query.property('kny:em_missao') && !query.property('kny:oni_natural')"}, {"start_slayer": "!query.property('kny:em_missao') && !query.property('kny:oni_natural')"}]
       },
       "animations":{
         "death_day":"controller.animation.kill_burn",
@@ -311,7 +314,7 @@
       },
       "kny:on_death": {
         "queue_command":{
-          "command":["execute unless entity @s[tag=kny_missao_ator] run scoreboard players add @p[r=5,tag=!demon] upslayer 3", "execute unless entity @s[tag=kny_missao_ator] run tellraw @p[r=5]{\"rawtext\":[{\"text\":\"Killed the Demon\"}]}"]
+          "command":["execute unless entity @s[tag=kny_missao_ator] unless entity @s[tag=kny_oni_natural] run scoreboard players add @p[r=5,tag=!demon] upslayer 3", "execute unless entity @s[tag=kny_missao_ator] unless entity @s[tag=kny_oni_natural] run tellraw @p[r=5]{\"rawtext\":[{\"text\":\"Killed the Demon\"}]}"]
         }
      },
       "kny:be_wild":{

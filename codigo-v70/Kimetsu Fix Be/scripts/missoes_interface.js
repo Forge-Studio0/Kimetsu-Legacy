@@ -27,11 +27,11 @@ import { patenteDe } from "./stats.js";
 const POR_PAGINA = 6;
 const MARCA = "kny_miss|";
 const falha = (p, t) => { if (p.isValid && t) p.sendMessage("§e[Missões] " + t); };
-const linha = (titulo, detalhe, acao, tipo = acao ? "QA:" : "QI:") => ({
+export const linha = (titulo, detalhe, acao, tipo = acao ? "QA:" : "QI:") => ({
   texto: `§l§f${titulo}${detalhe ? "\n§r§7" + detalhe : ""}`, acao, tipo,
 });
 
-async function quadro(ctx, titulo, resumo, linhas, voltar = ctx.voltar, pagina = 0, classico = ctx.p.hasTag("kny_cfg_classico")) {
+export async function quadro(ctx, titulo, resumo, linhas, voltar = ctx.voltar, pagina = 0, classico = ctx.p.hasTag("kny_cfg_classico")) {
   const { p, mostrar } = ctx;
   if (!p.isValid) return;
   const paginas = Math.max(1, Math.ceil(linhas.length / POR_PAGINA));
@@ -43,7 +43,7 @@ async function quadro(ctx, titulo, resumo, linhas, voltar = ctx.voltar, pagina =
     form.button((classico ? "" : tipo) + texto);
     acoes.push(acao);
   };
-  add("B:", "§6§l< VOLTAR", voltar);
+  if (voltar) add("B:", "§6§l< VOLTAR", voltar);
   if (!classico && (resumo || c)) add("H:", "§7" + resumo + c);
   const inicio = atual * POR_PAGINA;
   for (const l of linhas.slice(inicio, inicio + POR_PAGINA)) add(l.tipo, l.texto, l.acao);

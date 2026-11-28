@@ -126,16 +126,17 @@ export function chavesCarregadas(area) {
   return true;
 }
 
-export async function carregarArea(chave, area) {
+export async function carregarArea(chave, area, continuar = () => true) {
   for (let tentativa = 0; tentativa < 2; tentativa++) {
-    if (await aguardarArea(chave, area)) return;
+    if (!continuar() || await aguardarArea(chave, area, continuar)) return;
     descarregarArea(chave);
+    if (!continuar()) return;
     await system.waitTicks(24);
   }
-  throw new Error("Os chunks da arena não carregaram a tempo.");
+  if (continuar()) throw new Error("Os chunks da área não carregaram a tempo.");
 }
 
-async function aguardarArea(chave, area) {
+async function aguardarArea(chave, area, continuar) {
   const mgr = world.tickingAreaManager;
   let carga = carregamentos.get(chave);
   if (!carga && !mgr.hasTickingArea(chave)) {
@@ -151,6 +152,7 @@ async function aguardarArea(chave, area) {
   // O Bedrock pode deixar a promessa pendente ao reservar chunks já residentes.
   // Confirme o carregamento real e imponha um prazo para a reserva.
   for (let i = 0; i < 25 && !chavesCarregadas(area); i++) {
+    if (!continuar()) return false;
     if (carga?.erro) throw carga.erro;
     await system.waitTicks(2);
   }
@@ -168,11 +170,12 @@ export function descarregarArea(chave) {
   if (mgr.hasTickingArea(chave)) mgr.removeTickingArea(chave);
 }
 
-export async function comPontoCarregado(chave, dim, pos, acao) {
+export async function comPontoCarregado(chave, dim, pos, acao, continuar = () => true) {
+  if (!continuar()) return;
   if (dim.isChunkLoaded(pos)) return acao();
   try {
-    await carregarArea(chave, { dimension: dim, from: pos, to: pos });
-    return await acao();
+    await carregarArea(chave, { dimension: dim, from: pos, to: pos }, continuar);
+    if (continuar()) return await acao();
   } finally {
     descarregarArea(chave);
   }

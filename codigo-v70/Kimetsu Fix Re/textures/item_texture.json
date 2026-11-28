@@ -1,0 +1,543 @@
+{
+  "resource_pack_name": "Demon Craft",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "kny_talisma_eternidade": {
+      "textures": "textures/icons/kny_talisma_eternidade"
+    },
+    "kny_pergaminho_teleporte": {
+      "textures": "textures/icons/kny_pergaminho_teleporte"
+    },
+    "exploding": {
+      "textures": "textures/icons/exploding"
+    },
+    "rengoku_head": {
+      "textures": "textures/icons/rengoku_head"
+    },
+    "yoriichi_hair2": {
+      "textures": "textures/icons/yoriichi_hair2"
+    },
+    "nichirin_rengoku": {
+      "textures": "textures/icons/nichirin_rengoku"
+    },
+    "haori_rengoku": {
+      "textures": "textures/icons/haori_rengoku"
+    },
+    "haori_rengoku2": {
+      "textures": "textures/icons/haori_rengoku2"
+    },
+    "boots_rengoku": {
+      "textures": "textures/icons/boots_rengoku"
+    },
+    "nichirin_flame": {
+      "textures": "textures/icons/nichirin_flame"
+    },
+    "nichirin_uzui": {
+      "textures": "textures/icons/nichirin_uzui"
+    },
+    "head_uzui": {
+      "textures": "textures/icons/head_uzui"
+    },
+    "clothes_uzui": {
+      "textures": "textures/icons/clothes_uzui"
+    },
+    "pants_uzui": {
+      "textures": "textures/icons/pants_uzui"
+    },
+    "boots_uzui": {
+      "textures": "textures/icons/boots_uzui"
+    },
+    "nichirin_muichiro": {
+      "textures": "textures/icons/nichirin_muichiro"
+    },
+    "nichirin_mist": {
+      "textures": "textures/icons/nichirin_mist"
+    },
+    "uniform_tokito": {
+      "textures": "textures/icons/uniform_tokito"
+    },
+    "uniform_pants_tokito": {
+      "textures": "textures/icons/uniform_pants_tokito"
+    },
+    "muichiro_hair": {
+      "textures": "textures/icons/muichiro_hair"
+    },
+    "nichirin_tomioka": {
+      "textures": "textures/icons/nichirin_tomioka"
+    },
+    "sabito_mask": {
+      "textures": "textures/icons/sabito_mask"
+    },
+    "hyottoko_mask": {
+      "textures": "textures/icons/hyottoko_mask"
+    },
+    "urokodaki_mask": {
+      "textures": "textures/icons/urokodaki_mask"
+    },
+    "haori_tomioka": {
+      "textures": "textures/icons/haori_tomioka"
+    },
+    "haori_tomioka2": {
+      "textures": "textures/icons/haori_tomioka2"
+    },
+    "haori_tanjiro": {
+      "textures": "textures/icons/haori_tanjiro"
+    },
+    "haori_tanjiro2": {
+      "textures": "textures/icons/haori_tanjiro2"
+    },
+    "nichirin_tanjiro": {
+      "textures": "textures/icons/nichirin_tanjiro"
+    },
+    "nichirin_water": {
+      "textures": "textures/icons/nichirin_water"
+    },
+    "brincos": {
+      "textures": "textures/icons/brincos"
+    },
+    "haori_shinobu": {
+      "textures": "textures/icons/haori_shinobu"
+    },
+    "haori_shinobu2": {
+      "textures": "textures/icons/haori_shinobu2"
+    },
+    "boots_shinobu": {
+      "textures": "textures/icons/boots_shinobu"
+    },
+    "nichirin_shinobu": {
+      "textures": "textures/icons/nichirin_shinobu"
+    },
+    "clothes_sanemi": {
+      "textures": "textures/icons/clothes_sanemi"
+    },
+    "clothes_sanemi2": {
+      "textures": "textures/icons/clothes_sanemi2"
+    },
+    "nichirin_sanemi": {
+      "textures": "textures/icons/nichirin_sanemi"
+    },
+    "nichirin_wind": {
+      "textures": "textures/icons/nichirin_wind"
+    },
+    "clothes_genya": {
+      "textures": "textures/icons/clothes_genya"
+    },
+    "pistol": {
+      "textures": "textures/icons/pistol"
+    },
+    "nichirin_kanao": {
+      "textures": "textures/icons/nichirin_kanao"
+    },
+    "nichirin_kanae": {
+      "textures": "textures/icons/nichirin_kanae"
+    },
+    "doma_hat": {
+      "textures": "textures/icons/doma_hat"
+    },
+    "blooddemonart_doma": {
+      "textures": "textures/icons/blooddemonart_doma"
+    },
+    "clothes_doma": {
+      "textures": "textures/icons/clothes_doma"
+    },
+    "hakama_doma": {
+      "textures": "textures/icons/hakama_doma"
+    },
+    "boar_head": {
+      "textures": "textures/icons/boar_head"
+    },
+    "nichirin_inosuke": {
+      "textures": "textures/icons/nichirin_inosuke"
+    },
+    "nichirin_yoriichi": {
+      "textures": "textures/icons/nichirin_yoriichi"
+    },
+    "nichirin_tanjiro2": {
+      "textures": "textures/icons/nichirin_tanjiro2"
+    },
+    "nichirin_sun": {
+      "textures": "textures/icons/nichirin_sun"
+    },
+    "yoriichi_hair": {
+      "textures": "textures/icons/yoriichi_hair"
+    },
+    "clothes_yoriichi": {
+      "textures": "textures/icons/clothes_yoriichi"
+    },
+    "icon_yorichi0": {
+      "textures": "textures/icons/icon_yorichi0"
+    },
+    "urogi_hand": {
+      "textures": "textures/icons/urogi_hand"
+    },
+    "urogi_wings": {
+      "textures": "textures/icons/urogi_wings"
+    },
+    "sekido_weapon": {
+      "textures": "textures/icons/sekido_weapon"
+    },
+    "nichirin_moon": {
+      "textures": "textures/icons/nichirin_moon"
+    },
+    "haori_zenitsu": {
+      "textures": "textures/icons/haori_zenitsu"
+    },
+    "haori_zenitsu2": {
+      "textures": "textures/icons/haori_zenitsu2"
+    },
+    "boots_zenitsu": {
+      "textures": "textures/icons/boots_zenitsu"
+    },
+    "nichirin_zenitsu": {
+      "textures": "textures/icons/nichirin_zenitsu"
+    },
+    "nichirin_kaigaku": {
+      "textures": "textures/icons/nichirin_kaigaku"
+    },
+    "clothes_kaigaku": {
+      "textures": "textures/icons/clothes_kaigaku"
+    },
+    "nichirin_thunder": {
+      "textures": "textures/icons/nichirin_thunder"
+    },
+    "chigama": {
+      "textures": "textures/icons/chigama"
+    },
+    "clothes_gyutaro": {
+      "textures": "textures/icons/clothes_gyutaro"
+    },
+    "pants_gyutaro": {
+      "textures": "textures/icons/pants_gyutaro"
+    },
+    "akaza_head": {
+      "textures": "textures/icons/akaza_head"
+    },
+    "akaza_art": {
+      "textures": "textures/icons/akaza_art"
+    },
+    "akaza_clothes": {
+      "textures": "textures/icons/akaza_clothes"
+    },
+    "akaza_pants": {
+      "textures": "textures/icons/akaza_pants"
+    },
+    "kokushibo_tentacles": {
+      "textures": "textures/icons/kokushibo_tentacles"
+    },
+    "clothes_kokushibo": {
+      "textures": "textures/icons/clothes_kokushibo"
+    },
+    "kokushibo_head": {
+      "textures": "textures/icons/kokushibo_head"
+    },
+    "kokushibo_head2": {
+      "textures": "textures/icons/kokushibo_head2"
+    },
+    "nichirin_kokushibo": {
+      "textures": "textures/icons/nichirin_kokushibo"
+    },
+    "nichirin_kokushibo2": {
+      "textures": "textures/icons/nichirin_kokushibo2"
+    },
+    "nichirin_blade": {
+      "textures": "textures/icons/nichirin_blade"
+    },
+    "hakama": {
+      "textures": "textures/icons/hakama"
+    },
+    "clothes_himejima": {
+      "textures": "textures/icons/clothes_himejima"
+    },
+    "clothes_himejima2": {
+      "textures": "textures/icons/clothes_himejima2"
+    },
+    "mangual": {
+      "textures": "textures/icons/mangual"
+    },
+    "ono": {
+      "textures": "textures/icons/ono"
+    },
+    "nichirin_mitsuri": {
+      "textures": "textures/icons/nichirin_mitsuri"
+    },
+    "haori_obanai": {
+      "textures": "textures/icons/haori_obanai"
+    },
+    "haori_obanai2": {
+      "textures": "textures/icons/haori_obanai2"
+    },
+    "hebi": {
+      "textures": "textures/icons/hebi"
+    },
+    "nichirin_obanai": {
+      "textures": "textures/icons/nichirin_obanai"
+    },
+    "nichirin_normal": {
+      "textures": "textures/icons/nichirin_normal"
+    },
+    "clothes": {
+      "textures": "textures/icons/clothes"
+    },
+    "pants": {
+      "textures": "textures/icons/pants"
+    },
+    "boots_slayer": {
+      "textures": "textures/icons/boots"
+    },
+    "kekki_rui": {
+      "textures": "textures/icons/kekki_rui"
+    },
+    "clothes_rui": {
+      "textures": "textures/icons/clothes_rui"
+    },
+    "enmu_hand": {
+      "textures": "textures/icons/enmu_hand"
+    },
+    "kimono": {
+      "textures": "textures/icons/kimono"
+    },
+    "shamisen": {
+      "textures": "textures/icons/shamisen"
+    },
+    "clothes_zohakuten": {
+      "textures": "textures/icons/clothes_zohakuten"
+    },
+    "zohakuten_drum": {
+      "textures": "textures/icons/zohakuten_drum"
+    },
+    "icon_urogi": {
+      "textures": "textures/icons/icon_urogi"
+    },
+    "kekki_zoha": {
+      "textures": "textures/icons/kekki_zoha"
+    },
+    "yari": {
+      "textures": "textures/icons/yari"
+    },
+    "khakari": {
+      "textures": "textures/icons/khakari"
+    },
+    "demon": {
+      "textures": "textures/icons/demon"
+    },
+    "muzan_hat": {
+      "textures": "textures/icons/muzan_hat"
+    },
+    "muzan_hand": {
+      "textures": "textures/icons/muzan_hand"
+    },
+    "muzan_hand2": {
+      "textures": "textures/icons/muzan_hand2"
+    },
+    "muzan_tentacles": {
+      "textures": "textures/icons/muzan_tentacles"
+    },
+    "muzan_mouth": {
+      "textures": "textures/icons/muzan_mouth"
+    },
+    "tentacles_tanjiro": {
+      "textures": "textures/icons/tentacles_tanjiro"
+    },
+    "drum": {
+      "textures": "textures/icons/drum"
+    },
+    "kemari": {
+      "textures": "textures/icons/kemari"
+    },
+    "yahaba_hand": {
+      "textures": "textures/icons/yahaba_hand"
+    },
+    "vase": {
+      "textures": "textures/icons/vase"
+    },
+    "rifle": {
+      "textures": "textures/icons/rifle"
+    },
+    "sword_hairo": {
+      "textures": "textures/icons/sword_hairo"
+    },
+    "minigun": {
+      "textures": "textures/icons/minigun"
+    },
+    "wolf_head": {
+      "textures": "textures/icons/rokakko_sennkazinnrou_head"
+    },
+    "wolf_body": {
+      "textures": "textures/icons/rokakko_sennkazinnrou_body"
+    },
+    "wolf_leg": {
+      "textures": "textures/icons/rokakko_sennkazinnrou_legs"
+    },
+    "hairo_mant": {
+      "textures": "textures/icons/hairo_mant"
+    },
+    "kamanue_hand": {
+      "textures": "textures/icons/kamanue_hand"
+    },
+    "nichirin_dragon": {
+      "textures": "textures/icons/nichirin_dragon"
+    },
+    "nichirin_death": {
+      "textures": "textures/icons/nichirin_death"
+    },
+    "nichirin_gold": {
+      "textures": "textures/icons/nichirin_gold"
+    },
+    "nichirin_ice": {
+      "textures": "textures/icons/nichirin_ice"
+    },
+    "bamboo": {
+      "textures": "textures/icons/bamboo"
+    },
+    "nichirin_bamboo": {
+      "textures": "textures/icons/nichirin_bamboo"
+    },
+    "panda_helmet": {
+      "textures": "textures/icons/panda_helmet"
+    },
+    "panda_chestplate": {
+      "textures": "textures/icons/panda_chestplate"
+    },
+    "panda_leggings": {
+      "textures": "textures/icons/panda_leggings"
+    },
+    "panda_boots": {
+      "textures": "textures/icons/panda_boots"
+    },
+    "nichirin_cherry": {
+      "textures": "textures/icons/nichirin_cherry"
+    },
+    "blood": {
+      "textures": "textures/icons/blood"
+    },
+    "cura": {
+      "textures": "textures/icons/cura"
+    },
+    "carne": {
+      "textures": "textures/icons/carne"
+    },
+    "bento": {
+      "textures": "textures/icons/bento"
+    },
+    "corpo": {
+      "textures": "textures/icons/corpo"
+    },
+    "marca": {
+      "textures": "textures/icons/marca"
+    },
+    "kouse": {
+      "textures": "textures/icons/kouse"
+    },
+    "kouseki_mist": {
+      "textures": "textures/icons/kouseki_mist"
+    },
+    "sate": {
+      "textures": "textures/icons/sate"
+    },
+    "hand_demon": {
+      "textures": "textures/icons/hand_demon"
+    },
+    "daki_head": {
+      "textures": "textures/icons/daki_head"
+    },
+    "daki_head2": {
+      "textures": "textures/icons/daki_head2"
+    },
+    "gyutaro_head": {
+      "textures": "textures/icons/gyutaro_head"
+    },
+    "bag": {
+      "textures": "textures/icons/bag"
+    },
+    "saber": {
+      "textures": "textures/icons/saber"
+    },
+    "shinai": {
+      "textures": "textures/icons/shinai"
+    },
+    "demon_hend": {
+      "textures": "textures/icons/demon_hend"
+    },
+    "demon_hend2": {
+      "textures": "textures/icons/demon_hend2"
+    },
+    "transparent": {
+      "textures": "textures/icons/transparent"
+    },
+    "horns": {
+      "textures": "textures/icons/horns"
+    },
+    "demonart_zohakuten": {
+      "textures": "textures/icons/demonart_zohakuten"
+    },
+    "compass_needle": {
+      "textures": "textures/icons/compass_needle"
+    },
+    "rui_kekkijutsu": {
+      "textures": "textures/icons/rui_kekkijutsu"
+    },
+    "nichirin_infinity": {
+      "textures": "textures/icons/nichirin_infinity"
+    },
+    "blooddemonart_gyokko": {
+      "textures": "textures/icons/blooddemonart_gyokko"
+    },
+    "cure": {
+      "textures": "textures/icons/cure"
+    },
+    "book_archievement": {
+      "textures": "textures/items/book_normal"
+    },
+    "bento_icon": {
+      "textures": "textures/icons/bento"
+    },
+    "sakuramochi_icon": {
+      "textures": "textures/icons/sakuramochi"
+    },
+    "tanjiro_tentacles": {
+      "textures": "textures/icons/tanjiro_tentacles"
+    },
+    "nichirinsword_death": {
+      "textures": "textures/icons/nichirinsword_death"
+    },
+    "haori_rengokudemon": {
+      "textures": "textures/icons/haori_rengokudemon"
+    },
+    "biwa": {
+      "textures": "textures/icons/biwa"
+    },
+    "menu_kimetsu": {
+      "textures": "textures/icons/menu_kimetsu"
+    },
+    "lamina_cinza": {
+      "textures": "textures/icons/lamina_cinza"
+    },
+    "lamina_azul": {
+      "textures": "textures/icons/lamina_azul"
+    },
+    "lamina_verde": {
+      "textures": "textures/icons/lamina_verde"
+    },
+    "lamina_amarela": {
+      "textures": "textures/icons/lamina_amarela"
+    },
+    "lamina_laranja": {
+      "textures": "textures/icons/lamina_laranja"
+    },
+    "lamina_vermelha": {
+      "textures": "textures/icons/lamina_vermelha"
+    },
+    "lamina_rosa": {
+      "textures": "textures/icons/lamina_rosa"
+    },
+    "lamina_roxa": {
+      "textures": "textures/icons/lamina_roxa"
+    },
+    "lamina_branca": {
+      "textures": "textures/icons/lamina_branca"
+    },
+    "lamina_preta": {
+      "textures": "textures/icons/lamina_preta"
+    }
+  }
+}

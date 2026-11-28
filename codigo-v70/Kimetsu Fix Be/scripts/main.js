@@ -14,4 +14,6 @@ import "./blocks.js";
 import "./tamayo.js";
 import "./spawn_muzan.js";
 import "./bloodmoon.js";
+import "./spawn_noturno.js";
+import "./pergaminho_interface.js";
 import "./haganezuka.js";

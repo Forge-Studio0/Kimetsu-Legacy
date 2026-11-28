@@ -1,0 +1,33 @@
+{
+  "format_version": "1.20.30",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "kny:pergaminho_teleporte",
+      "item": {
+        "kny:pergaminho_teleporte": "q.is_owner_identifier_any('minecraft:player')"
+      },
+      "materials": {
+        "default": "entity_alphatest",
+        "enchanted": "entity_alphatest_glint"
+      },
+      "textures": {
+        "default": "textures/entity/kny_pergaminho_teleporte",
+        "enchanted": "textures/misc/enchanted_item_glint"
+      },
+      "geometry": {
+        "default": "geometry.kny.pergaminho_teleporte"
+      },
+      "animations": {
+        "segurar": "animation.kny.papeis_v86.segurar"
+      },
+      "scripts": {
+        "animate": [
+          "segurar"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.item_default"
+      ]
+    }
+  }
+}

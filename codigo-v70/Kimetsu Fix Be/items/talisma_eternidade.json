@@ -1,0 +1,21 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kny:talisma_eternidade"
+    },
+    "components": {
+      "minecraft:icon": "kny_talisma_eternidade",
+      "minecraft:display_name": {
+        "value": "§6Talismã da Eternidade"
+      },
+      "minecraft:interact_button": "Usar talismã",
+      "minecraft:max_stack_size": 1,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.1,
+        "movement_modifier": 1.0
+      },
+      "kny:usar_talisma_eternidade": {}
+    }
+  }
+}

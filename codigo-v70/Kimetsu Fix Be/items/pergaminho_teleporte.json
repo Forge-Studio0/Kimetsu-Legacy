@@ -1,0 +1,15 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kny:pergaminho_teleporte"
+    },
+    "components": {
+      "minecraft:display_name": { "value": "§6Pergaminho de Teletransporte" },
+      "minecraft:icon": "kny_pergaminho_teleporte",
+      "minecraft:max_stack_size": 1,
+      "minecraft:interact_button": "Abrir pergaminho",
+      "kny:abrir_pergaminho": {}
+    }
+  }
+}
