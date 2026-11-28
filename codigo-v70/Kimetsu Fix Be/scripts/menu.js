@@ -9,6 +9,7 @@ import {
 } from "./hybrid_mastery.js";
 import { limparTreinosDaForma, textoTreinoDaForma } from "./treino_respiracao.js";
 import { apresentarEditor } from "./character_editor.js";
+import { retornoPendente, sairEstudio } from "./character_studio.js";
 import { edicaoInicialDisponivel, prepararAparenciaInicial } from "./character_system.js";
 import { garantirItemMenu } from "./menu_item.js";
 import "./character_admin.js";
@@ -294,6 +295,7 @@ function abrirSessaoMenu(p, acao, podeAguardar = false) {
 function pedirAbertura(p, classico = false, automatico = false) {
   if (!p?.isValid || (automatico && menuAbertoNestaEntrada.has(p.id))) return;
   const abriu = abrirSessaoMenu(p, async () => {
+    if (retornoPendente(p) && !await sairEstudio(p)) return;
     if (classico) p.addTag(TAG_CLASSICO);
     // A inicialização nativa pode terminar depois de chegar o evento de login
     // ou o primeiro uso do item. Dê tempo para ela registrar a oportunidade.
@@ -304,7 +306,7 @@ function pedirAbertura(p, classico = false, automatico = false) {
     if (!jaEscolheu(p)) prepararAparenciaInicial(p);
     const editar = edicaoInicialDisponivel(p);
     if (editar) await apresentarEditor(p);
-    if (!p.isValid || p.hasTag("kny_caido") || edicaoInicialDisponivel(p)) return;
+    if (!p.isValid || p.hasTag("kny_caido") || edicaoInicialDisponivel(p) || retornoPendente(p)) return;
     if (!jaEscolheu(p)) return escolha(p);
     if (!editar && !automatico) return menuPrincipal(p);
   }, true);
@@ -731,18 +733,25 @@ async function menuClassico(p) {
   if (acao === "cargo") return alterarCargo(p);
 }
 
-async function guiaEAcessos(p) {
-  const f = novoForm(p).title("§lGUIA E ACESSOS").button(TXT_VOLTAR).button("Como jogar").button("Acessos de facção");
-  const acoes = [() => menuPrincipal(p), () => comoJogar(p), () => menuAcessos(p)];
+async function guiaEAcessos(p, classico = p.hasTag(TAG_CLASSICO)) {
+  const f = classico ? novoForm(p).title("§lGUIA E ACESSOS")
+    : new ActionFormData().title(MARCA_CONF + "§lGUIA E ACESSOS").body(" ");
+  const acoes = [];
+  const add = (prefixo, texto, acao) => {
+    f.button(classico ? texto : prefixo + texto);
+    acoes.push(acao);
+  };
+  add("B:", TXT_VOLTAR, () => menuPrincipal(p));
+  add("L:", "Como jogar", () => comoJogar(p));
+  add("L:", "Acessos de facção", () => menuAcessos(p));
   if (ehCacadorHumano(p)) {
-    f.button("Domínio humano");
-    acoes.push(() => menuDominio(p));
+    add("L:", "Domínio humano", () => menuDominio(p));
   }
   if (ehStaff(p)) {
-    f.button("Configurar Castelo Infinito");
-    acoes.push(() => menuCasteloStaff(p));
+    add("L:", "Configurar Castelo Infinito", () => menuCasteloStaff(p));
   }
   const r = await mostrar(f, p);
+  if (r.canceled && r.cancelationReason === undefined && !classico) return guiaEAcessos(p, true);
   if (!r.canceled) return acoes[r.selection]?.();
 }
 

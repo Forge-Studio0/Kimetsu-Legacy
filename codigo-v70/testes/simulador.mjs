@@ -3,6 +3,7 @@ const jogadores = new Map();
 const depois = [];
 const intervalos = [];
 const mundoDinamico = new Map();
+const dimensoes = new Map();
 export const InputPermissionCategory = { LateralMovement: 4, Sneak: 5, Jump: 6, Mount: 7, Dismount: 8 };
 
 function sinais() {
@@ -32,6 +33,10 @@ export const world = {
   getDynamicProperty(id) { return mundoDinamico.get(id); },
   setDynamicProperty(id, value) { mundoDinamico.set(id, value); },
   getDynamicPropertyIds() { return [...mundoDinamico.keys()]; },
+  getDimension(id) {
+    if (!dimensoes.has(id)) dimensoes.set(id, { id, isChunkLoaded: () => true, runCommand() {} });
+    return dimensoes.get(id);
+  },
   getPlayers(opts) {
     return [...jogadores.values()].filter((p) => p.isValid && (!opts?.name || p.name === opts.name));
   },

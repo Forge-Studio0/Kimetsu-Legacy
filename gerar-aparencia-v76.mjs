@@ -406,8 +406,6 @@ for (const [i, campos] of CANAIS.entries()) {
 inserir("texturas", '"textures": {', pares(texturas));
 inserir("geometrias", '"geometry": {', pares(geometrias));
 inserir("canais", '"pre_animation": [', molang.map((s) => JSON.stringify(s) + ","));
-inserir("render", '"render_controllers":[', Object.entries(ativacoes).map(([id, cond]) =>
-  JSON.stringify({ [id]: "(query.is_local_player || !query.property('kny:cc_edicao')) && (" + cond + ")" }) + ","
-));
+inserir("render", '"render_controllers":[', Object.entries(ativacoes).map(([id, cond]) => JSON.stringify({ [id]: cond }) + ","));
 gravar(cliente, arquivo);
 console.log("Oficina gerada com " + modelos.length + " geometrias, " + Object.keys(texturas).length + " texturas de entidade e " + Object.keys(controladores).length + " camadas.");

@@ -3,6 +3,7 @@ import { ActionFormData } from "@minecraft/server-ui";
 import { CAMPOS, CATEGORIAS, VISUAL_PADRAO, opcaoDe } from "./character_config.js";
 import { atualizarCamera } from "./character_camera.js";
 import { liberarCriacao, protegerCriacao } from "./character_protection.js";
+import { entrarEstudio, sairEstudio } from "./character_studio.js";
 import {
   definirVisual, edicaoInicialDisponivel, encerrarEdicao, indisponivel, iniciarEdicao, lerCatalogo,
   opcaoPermitida, salvarEdicao, sessaoAtual, sessaoSegura, usarRetrato,
@@ -169,7 +170,22 @@ export async function apresentarEditor(p) {
       estilizada = false;
       continue;
     }
-    if (!resposta.canceled && resposta.selection === 0) await abrirEditor(p);
+    if (!resposta.canceled && resposta.selection === 0) {
+      while (p.isValid && edicaoInicialDisponivel(p) && indisponivel(p)) await espera(20);
+      if (!p.isValid || !edicaoInicialDisponivel(p)) return;
+      try {
+        const entrou = await entrarEstudio(p, () => edicaoInicialDisponivel(p) && !indisponivel(p));
+        if (entrou) {
+          await espera(3);
+          await abrirEditor(p);
+        } else if (p.isValid) p.sendMessage("§eO estúdio está indisponível. Use o Menu Kimetsu para tentar novamente.");
+      } catch (e) {
+        console.warn("[Estúdio] Entrada: " + e);
+        if (p.isValid) p.sendMessage("§eO estúdio está indisponível. Use o Menu Kimetsu para tentar novamente.");
+      } finally {
+        await sairEstudio(p);
+      }
+    }
     return;
   }
 }

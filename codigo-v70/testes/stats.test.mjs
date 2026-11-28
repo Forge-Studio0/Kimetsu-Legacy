@@ -27,7 +27,7 @@ await carregar("hud_painel.js");
 const { ATR, ATRIBUTOS, HIBRIDO_SUPERIOR, REI_ONI, PATENTES, POR_PATENTE, CUSTOS, NIVEL_MAXIMO, LIMITE_SALDO } = c;
 
 const componentesMenu = new Map();
-system.beforeEvents.startup.emit({
+system.beforeEvents.startup.emit({ dimensionRegistry: { registerCustomDimension() {} },
   itemComponentRegistry: {
     registerCustomComponent(id, component) { componentesMenu.set(id, component); },
   },

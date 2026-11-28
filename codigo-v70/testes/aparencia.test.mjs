@@ -101,6 +101,31 @@ test("o primeiro acesso abre a aparência sozinho, guarda pele, cabelo e olhos e
   assert.throws(() => iniciarEdicao(p), /somente na primeira entrada/);
 });
 
+test("o estúdio separa dois jogadores e recupera a origem depois de reconectar", async () => {
+  const { entrarEstudio, sairEstudio } = await carregar("character_studio");
+  const a = novo();
+  const b = novo();
+  a.location = { x: 17, y: 74, z: -35 };
+  const origem = { ...a.location };
+  assert.equal(await entrarEstudio(a, () => true), true);
+  assert.equal(await entrarEstudio(b, () => true), true);
+  assert.equal(a.dimension.id, "kny:estudio");
+  assert.equal(b.dimension.id, "kny:estudio");
+  assert.ok(Math.hypot(a.location.x - b.location.x, a.location.z - b.location.z) >= 4096);
+  a.desconectar();
+  const retorno = jogador(a.name, a.dinamicos);
+  retorno.dimension = a.dimension;
+  retorno.location = a.location;
+  retorno.addTag("start");
+  retorno.addTag("slayer");
+  entrar(retorno);
+  await executarAgendados();
+  assert.equal(retorno.dimension.id, "minecraft:overworld");
+  assert.deepEqual(retorno.location, origem);
+  assert.equal(retorno.getDynamicProperty("kny:criacao_origem"), undefined);
+  assert.equal(await sairEstudio(b), true);
+});
+
 test("trocar de dimensão limpa a proteção da edição e devolve os controles", async () => {
   const p = novo();
   let devolver;

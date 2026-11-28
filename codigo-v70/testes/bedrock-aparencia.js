@@ -8,7 +8,7 @@ const CAMERA = "kny:aparencia_camera";
 const CHECKPOINT = "kny:teste_v78_ficha";
 const MENU = "kny:menu_kimetsu";
 const LIVRO = "kny:book_archievement";
-const log = (s) => console.warn("KNY-TEST ENTRADA V79 " + s);
+const log = (s) => console.warn("KNY-TEST ENTRADA V80 " + s);
 const ok = (cond, msg) => { if (!cond) throw new Error(msg); };
 const eq = (a, b, msg) => ok(a === b, msg + " (" + a + " × " + b + ")");
 const canais = (p, props) => props.map((k) => p.getProperty(k)).join(",");
@@ -47,7 +47,10 @@ function interceptarFormularios() {
     }
     if (tela.titulo.startsWith("kny_edit|§") && plano.testarProtecao) {
       plano.testarProtecao = false;
-      return testarProtecao(p).then(() => selecionar(plano, tela));
+      return testarProtecao(p).then(() => selecionar(plano, tela)).catch((erro) => {
+        console.error("KNY-TEST FALHA ISOLAMENTO " + erro);
+        throw erro;
+      });
     }
     return selecionar(plano, tela);
   };
@@ -62,6 +65,15 @@ function selecionar(plano, tela) {
 }
 
 async function testarProtecao(p) {
+  eq(p.dimension.id, "kny:estudio", "a edição ocorre fora do mundo público");
+  const participantes = () => p.dimension.getPlayers().filter((j) => j.id !== p.id);
+  for (let i = 0; i < 15 && participantes().length === 0; i++) await wait(3);
+  const outros = participantes();
+  ok(outros.length > 0 && outros.every((j) => Math.hypot(j.location.x - p.location.x, j.location.z - p.location.z) >= 4000),
+    "personalizações simultâneas estão em plataformas separadas");
+  ok(world.getDimension("overworld").getPlayers().length > 0, "há observadores no mundo público");
+  ok(!p.dimension.getPlayers({ location: p.location, maxDistance: 768 }).some((j) => j.id !== p.id),
+    "nenhum outro jogador próximo do estúdio");
   await wait(2);
   const movimento = InputPermissionCategory.LateralMovement;
   eq(p.inputPermissions.isPermissionCategoryEnabled(movimento), false, "movimento bloqueado durante o painel");
@@ -161,7 +173,7 @@ async function run() {
     },
   });
   escolhas.testarProtecao = true;
-  await wait(125);
+  await wait(165);
 
   eq(novo.getDynamicProperty(CHAVE_ENTRADA), "v78", "função nativa reservou a primeira entrada");
   eq(escolhas.acoes.length, 0, "ações de edição e contrato executadas");
@@ -179,12 +191,13 @@ async function run() {
   eq(visual.olhoE, "ciano", "cor dos olhos");
   eq(canais(novo, PROP_APARENCIA), codificarVisual(visual).join(","), "canais nativos do visual confirmado");
   eq(novo.getDynamicProperty(CAMERA), undefined, "câmera restaurada ao confirmar");
+  eq(novo.dimension.id, "minecraft:overworld", "voltou ao mundo antes do contrato");
   eq(novo.getProperty("kny:cc_edicao"), false, "visibilidade restaurada");
   eq(novo.inputPermissions.isPermissionCategoryEnabled(InputPermissionCategory.LateralMovement), true, "controle restaurado");
   eq(slotsMenu(visita).length, 1, "duas cópias preexistentes viraram uma");
-  ok(fechado.telas[1]?.titulo.startsWith("kny_edit|R"), "sala fechada recebe o painel com retrato");
+  ok(fechado.telas.some((tela) => tela.titulo.startsWith("kny_edit|R")), "sala fechada recebe o painel com retrato");
   ok(!fechado.telas.some((tela) => tela.titulo.startsWith("kny_ctr|")), "contrato aguardando durante a tela ocupada");
-  log("câmera em área aberta, painel com retrato em espaço fechado e item único no login");
+  log("estúdios privados, retorno ao mundo e item único no login");
 
   eq(slotsMenu(cheio).length, 0, "inventário cheio sem item");
   eq(cheio.dimension.getEntities({ type: "minecraft:item", location: cheio.location, maxDistance: 2 }).length, 0, "sem item largado no chão");
@@ -211,15 +224,19 @@ async function run() {
   ok(lerAparencia(legado).perfis.base.peleIntegral, "ficha recuperada salva");
 
   for (let i = 0; i < 16 && !fechado.telas.at(-1)?.titulo.startsWith("kny_ctr|"); i++) await wait(12);
-  eq(fechado.telas.filter((t) => t.titulo.startsWith("kny_edit|R")).length, 11, "dez bloqueios e exibição do editor");
+  eq(fechado.telas.filter((t) => t.titulo.startsWith("kny_edit|")).length, 11, "dez bloqueios e exibição do editor");
   ok(fechado.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "só abriu contrato quando a escolha terminou");
+  eq(visita.dimension.id, "minecraft:overworld", "voltou ao mundo ao cancelar");
   eq(visita.getDynamicProperty(CHAVE_VISUAL), undefined, "cancelamento preservou a ficha");
   eq(canais(visita, PROP_RASCUNHO), "-1,-1,-1", "rascunho descartado");
   log("dez tentativas com tela ocupada e recuperação controlada da v77");
 
+  escolhas.acoes.push("Guia");
   await usarMenu(novo);
   await usarMenu(visita);
-  ok(escolhas.telas.at(-1)?.titulo.startsWith("kny_painel|"), "item abre painel normal depois do contrato");
+  ok(escolhas.telas.some((tela) => tela.titulo.startsWith("kny_painel|")), "item abre painel normal depois do contrato");
+  eq(escolhas.telas.at(-1)?.titulo, "kny_conf|§lGUIA E ACESSOS", "Guia usa a moldura do Kimetsu");
+  ok(escolhas.telas.at(-1)?.botoes.includes("L:Acessos de facção"), "Guia mantém os acessos");
   ok(fechado.telas.at(-1)?.titulo.startsWith("kny_ctr|"), "item reabre apenas o contrato");
   let bloqueou = false;
   try { iniciarEdicao(novo); } catch { bloqueou = true; }
