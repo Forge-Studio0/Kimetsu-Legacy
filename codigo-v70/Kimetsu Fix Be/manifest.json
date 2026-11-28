@@ -14,7 +14,7 @@
 		}
 	},
 	"header": {
-		"name": "Kimetsu Survival Craft Be",
+		"name": "Kimetsu Survival Craft Be v83",
 		"description": "addon expirada no Mod de Pc",
 		"min_engine_version": [
 			1,
@@ -25,7 +25,7 @@
 		"version": [
 			1,
 			0,
-			64
+			65
 		]
 	},
 	"modules": [
@@ -56,7 +56,7 @@
 			"version": [
 				1,
 				0,
-				64
+				65
 			]
 		},
 		{
